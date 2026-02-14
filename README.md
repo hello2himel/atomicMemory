@@ -52,12 +52,6 @@ Access the live version: [atomicmemory.netlify.app](https://atomicmemory.netlify
 
 ---
 
-## Screenshots
-
-*(Optional: Add screenshots or GIFs to show the UI and intro overlay.)*
-
----
-
 ## Technologies Used
 
 - HTML5, CSS3, Vanilla JavaScript
