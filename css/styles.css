@@ -2298,6 +2298,31 @@ body {
   border-color: var(--border-hover);
 }
 
+/* Info Modal */
+.info-modal-body {
+  text-align: center;
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.info-modal-body p {
+  font-size: 16px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.info-modal-body a {
+  color: var(--accent-primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.info-modal-body a:hover {
+  text-decoration: underline;
+}
+
 /* ===== FOOTER ===== */
 .footer {
   padding: var(--space-lg);

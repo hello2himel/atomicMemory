@@ -68,6 +68,8 @@ const mobileSetupScreen = document.getElementById('mobileSetupScreen');
 const completeModal = document.getElementById('completeModal');
 const playAgainBtn = document.getElementById('playAgainBtn');
 const shareScoreBtn = document.getElementById('shareScoreBtn');
+const infoModal = document.getElementById('infoModal');
+const closeInfoBtn = document.getElementById('closeInfoBtn');
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -175,6 +177,9 @@ function setupEventListeners() {
   achievementsBtn.addEventListener('click', openAchievementsModal);
   closeAchievementsBtn.addEventListener('click', () => closeModal(achievementsModal));
   
+  // Info modal
+  closeInfoBtn.addEventListener('click', () => closeModal(infoModal));
+  
   // Mobile menu
   menuBtn.addEventListener('click', openMobileMenu);
   closeMobileMenu.addEventListener('click', () => mobileMenu.classList.add('hidden'));
@@ -227,14 +232,14 @@ function setupEventListeners() {
   shareScoreBtn.addEventListener('click', shareScore);
   
   // Close modals on overlay click
-  [historyModal, leaderboardModal, achievementsModal, completeModal].forEach(modal => {
+  [historyModal, leaderboardModal, achievementsModal, completeModal, infoModal].forEach(modal => {
     modal.querySelector('.modal-overlay')?.addEventListener('click', () => closeModal(modal));
   });
   
   // Close modals on Escape key
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      [historyModal, leaderboardModal, achievementsModal, completeModal].forEach(modal => {
+      [historyModal, leaderboardModal, achievementsModal, completeModal, infoModal].forEach(modal => {
         if (!modal.classList.contains('hidden')) {
           closeModal(modal);
         }
@@ -1136,6 +1141,10 @@ function closeModal(modal) {
   modal.classList.add('hidden');
 }
 
+function openInfoModal() {
+  infoModal.classList.remove('hidden');
+}
+
 function openHistoryModal() {
   loadHistory();
   historyModal.classList.remove('hidden');
@@ -1468,9 +1477,7 @@ function showMobileSetupScreen() {
     const icon = screen.querySelector('#setupThemeBtn i');
     icon.className = document.body.dataset.theme === 'dark' ? 'ri-sun-line' : 'ri-moon-line';
   });
-  screen.querySelector('#setupInfoBtn').addEventListener('click', () => {
-    alert('Made with ❤️ by @hello2himel from 🇧🇩\n\nThis is an open source software.\nhttps://github.com/hello2himel/atomicmemory');
-  });
+  screen.querySelector('#setupInfoBtn').addEventListener('click', openInfoModal);
   
   updateMobileSetupSelectors();
   renderSetupPreviewTable();
@@ -1560,27 +1567,7 @@ function renderSetupPreviewTable() {
     }
   }
   
-  // Build layout (same as renderMiniTable)
-  const layout = [];
-  layout.push(1);
-  for (let i = 0; i < 16; i++) layout.push('spacer');
-  layout.push(2);
-  layout.push(3, 4);
-  for (let i = 0; i < 10; i++) layout.push('spacer');
-  for (let i = 5; i <= 10; i++) layout.push(i);
-  layout.push(11, 12);
-  for (let i = 0; i < 10; i++) layout.push('spacer');
-  for (let i = 13; i <= 18; i++) layout.push(i);
-  for (let i = 19; i <= 54; i++) layout.push(i);
-  layout.push(55, 56, 'placeholder');
-  for (let i = 72; i <= 86; i++) layout.push(i);
-  layout.push(87, 88, 'placeholder');
-  for (let i = 104; i <= 118; i++) layout.push(i);
-  for (let i = 0; i < 18; i++) layout.push('spacer');
-  layout.push('spacer', 'spacer', 'label');
-  for (let i = 57; i <= 71; i++) layout.push(i);
-  layout.push('spacer', 'spacer', 'label');
-  for (let i = 89; i <= 103; i++) layout.push(i);
+  const layout = getMiniTableLayout();
   
   layout.forEach(item => {
     if (item === 'spacer' || item === 'label' || item === 'placeholder') {
@@ -1657,50 +1644,36 @@ function findFirstActiveElement() {
   return elements[0] || null;
 }
 
+function getMiniTableLayout() {
+  const layout = [];
+  layout.push(1);
+  for (let i = 0; i < 16; i++) layout.push('spacer');
+  layout.push(2);
+  layout.push(3, 4);
+  for (let i = 0; i < 10; i++) layout.push('spacer');
+  for (let i = 5; i <= 10; i++) layout.push(i);
+  layout.push(11, 12);
+  for (let i = 0; i < 10; i++) layout.push('spacer');
+  for (let i = 13; i <= 18; i++) layout.push(i);
+  for (let i = 19; i <= 54; i++) layout.push(i);
+  layout.push(55, 56, 'placeholder');
+  for (let i = 72; i <= 86; i++) layout.push(i);
+  layout.push(87, 88, 'placeholder');
+  for (let i = 104; i <= 118; i++) layout.push(i);
+  for (let i = 0; i < 18; i++) layout.push('spacer');
+  layout.push('spacer', 'spacer', 'label');
+  for (let i = 57; i <= 71; i++) layout.push(i);
+  layout.push('spacer', 'spacer', 'label');
+  for (let i = 89; i <= 103; i++) layout.push(i);
+  return layout;
+}
+
 function renderMiniTable() {
   const miniTable = document.getElementById('miniPeriodicTable');
   if (!miniTable) return;
   miniTable.innerHTML = '';
   
-  // Build the same layout as renderPeriodicTable()
-  const layout = [];
-  
-  // Period 1: H (1), 16 spacers, He (2)
-  layout.push(1);
-  for (let i = 0; i < 16; i++) layout.push('spacer');
-  layout.push(2);
-  
-  // Period 2: Li (3), Be (4), 10 spacers, B-Ne (5-10)
-  layout.push(3, 4);
-  for (let i = 0; i < 10; i++) layout.push('spacer');
-  for (let i = 5; i <= 10; i++) layout.push(i);
-  
-  // Period 3: Na (11), Mg (12), 10 spacers, Al-Ar (13-18)
-  layout.push(11, 12);
-  for (let i = 0; i < 10; i++) layout.push('spacer');
-  for (let i = 13; i <= 18; i++) layout.push(i);
-  
-  // Periods 4-5: K-Xe (19-54)
-  for (let i = 19; i <= 54; i++) layout.push(i);
-  
-  // Period 6: Cs (55), Ba (56), placeholder, Hf-At (72-86)
-  layout.push(55, 56, 'placeholder');
-  for (let i = 72; i <= 86; i++) layout.push(i);
-  
-  // Period 7: Fr (87), Ra (88), placeholder, Rf-Og (104-118)
-  layout.push(87, 88, 'placeholder');
-  for (let i = 104; i <= 118; i++) layout.push(i);
-  
-  // Spacer row
-  for (let i = 0; i < 18; i++) layout.push('spacer');
-  
-  // Lanthanides: 2 spacers, label, La-Lu (57-71)
-  layout.push('spacer', 'spacer', 'label');
-  for (let i = 57; i <= 71; i++) layout.push(i);
-  
-  // Actinides: 2 spacers, label, Ac-Lr (89-103)
-  layout.push('spacer', 'spacer', 'label');
-  for (let i = 89; i <= 103; i++) layout.push(i);
+  const layout = getMiniTableLayout();
   
   // Build mini cells
   layout.forEach(item => {
