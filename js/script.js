@@ -597,6 +597,7 @@ function handleElementClick(e) {
   if (!element || element.classList.contains('placeholder')) return;
   if (element.classList.contains('disabled')) return;
   if (element.classList.contains('correct')) return;
+  if (viewTableBtn.classList.contains('viewing')) return;
   if (!state.activeElements.has(parseInt(element.dataset.atomic))) return;
   
   if (state.isMobile) {
@@ -1439,7 +1440,7 @@ function showMobileSetupScreen() {
   screen.innerHTML = `
     <div class="mobile-setup-header">
       <div class="mobile-setup-logo-row">
-        <img src="res/logo.svg" alt="AtomicMemory" class="mobile-setup-logo">
+        <img src="res/logo.png" alt="AtomicMemory" class="mobile-setup-logo">
         <div class="mobile-setup-title">AtomicMemory</div>
       </div>
       <div class="mobile-setup-subtitle">Configure your challenge</div>
