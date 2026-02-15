@@ -164,3 +164,77 @@
     }, 600);
   });
 })();
+
+// Logo Grid Animation (nav header mini periodic table)
+(function() {
+  var LOGO_COLORS = ['#ef4444', '#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6', '#06b6d4', '#eab308', '#f97316', '#84cc16'];
+
+  // Original colors for each cell (matches HTML inline styles)
+  var ORIGINAL_COLORS = [
+    '#ef4444', null, null, null, '#ec4899',
+    '#ef4444', '#f97316', null, null, '#10b981',
+    '#3b82f6', '#8b5cf6', '#06b6d4', '#eab308', '#ec4899',
+    null, '#f59e0b', '#84cc16', '#3b82f6', null
+  ];
+
+  var logoGrid = document.querySelector('.logo-grid');
+  if (!logoGrid) return;
+
+  var cells = logoGrid.querySelectorAll('.lg-cell');
+  if (!cells.length) return;
+
+  var animId = null;
+
+  function runLogoAnimation() {
+    // Phase 1: Random flashes
+    var flashCount = 0;
+    var maxFlashes = 15;
+
+    function scheduleFlash() {
+      if (flashCount >= maxFlashes) {
+        // Phase 2: Settle back to original colors
+        animId = setTimeout(function() {
+          var allSpans = logoGrid.querySelectorAll('.lg-cell, .lg-empty');
+          var cellIdx = 0;
+          allSpans.forEach(function(span, i) {
+            if (span.classList.contains('lg-cell')) {
+              // Find this cell's index among lg-cell elements
+              var origColor = null;
+              var ci = 0;
+              var allChildren = logoGrid.children;
+              for (var j = 0; j < allChildren.length; j++) {
+                if (allChildren[j] === span) {
+                  origColor = ORIGINAL_COLORS[j];
+                  break;
+                }
+              }
+              if (origColor) {
+                span.style.background = origColor;
+              }
+            }
+          });
+          // Wait then restart cycle
+          animId = setTimeout(runLogoAnimation, 2000);
+        }, 200);
+        return;
+      }
+      flashCount++;
+      animId = setTimeout(function() {
+        var cell = cells[Math.floor(Math.random() * cells.length)];
+        var color = LOGO_COLORS[Math.floor(Math.random() * LOGO_COLORS.length)];
+        cell.style.background = color;
+        scheduleFlash();
+      }, Math.random() * 150 + 50);
+    }
+
+    scheduleFlash();
+  }
+
+  // Start after a brief delay (after intro transition)
+  var started = false;
+  document.getElementById('startBtn').addEventListener('click', function() {
+    if (started) return;
+    started = true;
+    setTimeout(runLogoAnimation, 800);
+  });
+})();
