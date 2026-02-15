@@ -2258,10 +2258,6 @@ body {
     gap: var(--space-xl);
   }
   
-  .score-section {
-    display: none;
-  }
-  
   .inline-stats {
     display: none;
   }
