@@ -703,9 +703,12 @@ function handleMobileSubmit() {
 
 function formatSymbolInput(input) {
   const val = input.value;
+  if (!val) return;
+  const pos = input.selectionStart;
   const formatted = val.charAt(0).toUpperCase() + val.slice(1).toLowerCase();
   if (input.value !== formatted) {
     input.value = formatted;
+    input.setSelectionRange(pos, pos);
   }
 }
 
