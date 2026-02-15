@@ -1,3 +1,9 @@
+// Element lookup map for O(1) access by atomic number
+const ELEMENTS_MAP = {};
+if (typeof ELEMENTS !== 'undefined') {
+  ELEMENTS.forEach(el => { ELEMENTS_MAP[el.atomicNumber] = el; });
+}
+
 // State
 const state = {
   navigationMode: 'period',
@@ -1526,7 +1532,7 @@ function renderMiniTable() {
       cell.dataset.atomic = item;
       
       // Color by category
-      const elData = ELEMENTS.find(e => e.atomicNumber === item);
+      const elData = ELEMENTS_MAP[item];
       if (elData) {
         cell.style.background = getCategoryColor(elData.category);
         cell.style.borderColor = getCategoryColor(elData.category);
@@ -1587,7 +1593,7 @@ function updateMiniTable(atomicNumber, status) {
     // Flash red then revert
     setTimeout(() => {
       cell.classList.remove('mini-incorrect');
-      const elData = ELEMENTS.find(e => e.atomicNumber === atomicNumber);
+      const elData = ELEMENTS_MAP[atomicNumber];
       if (elData && !state.correctElements.has(atomicNumber)) {
         cell.style.background = getCategoryColor(elData.category);
         cell.style.borderColor = getCategoryColor(elData.category);
@@ -1614,7 +1620,7 @@ function updateMobileInputForElement(element) {
   updateMiniTable(parseInt(element.dataset.atomic), 'current');
   updateMobileStats();
   
-  setTimeout(() => mobileInput.focus(), 50);
+  setTimeout(() => mobileInput.focus(), 100);
 }
 
 function updateMobileStats() {
