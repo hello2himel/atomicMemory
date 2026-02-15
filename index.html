@@ -63,13 +63,41 @@
 
   <!-- Main App -->
   <div id="mainApp" class="main-app hidden">
-    <!-- Header -->
+    <!-- Unified Top Bar -->
     <header class="header">
       <div class="header-left">
         <img src="res/logo.svg" alt="AtomicMemory" class="logo">
-        <div class="header-title-group">
-          <h1 class="site-title">AtomicMemory</h1>
-          <span class="header-subtitle">Score Attack Mode</span>
+        <h1 class="site-title">AtomicMemory</h1>
+        <span id="currentRank" class="rank-badge">Novice</span>
+      </div>
+      <div class="header-center">
+        <div class="inline-stats">
+          <div class="inline-stat" title="Score">
+            <span class="inline-stat-value score-value-wrapper">
+              <span id="currentScore" class="inline-score">0</span>
+              <div id="scoreChangeIndicator" class="score-change"></div>
+            </span>
+          </div>
+          <span class="stat-divider"></span>
+          <div class="inline-stat" title="Time">
+            <i class="ri-timer-line" aria-hidden="true"></i>
+            <span id="timerDisplay" class="inline-stat-value">00:00</span>
+          </div>
+          <span class="stat-divider"></span>
+          <div class="inline-stat" title="Progress">
+            <i class="ri-check-double-line" aria-hidden="true"></i>
+            <span class="inline-stat-value"><span id="correctCount">0</span>/<span id="totalCount">118</span></span>
+          </div>
+          <span class="stat-divider"></span>
+          <div class="inline-stat" title="Streak">
+            <i class="ri-fire-line" aria-hidden="true"></i>
+            <span id="streakDisplay" class="inline-stat-value">0</span>
+          </div>
+          <span class="stat-divider"></span>
+          <div class="inline-stat" title="Accuracy">
+            <i class="ri-percent-line" aria-hidden="true"></i>
+            <span id="accuracyDisplay" class="inline-stat-value">100%</span>
+          </div>
         </div>
       </div>
       <div class="header-right">
@@ -92,6 +120,11 @@
       </div>
     </header>
 
+    <!-- Progress Bar -->
+    <div class="progress-bar-container">
+      <div id="progressFill" class="progress-fill"></div>
+    </div>
+
     <!-- Mobile Menu Overlay -->
     <div id="mobileMenu" class="mobile-menu hidden">
       <div class="mobile-menu-content">
@@ -112,115 +145,37 @@
       <!-- content will be populated by JS -->
     </div>
 
-    <!-- Score Display (Prominent) -->
-    <div class="score-section">
-      <div class="score-main">
-        <div class="score-label">
-          <i class="ri-star-line"></i>
-          Current Score
-        </div>
-        <div class="score-value-wrapper">
-          <span id="currentScore" class="score-value">0</span>
-          <div id="scoreChangeIndicator" class="score-change"></div>
-        </div>
-        <div class="score-rank">
-          <span id="currentRank" class="rank-badge">Novice</span>
-          <span id="scoreProgress" class="score-progress-text">Start typing to score!</span>
-        </div>
-      </div>
-      
-      <div class="score-stats-grid">
-        <div class="mini-stat">
-          <div class="mini-stat-icon timer-icon">
-            <i class="ri-timer-line"></i>
-          </div>
-          <div class="mini-stat-content">
-            <div class="mini-stat-label">Time</div>
-            <div class="mini-stat-value" id="timerDisplay">00:00</div>
-          </div>
-        </div>
-
-        <div class="mini-stat">
-          <div class="mini-stat-icon progress-icon">
-            <i class="ri-check-double-line"></i>
-          </div>
-          <div class="mini-stat-content">
-            <div class="mini-stat-label">Progress</div>
-            <div class="mini-stat-value">
-              <span id="correctCount">0</span>/<span id="totalCount">118</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="mini-stat">
-          <div class="mini-stat-icon streak-icon">
-            <i class="ri-fire-line"></i>
-          </div>
-          <div class="mini-stat-content">
-            <div class="mini-stat-label">Streak</div>
-            <div class="mini-stat-value" id="streakDisplay">0</div>
-          </div>
-        </div>
-
-        <div class="mini-stat">
-          <div class="mini-stat-icon accuracy-icon">
-            <i class="ri-percent-line"></i>
-          </div>
-          <div class="mini-stat-content">
-            <div class="mini-stat-label">Accuracy</div>
-            <div class="mini-stat-value" id="accuracyDisplay">100%</div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="progress-bar-container">
-        <div id="progressFill" class="progress-fill"></div>
-      </div>
-    </div>
-
-    <!-- Quick Settings Bar -->
+    <!-- Slim Control Bar -->
     <div class="quick-settings">
       <div class="settings-left">
-        <div class="setting-group">
-          <label class="setting-label">
-            <i class="ri-gamepad-line"></i>
-            Mode
-          </label>
-          <div class="mode-tabs">
-            <button class="mode-tab active" data-mode="full" title="All 118 elements">
-              <i class="ri-table-2"></i>
-              <span>Full</span>
-            </button>
-            <button class="mode-tab" data-mode="block" title="Practice by blocks">
-              <i class="ri-shapes-line"></i>
-              <span>Blocks</span>
-            </button>
-            <button class="mode-tab" data-mode="group" title="Practice by groups">
-              <i class="ri-layout-column-line"></i>
-              <span>Groups</span>
-            </button>
-            <button class="mode-tab" data-mode="period" title="Practice by periods">
-              <i class="ri-layout-row-line"></i>
-              <span>Periods</span>
-            </button>
-          </div>
+        <div class="mode-tabs">
+          <button class="mode-tab active" data-mode="full" title="All 118 elements">
+            <i class="ri-table-2"></i>
+            <span>Full</span>
+          </button>
+          <button class="mode-tab" data-mode="block" title="Practice by blocks">
+            <i class="ri-shapes-line"></i>
+            <span>Blocks</span>
+          </button>
+          <button class="mode-tab" data-mode="group" title="Practice by groups">
+            <i class="ri-layout-column-line"></i>
+            <span>Groups</span>
+          </button>
+          <button class="mode-tab" data-mode="period" title="Practice by periods">
+            <i class="ri-layout-row-line"></i>
+            <span>Periods</span>
+          </button>
         </div>
 
-        <div class="setting-group">
-          <label class="setting-label">
-            <i class="ri-compass-3-line"></i>
-            Navigation
-          </label>
-          <div class="nav-toggle">
-            <button class="nav-option active" data-nav="period" title="Move horizontally">
-              <i class="ri-arrow-right-line"></i>
-              <span>Horizontal</span>
-            </button>
-            <button class="nav-option" data-nav="group" title="Move vertically">
-              <i class="ri-arrow-down-line"></i>
-              <span>Vertical</span>
-            </button>
-          </div>
+        <div class="nav-toggle">
+          <button class="nav-option active" data-nav="period" title="Move horizontally">
+            <i class="ri-arrow-right-line"></i>
+            <span>Horizontal</span>
+          </button>
+          <button class="nav-option" data-nav="group" title="Move vertically">
+            <i class="ri-arrow-down-line"></i>
+            <span>Vertical</span>
+          </button>
         </div>
       </div>
 
