@@ -348,6 +348,32 @@ body {
   transform: rotate(5deg) scale(1.05);
 }
 
+/* Logo Grid - Mini periodic table shape */
+.logo-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 5px);
+  grid-template-rows: repeat(4, 5px);
+  gap: 1px;
+  flex-shrink: 0;
+  transition: transform 300ms ease;
+}
+
+.logo-grid:hover {
+  transform: scale(1.1);
+}
+
+.lg-cell {
+  width: 5px;
+  height: 5px;
+  border-radius: 1px;
+  transition: background 300ms ease;
+}
+
+.lg-empty {
+  width: 5px;
+  height: 5px;
+}
+
 .site-title {
   font-size: 18px;
   font-weight: 800;
@@ -703,6 +729,22 @@ body {
 
 .reset-btn {
   border-color: var(--border-color);
+}
+
+.view-btn {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.view-btn:hover {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--accent-secondary);
+}
+
+.view-btn.viewing {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: var(--accent-secondary);
+  color: var(--accent-secondary);
 }
 
 /* ===== MODE SELECTION PANEL ===== */
@@ -1227,6 +1269,9 @@ body {
 .mobile-setup-logo {
   width: 36px;
   height: 36px;
+  grid-template-columns: repeat(5, 6px);
+  grid-template-rows: repeat(4, 6px);
+  gap: 2px;
 }
 
 .mobile-setup-title {

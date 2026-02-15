@@ -45,7 +45,31 @@
     <!-- Unified Top Bar -->
     <header class="header">
       <div class="header-left">
-        <img src="res/logo.svg" alt="AtomicMemory" class="logo">
+        <div class="logo-grid" aria-label="AtomicMemory">
+          <span class="lg-cell" style="background:#ef4444"></span>
+          <span class="lg-empty"></span>
+          <span class="lg-empty"></span>
+          <span class="lg-empty"></span>
+          <span class="lg-cell" style="background:#ec4899"></span>
+
+          <span class="lg-cell" style="background:#f97316"></span>
+          <span class="lg-empty"></span>
+          <span class="lg-cell" style="background:#10b981"></span>
+          <span class="lg-cell" style="background:#3b82f6"></span>
+          <span class="lg-cell" style="background:#8b5cf6"></span>
+
+          <span class="lg-cell" style="background:#06b6d4"></span>
+          <span class="lg-cell" style="background:#eab308"></span>
+          <span class="lg-cell" style="background:#ec4899"></span>
+          <span class="lg-cell" style="background:#f59e0b"></span>
+          <span class="lg-cell" style="background:#84cc16"></span>
+
+          <span class="lg-empty"></span>
+          <span class="lg-cell" style="background:#3b82f6"></span>
+          <span class="lg-cell" style="background:#ef4444"></span>
+          <span class="lg-cell" style="background:#f97316"></span>
+          <span class="lg-empty"></span>
+        </div>
         <h1 class="site-title">AtomicMemory</h1>
         <span id="currentRank" class="rank-badge" aria-label="Current rank">Novice</span>
       </div>
@@ -159,6 +183,10 @@
       </div>
 
       <div class="settings-right">
+        <button id="viewTableBtn" class="action-btn view-btn" title="View periodic table">
+          <i class="ri-eye-line"></i>
+          <span>View</span>
+        </button>
         <button id="hintBtn" class="action-btn hint-btn" title="Get a hint (-50 points)">
           <i class="ri-lightbulb-line"></i>
           <span>Hint</span>

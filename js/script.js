@@ -73,6 +73,7 @@ const playAgainBtn = document.getElementById('playAgainBtn');
 const shareScoreBtn = document.getElementById('shareScoreBtn');
 const infoModal = document.getElementById('infoModal');
 const closeInfoBtn = document.getElementById('closeInfoBtn');
+const viewTableBtn = document.getElementById('viewTableBtn');
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -182,6 +183,9 @@ function setupEventListeners() {
   
   // Info modal
   closeInfoBtn.addEventListener('click', () => closeModal(infoModal));
+  
+  // View table button (toggle element visibility on existing table)
+  viewTableBtn.addEventListener('click', toggleViewTable);
   
   // Mobile menu
   menuBtn.addEventListener('click', openMobileMenu);
@@ -593,6 +597,7 @@ function handleElementClick(e) {
   if (!element || element.classList.contains('placeholder')) return;
   if (element.classList.contains('disabled')) return;
   if (element.classList.contains('correct')) return;
+  if (viewTableBtn.classList.contains('viewing')) return;
   if (!state.activeElements.has(parseInt(element.dataset.atomic))) return;
   
   if (state.isMobile) {
@@ -1000,6 +1005,11 @@ function findFirstInCategory(category) {
 function startTimer() {
   state.timerStarted = true;
   state.startTime = Date.now();
+  // Reset view mode if active
+  if (viewTableBtn.classList.contains('viewing')) {
+    toggleViewTable();
+  }
+  viewTableBtn.classList.add('hidden');
   
   state.timerInterval = setInterval(() => {
     state.elapsedTime = Math.floor((Date.now() - state.startTime) / 1000);
@@ -1063,6 +1073,10 @@ function resetChallenge() {
   
   updateElementStates();
   updateStats();
+  // Reset view mode
+  viewTableBtn.classList.remove('hidden', 'viewing');
+  viewTableBtn.querySelector('i').className = 'ri-eye-line';
+  viewTableBtn.querySelector('span').textContent = 'View';
   
   // Reset mini table if it exists
   const miniTable = document.getElementById('miniPeriodicTable');
@@ -1076,6 +1090,9 @@ function resetChallenge() {
 
 function completeChallenge() {
   stopTimer();
+  viewTableBtn.classList.remove('hidden', 'viewing');
+  viewTableBtn.querySelector('i').className = 'ri-eye-line';
+  viewTableBtn.querySelector('span').textContent = 'View';
   
   const totalMistakes = Object.values(state.wrongAttempts).reduce((a, b) => a + b, 0);
   
@@ -1190,6 +1207,36 @@ function closeModal(modal) {
 
 function openInfoModal() {
   infoModal.classList.remove('hidden');
+}
+
+function toggleViewTable() {
+  const isViewing = viewTableBtn.classList.toggle('viewing');
+  const icon = viewTableBtn.querySelector('i');
+
+  document.querySelectorAll('.element').forEach(el => {
+    if (el.classList.contains('placeholder')) return;
+    if (el.classList.contains('correct')) return;
+
+    const symbolSpan = el.querySelector('.element-symbol');
+    const nameSpan = el.querySelector('.element-name');
+    if (!symbolSpan || !nameSpan) return;
+
+    if (isViewing) {
+      symbolSpan.textContent = el.dataset.symbol;
+      nameSpan.textContent = el.dataset.name;
+    } else {
+      symbolSpan.textContent = '';
+      nameSpan.textContent = '';
+    }
+  });
+
+  if (isViewing) {
+    icon.className = 'ri-eye-off-line';
+    viewTableBtn.querySelector('span').textContent = 'Hide';
+  } else {
+    icon.className = 'ri-eye-line';
+    viewTableBtn.querySelector('span').textContent = 'View';
+  }
 }
 
 function openHistoryModal() {
@@ -1393,7 +1440,28 @@ function showMobileSetupScreen() {
   screen.innerHTML = `
     <div class="mobile-setup-header">
       <div class="mobile-setup-logo-row">
-        <img src="res/logo.svg" alt="AtomicMemory" class="mobile-setup-logo">
+        <div class="logo-grid mobile-setup-logo" aria-label="AtomicMemory">
+          <span class="lg-cell" style="background:#ef4444"></span>
+          <span class="lg-empty"></span>
+          <span class="lg-empty"></span>
+          <span class="lg-empty"></span>
+          <span class="lg-cell" style="background:#ec4899"></span>
+          <span class="lg-cell" style="background:#f97316"></span>
+          <span class="lg-empty"></span>
+          <span class="lg-cell" style="background:#10b981"></span>
+          <span class="lg-cell" style="background:#3b82f6"></span>
+          <span class="lg-cell" style="background:#8b5cf6"></span>
+          <span class="lg-cell" style="background:#06b6d4"></span>
+          <span class="lg-cell" style="background:#eab308"></span>
+          <span class="lg-cell" style="background:#ec4899"></span>
+          <span class="lg-cell" style="background:#f59e0b"></span>
+          <span class="lg-cell" style="background:#84cc16"></span>
+          <span class="lg-empty"></span>
+          <span class="lg-cell" style="background:#3b82f6"></span>
+          <span class="lg-cell" style="background:#ef4444"></span>
+          <span class="lg-cell" style="background:#f97316"></span>
+          <span class="lg-empty"></span>
+        </div>
         <div class="mobile-setup-title">AtomicMemory</div>
       </div>
       <div class="mobile-setup-subtitle">Configure your challenge</div>
