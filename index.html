@@ -63,13 +63,41 @@
 
   <!-- Main App -->
   <div id="mainApp" class="main-app hidden">
-    <!-- Header -->
+    <!-- Unified Top Bar -->
     <header class="header">
       <div class="header-left">
         <img src="res/logo.svg" alt="AtomicMemory" class="logo">
-        <div class="header-title-group">
-          <h1 class="site-title">AtomicMemory</h1>
-          <span class="header-subtitle">Score Attack Mode</span>
+        <h1 class="site-title">AtomicMemory</h1>
+        <span id="currentRank" class="rank-badge" aria-label="Current rank">Novice</span>
+      </div>
+      <div class="header-center">
+        <div class="inline-stats">
+          <div class="inline-stat" title="Score">
+            <span class="inline-stat-value score-value-wrapper">
+              <span id="currentScore" class="inline-score">0</span>
+              <div id="scoreChangeIndicator" class="score-change"></div>
+            </span>
+          </div>
+          <span class="stat-divider"></span>
+          <div class="inline-stat" title="Time">
+            <i class="ri-timer-line" aria-hidden="true"></i>
+            <span id="timerDisplay" class="inline-stat-value">00:00</span>
+          </div>
+          <span class="stat-divider"></span>
+          <div class="inline-stat" title="Progress">
+            <i class="ri-check-double-line" aria-hidden="true"></i>
+            <span class="inline-stat-value"><span id="correctCount">0</span>/<span id="totalCount">118</span></span>
+          </div>
+          <span class="stat-divider"></span>
+          <div class="inline-stat" title="Streak">
+            <i class="ri-fire-line" aria-hidden="true"></i>
+            <span id="streakDisplay" class="inline-stat-value">0</span>
+          </div>
+          <span class="stat-divider"></span>
+          <div class="inline-stat" title="Accuracy">
+            <i class="ri-percent-line" aria-hidden="true"></i>
+            <span id="accuracyDisplay" class="inline-stat-value">100%</span>
+          </div>
         </div>
       </div>
       <div class="header-right">
@@ -92,6 +120,11 @@
       </div>
     </header>
 
+    <!-- Progress Bar -->
+    <div class="progress-bar-container">
+      <div id="progressFill" class="progress-fill"></div>
+    </div>
+
     <!-- Mobile Menu Overlay -->
     <div id="mobileMenu" class="mobile-menu hidden">
       <div class="mobile-menu-content">
@@ -107,115 +140,42 @@
       </div>
     </div>
 
-    <!-- Score Display (Prominent) -->
-    <div class="score-section">
-      <div class="score-main">
-        <div class="score-label">
-          <i class="ri-star-line"></i>
-          Current Score
-        </div>
-        <div class="score-value-wrapper">
-          <span id="currentScore" class="score-value">0</span>
-          <div id="scoreChangeIndicator" class="score-change"></div>
-        </div>
-        <div class="score-rank">
-          <span id="currentRank" class="rank-badge">Novice</span>
-          <span id="scoreProgress" class="score-progress-text">Start typing to score!</span>
-        </div>
-      </div>
-      
-      <div class="score-stats-grid">
-        <div class="mini-stat">
-          <div class="mini-stat-icon timer-icon">
-            <i class="ri-timer-line"></i>
-          </div>
-          <div class="mini-stat-content">
-            <div class="mini-stat-label">Time</div>
-            <div class="mini-stat-value" id="timerDisplay">00:00</div>
-          </div>
-        </div>
-
-        <div class="mini-stat">
-          <div class="mini-stat-icon progress-icon">
-            <i class="ri-check-double-line"></i>
-          </div>
-          <div class="mini-stat-content">
-            <div class="mini-stat-label">Progress</div>
-            <div class="mini-stat-value">
-              <span id="correctCount">0</span>/<span id="totalCount">118</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="mini-stat">
-          <div class="mini-stat-icon streak-icon">
-            <i class="ri-fire-line"></i>
-          </div>
-          <div class="mini-stat-content">
-            <div class="mini-stat-label">Streak</div>
-            <div class="mini-stat-value" id="streakDisplay">0</div>
-          </div>
-        </div>
-
-        <div class="mini-stat">
-          <div class="mini-stat-icon accuracy-icon">
-            <i class="ri-percent-line"></i>
-          </div>
-          <div class="mini-stat-content">
-            <div class="mini-stat-label">Accuracy</div>
-            <div class="mini-stat-value" id="accuracyDisplay">100%</div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="progress-bar-container">
-        <div id="progressFill" class="progress-fill"></div>
-      </div>
+    <!-- Mobile Setup Screen -->
+    <div id="mobileSetupScreen" class="mobile-setup-screen hidden">
+      <!-- content will be populated by JS -->
     </div>
 
-    <!-- Quick Settings Bar -->
+    <!-- Slim Control Bar -->
     <div class="quick-settings">
       <div class="settings-left">
-        <div class="setting-group">
-          <label class="setting-label">
-            <i class="ri-gamepad-line"></i>
-            Mode
-          </label>
-          <div class="mode-tabs">
-            <button class="mode-tab active" data-mode="full" title="All 118 elements">
-              <i class="ri-table-2"></i>
-              <span>Full</span>
-            </button>
-            <button class="mode-tab" data-mode="block" title="Practice by blocks">
-              <i class="ri-shapes-line"></i>
-              <span>Blocks</span>
-            </button>
-            <button class="mode-tab" data-mode="group" title="Practice by groups">
-              <i class="ri-layout-column-line"></i>
-              <span>Groups</span>
-            </button>
-            <button class="mode-tab" data-mode="period" title="Practice by periods">
-              <i class="ri-layout-row-line"></i>
-              <span>Periods</span>
-            </button>
-          </div>
+        <div class="mode-tabs">
+          <button class="mode-tab active" data-mode="full" title="All 118 elements">
+            <i class="ri-table-2"></i>
+            <span>Full</span>
+          </button>
+          <button class="mode-tab" data-mode="block" title="Practice by blocks">
+            <i class="ri-shapes-line"></i>
+            <span>Blocks</span>
+          </button>
+          <button class="mode-tab" data-mode="group" title="Practice by groups">
+            <i class="ri-layout-column-line"></i>
+            <span>Groups</span>
+          </button>
+          <button class="mode-tab" data-mode="period" title="Practice by periods">
+            <i class="ri-layout-row-line"></i>
+            <span>Periods</span>
+          </button>
         </div>
 
-        <div class="setting-group">
-          <label class="setting-label">
-            <i class="ri-compass-3-line"></i>
-            Navigation
-          </label>
-          <div class="nav-toggle">
-            <button class="nav-option active" data-nav="period" title="Move horizontally">
-              <i class="ri-arrow-right-line"></i>
-              <span>Horizontal</span>
-            </button>
-            <button class="nav-option" data-nav="group" title="Move vertically">
-              <i class="ri-arrow-down-line"></i>
-              <span>Vertical</span>
-            </button>
-          </div>
+        <div class="nav-toggle">
+          <button class="nav-option active" data-nav="period" title="Move horizontally">
+            <i class="ri-arrow-right-line"></i>
+            <span>Horizontal</span>
+          </button>
+          <button class="nav-option" data-nav="group" title="Move vertically">
+            <i class="ri-arrow-down-line"></i>
+            <span>Vertical</span>
+          </button>
         </div>
       </div>
 
@@ -243,6 +203,48 @@
       <!-- Mobile Input Modal -->
       <div id="mobileInputModal" class="mobile-input-modal hidden">
         <div class="mobile-input-content">
+          <!-- Score Row -->
+          <div class="mobile-modal-score-row">
+            <div class="mobile-modal-score-value" id="mobileScoreDisplay">0</div>
+            <span class="mobile-modal-rank" id="mobileRankDisplay">Novice</span>
+          </div>
+
+          <!-- Mini Table Preview -->
+          <div id="miniTableContainer" class="mini-table-container">
+            <div id="miniPeriodicTable" class="mini-periodic-table"></div>
+          </div>
+
+          <!-- Stats Bar -->
+          <div class="mobile-modal-stats">
+            <div class="mobile-modal-stat">
+              <div class="mobile-modal-stat-value" id="mobileProgressDisplay">0/118</div>
+              <div class="mobile-modal-stat-label">Progress</div>
+            </div>
+            <div class="mobile-modal-stat">
+              <div class="mobile-modal-stat-value" id="mobileStreakDisplay">0</div>
+              <div class="mobile-modal-stat-label">Streak</div>
+            </div>
+            <div class="mobile-modal-stat">
+              <div class="mobile-modal-stat-value" id="mobileAccuracyDisplay">100%</div>
+              <div class="mobile-modal-stat-label">Accuracy</div>
+            </div>
+            <div class="mobile-modal-stat">
+              <div class="mobile-modal-stat-value" id="mobileTimerDisplay">00:00</div>
+              <div class="mobile-modal-stat-label">Time</div>
+            </div>
+          </div>
+
+          <!-- Toolbar -->
+          <div class="mobile-modal-toolbar">
+            <button class="mobile-toolbar-btn" id="mobileToolbarTheme" title="Toggle theme">
+              <i class="ri-moon-line"></i>
+            </button>
+            <button class="mobile-toolbar-btn" id="mobileToolbarReset" title="Reset">
+              <i class="ri-restart-line"></i>
+            </button>
+          </div>
+
+          <!-- Element Info & Input -->
           <div class="mobile-input-header">
             <div class="mobile-input-element-info">
               <span class="mobile-input-number"></span>
@@ -256,7 +258,11 @@
           <div class="mobile-input-actions">
             <button id="mobileHintBtn" class="mobile-hint-btn">
               <i class="ri-lightbulb-line"></i>
-              Hint (-50)
+              Hint
+            </button>
+            <button id="mobileSkipBtn" class="mobile-skip-btn">
+              <i class="ri-skip-forward-line"></i>
+              Skip
             </button>
             <button id="mobileSubmitBtn" class="mobile-submit-btn">
               <i class="ri-check-line"></i>
@@ -344,63 +350,98 @@
       </div>
     </div>
 
+    <!-- Info Modal -->
+    <div id="infoModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="About AtomicMemory">
+      <div class="modal-overlay"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>
+            <i class="ri-information-line" aria-hidden="true"></i>
+            About
+          </h3>
+          <button id="closeInfoBtn" class="close-modal-btn" aria-label="Close">
+            <i class="ri-close-line" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="modal-body info-modal-body">
+          <p>Made with <span aria-label="love">❤️</span> by <a href="https://hello2himel.netlify.app" target="_blank" rel="noopener noreferrer">@hello2himel</a> from <span aria-label="Bangladesh">🇧🇩</span></p>
+          <p>This is an open source software. <a href="https://github.com/hello2himel/atomicmemory" target="_blank" rel="noopener noreferrer">View Source Code</a></p>
+        </div>
+      </div>
+    </div>
+
     <!-- Challenge Complete Modal -->
     <div id="completeModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Challenge Complete">
       <div class="modal-overlay"></div>
       <div class="modal-content complete-modal-content">
-        <div class="complete-confetti"></div>
+        <!-- Header: icon + title + close -->
         <div class="complete-header">
           <div class="complete-icon">
             <i class="ri-trophy-line"></i>
           </div>
           <h2 class="complete-title">Challenge Complete!</h2>
-          <p class="complete-subtitle">Congratulations on mastering the elements</p>
+          <button id="closeCompleteBtn" class="close-modal-btn complete-close-btn" aria-label="Close">
+            <i class="ri-close-line" aria-hidden="true"></i>
+          </button>
         </div>
+
+        <!-- Score block -->
         <div class="complete-score">
           <div class="complete-score-label">Final Score</div>
           <div class="complete-score-value" id="finalScoreDisplay">0</div>
           <div class="complete-rank" id="finalRankDisplay">Novice</div>
         </div>
+
+        <!-- Stats row (3-column inline) -->
         <div class="complete-stats-grid">
           <div class="complete-stat">
-            <div class="complete-stat-icon"><i class="ri-timer-line"></i></div>
-            <div class="complete-stat-value" id="completeTime">00:00</div>
-            <div class="complete-stat-label">Time</div>
+            <i class="ri-timer-line"></i>
+            <span class="complete-stat-value" id="completeTime">00:00</span>
+            <span class="complete-stat-label">Time</span>
           </div>
           <div class="complete-stat">
-            <div class="complete-stat-icon"><i class="ri-percent-line"></i></div>
-            <div class="complete-stat-value" id="completeAccuracy">100%</div>
-            <div class="complete-stat-label">Accuracy</div>
+            <i class="ri-percent-line"></i>
+            <span class="complete-stat-value" id="completeAccuracy">100%</span>
+            <span class="complete-stat-label">Accuracy</span>
           </div>
           <div class="complete-stat">
-            <div class="complete-stat-icon"><i class="ri-fire-line"></i></div>
-            <div class="complete-stat-value" id="completeStreak">0</div>
-            <div class="complete-stat-label">Best Streak</div>
+            <i class="ri-fire-line"></i>
+            <span class="complete-stat-value" id="completeStreak">0</span>
+            <span class="complete-stat-label">Best Streak</span>
           </div>
         </div>
+
+        <!-- Collapsible breakdown -->
         <div class="complete-breakdown">
-          <h4>Score Breakdown</h4>
-          <div class="breakdown-item">
-            <span>Base Score (Speed × Elements)</span>
-            <span id="breakdownBase">0</span>
-          </div>
-          <div class="breakdown-item bonus">
-            <span>Bonuses (Streaks, Perfect)</span>
-            <span id="breakdownBonus">+0</span>
-          </div>
-          <div class="breakdown-item penalty">
-            <span>Penalties (Mistakes, Hints)</span>
-            <span id="breakdownPenalty">-0</span>
+          <button class="breakdown-toggle" id="breakdownToggle" aria-expanded="false">
+            <span>Score Breakdown</span>
+            <i class="ri-arrow-down-s-line"></i>
+          </button>
+          <div class="breakdown-content hidden" id="breakdownContent">
+            <div class="breakdown-item">
+              <span>Base Score</span>
+              <span id="breakdownBase">0</span>
+            </div>
+            <div class="breakdown-item bonus">
+              <span>Bonuses</span>
+              <span id="breakdownBonus">+0</span>
+            </div>
+            <div class="breakdown-item penalty">
+              <span>Penalties</span>
+              <span id="breakdownPenalty">-0</span>
+            </div>
           </div>
         </div>
+
+        <!-- Actions -->
         <div class="complete-actions">
-          <button id="shareScoreBtn" class="complete-btn secondary-btn">
-            <i class="ri-share-line"></i>
-            Share Score
-          </button>
           <button id="playAgainBtn" class="complete-btn primary-btn">
             <i class="ri-restart-line"></i>
             Play Again
+          </button>
+          <button id="shareScoreBtn" class="complete-btn secondary-btn">
+            <i class="ri-share-line"></i>
+            Share
           </button>
         </div>
       </div>
@@ -409,8 +450,10 @@
     <!-- Footer -->
     <footer class="footer">
       <p>
-        This project is <a href="https://github.com/hello2himel/atomicmemory" target="_blank" rel="noopener noreferrer">fully open source</a>. 
-        Built with love by <a href="https://hello2himel.netlify.app" target="_blank" rel="noopener noreferrer">@hello2himel</a> from Bangladesh.
+        Made with <span aria-label="love">❤️</span> by <a href="https://hello2himel.netlify.app" target="_blank" rel="noopener noreferrer">@hello2himel</a> from <span aria-label="Bangladesh">🇧🇩</span>
+      </p>
+      <p>
+        This is an open source software. <a href="https://github.com/hello2himel/atomicmemory" target="_blank" rel="noopener noreferrer">View Source Code</a>
       </p>
     </footer>
   </div>
