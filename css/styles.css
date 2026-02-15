@@ -351,7 +351,7 @@ body {
 /* Logo Grid - Mini periodic table shape */
 .logo-grid {
   display: grid;
-  grid-template-columns: repeat(5, 5px);
+  grid-template-columns: repeat(4, 5px);
   grid-template-rows: repeat(4, 5px);
   gap: 1px;
   flex-shrink: 0;

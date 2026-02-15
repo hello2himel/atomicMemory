@@ -171,10 +171,10 @@
 
   // Original colors for each cell (matches HTML inline styles)
   var ORIGINAL_COLORS = [
-    '#ef4444', null, null, null, '#ec4899',
-    '#ef4444', '#f97316', null, null, '#10b981',
-    '#3b82f6', '#8b5cf6', '#06b6d4', '#eab308', '#ec4899',
-    null, '#f59e0b', '#84cc16', '#3b82f6', null
+    '#ef4444', null, null, '#ec4899',
+    '#f97316', null, '#10b981', '#3b82f6',
+    '#8b5cf6', '#06b6d4', '#eab308', '#ec4899',
+    null, '#f59e0b', '#84cc16', null
   ];
 
   var logoGrid = document.querySelector('.logo-grid');
