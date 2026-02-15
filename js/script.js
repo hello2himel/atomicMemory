@@ -1495,13 +1495,13 @@ function renderMiniTable() {
   // Periods 4-5: K-Xe (19-54)
   for (let i = 19; i <= 54; i++) layout.push(i);
   
-  // Period 6: Cs (55), Ba (56), placeholder, Lu-At (72-86)
+  // Period 6: Cs (55), Ba (56), placeholder, Hf-At (72-86)
   layout.push(55, 56, 'placeholder');
   for (let i = 72; i <= 86; i++) layout.push(i);
   
-  // Period 7: Fr (87), Ra (88), placeholder, Lr-Og (103-118)
+  // Period 7: Fr (87), Ra (88), placeholder, Rf-Og (104-118)
   layout.push(87, 88, 'placeholder');
-  for (let i = 103; i <= 118; i++) layout.push(i);
+  for (let i = 104; i <= 118; i++) layout.push(i);
   
   // Spacer row
   for (let i = 0; i < 18; i++) layout.push('spacer');
