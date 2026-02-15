@@ -4,6 +4,8 @@ if (typeof ELEMENTS !== 'undefined') {
   ELEMENTS.forEach(el => { ELEMENTS_MAP[el.atomicNumber] = el; });
 }
 
+const APP_URL = 'https://atomicmemory.netlify.app';
+
 // State
 const state = {
   navigationMode: 'period',
@@ -1268,7 +1270,7 @@ function showCompleteModal() {
   
   finalScoreDisplay.textContent = scoringSystem.formatScore(scoringSystem.score);
   finalRankDisplay.textContent = rank.name;
-  if (/^#[0-9a-fA-F]{6}$/.test(rank.color)) {
+  if (/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(rank.color)) {
     finalRankDisplay.style.background = rank.color;
   }
   
@@ -1296,7 +1298,7 @@ function showCompleteModal() {
 
 function getShareFocusLabel() {
   if (state.practiceMode === 'full') return 'All 118 Elements';
-  if (state.practiceMode === 'block') return `${state.selectedBlocks.map(b => b + '-block').join(', ')}`;
+  if (state.practiceMode === 'block') return `${state.selectedBlocks.map(b => `${b}-block`).join(', ')}`;
   if (state.practiceMode === 'group') return `Group ${state.selectedGroups.join(', ')}`;
   if (state.practiceMode === 'period') return `Period ${state.selectedPeriods.join(', ')}`;
   return 'Custom';
@@ -1317,13 +1319,13 @@ function shareScore() {
   const modeLabel = getShareModeLabel();
   const focusLabel = getShareFocusLabel();
   
-  const text = `🎓 I just scored ${scoringSystem.formatScore(scoringSystem.score)} points on AtomicMemory!\n\n🏆 Rank: ${rank.name}\n🧪 Mode: ${modeLabel}\n📚 Focus: ${focusLabel}\n⏱️ Time: ${minutes}:${seconds}\n🎯 Accuracy: ${state.accuracy}%\n\nCan you beat my score?\nPlay now → https://atomicmemory.netlify.app`;
+  const text = `🎓 I just scored ${scoringSystem.formatScore(scoringSystem.score)} points on AtomicMemory!\n\n🏆 Rank: ${rank.name}\n🧪 Mode: ${modeLabel}\n📚 Focus: ${focusLabel}\n⏱️ Time: ${minutes}:${seconds}\n🎯 Accuracy: ${state.accuracy}%\n\nCan you beat my score?\nPlay now → ${APP_URL}`;
   
   if (navigator.share) {
     navigator.share({
       title: 'AtomicMemory Score',
       text: text,
-      url: 'https://atomicmemory.netlify.app'
+      url: APP_URL
     }).catch(() => {});
   } else {
     navigator.clipboard.writeText(text).then(() => {
@@ -1816,7 +1818,7 @@ function updateMobileStats() {
   if (rankEl && typeof scoringSystem !== 'undefined') {
     const rank = scoringSystem.getRank();
     rankEl.textContent = rank.name;
-    if (/^#[0-9a-fA-F]{6}$/.test(rank.color)) {
+    if (/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(rank.color)) {
       rankEl.style.background = `linear-gradient(135deg, ${rank.color} 0%, ${rank.color}dd 100%)`;
     }
   }
