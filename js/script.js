@@ -1440,7 +1440,28 @@ function showMobileSetupScreen() {
   screen.innerHTML = `
     <div class="mobile-setup-header">
       <div class="mobile-setup-logo-row">
-        <img src="res/logo.png" alt="AtomicMemory" class="mobile-setup-logo">
+        <div class="logo-grid mobile-setup-logo" aria-label="AtomicMemory">
+          <span class="lg-cell" style="background:#ef4444"></span>
+          <span class="lg-empty"></span>
+          <span class="lg-empty"></span>
+          <span class="lg-empty"></span>
+          <span class="lg-cell" style="background:#ec4899"></span>
+          <span class="lg-cell" style="background:#f97316"></span>
+          <span class="lg-empty"></span>
+          <span class="lg-cell" style="background:#10b981"></span>
+          <span class="lg-cell" style="background:#3b82f6"></span>
+          <span class="lg-cell" style="background:#8b5cf6"></span>
+          <span class="lg-cell" style="background:#06b6d4"></span>
+          <span class="lg-cell" style="background:#eab308"></span>
+          <span class="lg-cell" style="background:#ec4899"></span>
+          <span class="lg-cell" style="background:#f59e0b"></span>
+          <span class="lg-cell" style="background:#84cc16"></span>
+          <span class="lg-empty"></span>
+          <span class="lg-cell" style="background:#3b82f6"></span>
+          <span class="lg-cell" style="background:#ef4444"></span>
+          <span class="lg-cell" style="background:#f97316"></span>
+          <span class="lg-empty"></span>
+        </div>
         <div class="mobile-setup-title">AtomicMemory</div>
       </div>
       <div class="mobile-setup-subtitle">Configure your challenge</div>

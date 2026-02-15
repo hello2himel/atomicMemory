@@ -1269,6 +1269,9 @@ body {
 .mobile-setup-logo {
   width: 36px;
   height: 36px;
+  grid-template-columns: repeat(5, 6px);
+  grid-template-rows: repeat(4, 6px);
+  gap: 2px;
 }
 
 .mobile-setup-title {
