@@ -370,6 +370,7 @@ function createBlockSelector() {
       return;
     }
     applySelection();
+    modeSelectionPanel.classList.add('hidden');
   });
 }
 
@@ -395,6 +396,7 @@ function createGroupSelector() {
       return;
     }
     applySelection();
+    modeSelectionPanel.classList.add('hidden');
   });
 }
 
@@ -406,7 +408,7 @@ function createPeriodSelector() {
       ${periods.map(p => `
         <label class="checkbox-option">
           <input type="checkbox" value="${p}" class="period-checkbox">
-          <span>Period ${p}</span>
+          <span>${p}</span>
         </label>
       `).join('')}
     </div>
@@ -420,6 +422,7 @@ function createPeriodSelector() {
       return;
     }
     applySelection();
+    modeSelectionPanel.classList.add('hidden');
   });
 }
 
@@ -1515,7 +1518,7 @@ function updateMobileSetupSelectors() {
         ${groups.map(g => `
           <label class="mobile-setup-checkbox-option">
             <input type="checkbox" value="${g}" class="mobile-group-checkbox">
-            <span>Group ${g}</span>
+            <span>${g}</span>
           </label>
         `).join('')}
       </div>
@@ -1527,7 +1530,7 @@ function updateMobileSetupSelectors() {
         ${periods.map(p => `
           <label class="mobile-setup-checkbox-option">
             <input type="checkbox" value="${p}" class="mobile-period-checkbox">
-            <span>Period ${p}</span>
+            <span>${p}</span>
           </label>
         `).join('')}
       </div>

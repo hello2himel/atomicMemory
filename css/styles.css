@@ -545,38 +545,33 @@ body {
 
 /* ===== SCORE SECTION ===== */
 .score-section {
-  padding: var(--space-sm) var(--space-xl);
+  padding: var(--space-xs) var(--space-xl);
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-color);
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
 }
 
 .score-main {
-  text-align: center;
-  margin-bottom: var(--space-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-shrink: 0;
 }
 
 .score-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: var(--space-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
+  display: none;
 }
 
 .score-value-wrapper {
   position: relative;
   display: inline-block;
-  margin-bottom: var(--space-sm);
 }
 
 .score-value {
-  font-size: 40px;
+  font-size: 28px;
   font-weight: 900;
   background: var(--accent-gradient);
   -webkit-background-clip: text;
@@ -625,44 +620,42 @@ body {
 .score-rank {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: var(--space-md);
+  gap: var(--space-sm);
   flex-wrap: wrap;
 }
 
 .rank-badge {
   background: var(--accent-gradient);
   color: white;
-  padding: 6px 16px;
+  padding: 4px 10px;
   border-radius: var(--radius-full);
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-sm);
   font-family: var(--font-display);
 }
 
 .score-progress-text {
-  font-size: 13px;
-  color: var(--text-secondary);
-  font-weight: 500;
+  display: none;
 }
 
 .score-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-md);
+  display: flex;
+  gap: var(--space-sm);
+  flex: 1;
 }
 
 .mini-stat {
   background: var(--bg-tertiary);
-  padding: var(--space-sm) var(--space-md);
-  border-radius: var(--radius-lg);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
   transition: all 200ms ease;
+  flex: 1;
 }
 
 .mini-stat:hover {
@@ -670,13 +663,13 @@ body {
 }
 
 .mini-stat-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-md);
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 12px;
   flex-shrink: 0;
 }
 
@@ -715,7 +708,7 @@ body {
 }
 
 .mini-stat-value {
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 800;
   color: var(--text-primary);
   font-family: var(--font-mono);
@@ -764,17 +757,17 @@ body {
 .quick-settings {
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-color);
-  padding: var(--space-sm) var(--space-xl);
+  padding: var(--space-xs) var(--space-xl);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   flex-wrap: wrap;
 }
 
 .settings-left {
   display: flex;
-  gap: var(--space-lg);
+  gap: var(--space-md);
   align-items: center;
   flex-wrap: wrap;
   flex: 1;
@@ -787,7 +780,7 @@ body {
 
 .setting-group {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 6px;
 }
 
@@ -799,7 +792,8 @@ body {
   letter-spacing: 0.05em;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
+  white-space: nowrap;
 }
 
 .mode-tabs, .nav-toggle {
@@ -813,15 +807,15 @@ body {
 .mode-tab, .nav-option {
   background: transparent;
   border: none;
-  padding: 8px 14px;
+  padding: 6px 10px;
   border-radius: var(--radius-sm);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-secondary);
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   transition: all 200ms ease;
   font-family: var(--font-body);
 }
@@ -878,7 +872,7 @@ body {
 
 /* ===== MODE SELECTION PANEL ===== */
 .mode-selection-panel {
-  padding: var(--space-md) var(--space-xl);
+  padding: var(--space-sm) var(--space-xl);
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-color);
   animation: slide-down 300ms ease;
@@ -896,9 +890,9 @@ body {
 }
 
 .selector-title {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
-  margin-bottom: 10px;
+  margin-bottom: var(--space-xs);
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -907,28 +901,28 @@ body {
 .selector-options {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-sm);
-  margin-bottom: var(--space-md);
+  gap: var(--space-xs);
+  margin-bottom: var(--space-sm);
 }
 
 .selector-options.group-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-  gap: var(--space-sm);
+  grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+  gap: var(--space-xs);
 }
 
 .checkbox-option {
   background: var(--bg-tertiary);
   border: 2px solid transparent;
-  padding: 10px 14px;
+  padding: 6px 10px;
   border-radius: var(--radius-sm);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-primary);
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
   transition: all 200ms ease;
   justify-content: center;
   font-family: var(--font-body);
@@ -954,9 +948,9 @@ body {
   background: var(--accent-gradient);
   color: white;
   border: none;
-  padding: 12px 24px;
+  padding: 8px 20px;
   border-radius: var(--radius-md);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   cursor: pointer;
   box-shadow: var(--shadow-sm);
@@ -2373,14 +2367,14 @@ body {
     gap: var(--space-xl);
   }
   
-  .score-stats-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .score-section {
+    flex-wrap: wrap;
   }
   
   .quick-settings {
     flex-direction: column;
     align-items: stretch;
-    gap: var(--space-md);
+    gap: var(--space-sm);
   }
   
   .settings-left {
@@ -2397,7 +2391,7 @@ body {
   }
   
   .selector-options.group-grid {
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(9, 1fr);
   }
   
   .periodic-table {
