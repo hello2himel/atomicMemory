@@ -2084,6 +2084,14 @@ body {
 .complete-modal-content {
   max-width: 500px;
   text-align: center;
+  position: relative;
+}
+
+.complete-close-btn {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  z-index: 2;
 }
 
 .complete-confetti {

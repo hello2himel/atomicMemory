@@ -66,6 +66,7 @@ const mobileHintBtn = document.getElementById('mobileHintBtn');
 const mobileSkipBtn = document.getElementById('mobileSkipBtn');
 const mobileSetupScreen = document.getElementById('mobileSetupScreen');
 const completeModal = document.getElementById('completeModal');
+const closeCompleteBtn = document.getElementById('closeCompleteBtn');
 const playAgainBtn = document.getElementById('playAgainBtn');
 const shareScoreBtn = document.getElementById('shareScoreBtn');
 const infoModal = document.getElementById('infoModal');
@@ -222,6 +223,12 @@ function setupEventListeners() {
   });
   
   // Complete modal
+  closeCompleteBtn.addEventListener('click', () => {
+    closeModal(completeModal);
+    if (state.isMobile) {
+      showMobileSetupScreen();
+    }
+  });
   playAgainBtn.addEventListener('click', () => {
     closeModal(completeModal);
     resetChallenge();
