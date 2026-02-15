@@ -57,6 +57,8 @@ const mobileInputModal = document.getElementById('mobileInputModal');
 const mobileInput = document.getElementById('mobileInput');
 const mobileSubmitBtn = document.getElementById('mobileSubmitBtn');
 const mobileHintBtn = document.getElementById('mobileHintBtn');
+const mobileSkipBtn = document.getElementById('mobileSkipBtn');
+const mobileSetupScreen = document.getElementById('mobileSetupScreen');
 const completeModal = document.getElementById('completeModal');
 const playAgainBtn = document.getElementById('playAgainBtn');
 const shareScoreBtn = document.getElementById('shareScoreBtn');
@@ -97,6 +99,9 @@ function startApp() {
     mainApp.classList.remove('hidden');
     renderPeriodicTable();
     initializeFullTable();
+    if (state.isMobile) {
+      showMobileSetupScreen();
+    }
   }, 600);
 }
 
@@ -174,6 +179,13 @@ function setupEventListeners() {
     showHint();
     mobileInputModal.querySelector('.mobile-input-hint').classList.remove('hidden');
   });
+  mobileSkipBtn.addEventListener('click', () => {
+    if (!state.currentElement) return;
+    const nextEl = findNextElementAuto(state.currentElement);
+    if (nextEl) {
+      updateMobileInputForElement(nextEl);
+    }
+  });
   mobileInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -186,6 +198,9 @@ function setupEventListeners() {
   playAgainBtn.addEventListener('click', () => {
     closeModal(completeModal);
     resetChallenge();
+    if (state.isMobile) {
+      showMobileSetupScreen();
+    }
   });
   shareScoreBtn.addEventListener('click', shareScore);
   
@@ -508,7 +523,14 @@ function handleElementClick(e) {
   if (!state.activeElements.has(parseInt(element.dataset.atomic))) return;
   
   if (state.isMobile) {
-    openMobileInput(element);
+    // Don't process clicks when setup screen is visible
+    if (!mobileSetupScreen.classList.contains('hidden')) return;
+    // When modal is already open, just update it
+    if (!mobileInputModal.classList.contains('hidden')) {
+      updateMobileInputForElement(element);
+    } else {
+      openMobileInput(element);
+    }
   } else {
     activateElement(element);
   }
@@ -517,6 +539,9 @@ function handleElementClick(e) {
 function openMobileInput(element) {
   state.currentElement = element;
   
+  // Render mini table on first open
+  renderMiniTable();
+  
   const number = mobileInputModal.querySelector('.mobile-input-number');
   const category = mobileInputModal.querySelector('.mobile-input-category');
   
@@ -524,10 +549,15 @@ function openMobileInput(element) {
   category.textContent = element.dataset.category;
   
   mobileInput.value = '';
-  mobileInput.focus();
   
   mobileInputModal.querySelector('.mobile-input-hint').classList.add('hidden');
   mobileInputModal.classList.remove('hidden');
+  
+  // Highlight current element in mini table
+  updateMiniTable(parseInt(element.dataset.atomic), 'current');
+  updateMobileStats();
+  
+  setTimeout(() => mobileInput.focus(), 100);
 }
 
 function closeMobileInput() {
@@ -539,14 +569,41 @@ function handleMobileSubmit() {
   if (!state.currentElement) return;
   
   const value = mobileInput.value.trim();
-  if (value) {
-    validateInput(state.currentElement, value);
-    if (state.currentElement.classList.contains('correct')) {
+  if (!value) return;
+  
+  validateInput(state.currentElement, value);
+  
+  if (state.currentElement.classList.contains('correct')) {
+    // Update mini table
+    updateMiniTable(parseInt(state.currentElement.dataset.atomic), 'correct');
+    
+    // Flash green feedback on input
+    mobileInput.classList.add('input-correct');
+    setTimeout(() => mobileInput.classList.remove('input-correct'), 400);
+    
+    updateMobileStats();
+    
+    // Check if challenge complete
+    if (state.correctElements.size === state.activeElements.size) {
       closeMobileInput();
-    } else {
-      mobileInput.value = '';
-      mobileInput.focus();
+      return;
     }
+    
+    // Auto-advance to next element (don't close modal)
+    const nextEl = findNextElementAuto(state.currentElement);
+    if (nextEl) {
+      setTimeout(() => updateMobileInputForElement(nextEl), 200);
+    } else {
+      closeMobileInput();
+    }
+  } else {
+    // Flash red feedback
+    updateMiniTable(parseInt(state.currentElement.dataset.atomic), 'incorrect');
+    mobileInput.classList.add('input-incorrect');
+    setTimeout(() => mobileInput.classList.remove('input-incorrect'), 400);
+    mobileInput.value = '';
+    mobileInput.focus();
+    updateMobileStats();
   }
 }
 
@@ -634,7 +691,7 @@ function validateInput(element, userInput) {
     
     if (state.correctElements.size === state.activeElements.size) {
       completeChallenge();
-    } else {
+    } else if (!state.isMobile) {
       setTimeout(() => moveToNextElement(element), 100);
     }
   } else {
@@ -747,7 +804,12 @@ function moveToNextElement(currentElement) {
   
   if (nextElement && !nextElement.classList.contains('correct') && !nextElement.classList.contains('disabled')) {
     if (state.isMobile) {
-      openMobileInput(nextElement);
+      // On mobile, if modal is open update in-place; otherwise open it
+      if (!mobileInputModal.classList.contains('hidden')) {
+        updateMobileInputForElement(nextElement);
+      } else {
+        openMobileInput(nextElement);
+      }
     } else {
       activateElement(nextElement);
     }
@@ -848,7 +910,11 @@ function resetTimer() {
 function updateTimerDisplay() {
   const minutes = Math.floor(state.elapsedTime / 60);
   const seconds = state.elapsedTime % 60;
-  timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  const timeStr = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  timerDisplay.textContent = timeStr;
+  // Mirror timer in mobile modal
+  const mobileTimer = document.getElementById('mobileTimerDisplay');
+  if (mobileTimer) mobileTimer.textContent = timeStr;
 }
 
 // Challenge
@@ -882,6 +948,15 @@ function resetChallenge() {
   
   updateElementStates();
   updateStats();
+  
+  // Reset mini table if it exists
+  const miniTable = document.getElementById('miniPeriodicTable');
+  if (miniTable) miniTable.innerHTML = '';
+  
+  // Close mobile input modal if open
+  if (!mobileInputModal.classList.contains('hidden')) {
+    closeMobileInput();
+  }
 }
 
 function completeChallenge() {
@@ -974,6 +1049,11 @@ function updateStats() {
   progressFill.style.width = `${percent}%`;
   
   scoringSystem.updateScoreDisplay();
+  
+  // Update mobile modal stats if visible
+  if (!mobileInputModal.classList.contains('hidden')) {
+    updateMobileStats();
+  }
 }
 
 // Save/Load Total Challenges
@@ -1195,4 +1275,417 @@ function saveToHistory() {
   }
   
   localStorage.setItem('history', JSON.stringify(history));
+}
+
+// ===== MOBILE SETUP & PERSISTENT MODAL =====
+
+function showMobileSetupScreen() {
+  const screen = mobileSetupScreen;
+  
+  screen.innerHTML = `
+    <div class="mobile-setup-header">
+      <div class="mobile-setup-title">⚛️ AtomicMemory</div>
+      <div class="mobile-setup-subtitle">Configure your challenge</div>
+    </div>
+    
+    <div class="mobile-setup-section">
+      <div class="mobile-setup-section-title">
+        <i class="ri-gamepad-line"></i> Mode
+      </div>
+      <div class="mobile-setup-mode-tabs">
+        <button class="mobile-setup-mode-tab ${state.practiceMode === 'full' ? 'active' : ''}" data-mode="full">
+          <i class="ri-table-2"></i>
+          Full
+        </button>
+        <button class="mobile-setup-mode-tab ${state.practiceMode === 'block' ? 'active' : ''}" data-mode="block">
+          <i class="ri-shapes-line"></i>
+          Blocks
+        </button>
+        <button class="mobile-setup-mode-tab ${state.practiceMode === 'group' ? 'active' : ''}" data-mode="group">
+          <i class="ri-layout-column-line"></i>
+          Groups
+        </button>
+        <button class="mobile-setup-mode-tab ${state.practiceMode === 'period' ? 'active' : ''}" data-mode="period">
+          <i class="ri-layout-row-line"></i>
+          Periods
+        </button>
+      </div>
+      <div id="mobileSetupSelectors" class="mobile-setup-selectors"></div>
+    </div>
+    
+    <div class="mobile-setup-section">
+      <div class="mobile-setup-section-title">
+        <i class="ri-compass-3-line"></i> Navigation
+      </div>
+      <div class="mobile-setup-nav-toggle">
+        <button class="mobile-setup-nav-option ${state.navigationMode === 'period' ? 'active' : ''}" data-nav="period">
+          <i class="ri-arrow-right-line"></i> Horizontal
+        </button>
+        <button class="mobile-setup-nav-option ${state.navigationMode === 'group' ? 'active' : ''}" data-nav="group">
+          <i class="ri-arrow-down-line"></i> Vertical
+        </button>
+      </div>
+    </div>
+    
+    <button class="mobile-start-btn" id="mobileStartBtn">
+      <i class="ri-play-fill"></i>
+      Start Challenge
+    </button>
+  `;
+  
+  // Mode tab listeners
+  screen.querySelectorAll('.mobile-setup-mode-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      screen.querySelectorAll('.mobile-setup-mode-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      state.practiceMode = tab.dataset.mode;
+      
+      // Also sync the main mode tabs
+      document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+      const mainTab = document.querySelector(`.mode-tab[data-mode="${tab.dataset.mode}"]`);
+      if (mainTab) mainTab.classList.add('active');
+      
+      updateMobileSetupSelectors();
+    });
+  });
+  
+  // Nav toggle listeners
+  screen.querySelectorAll('.mobile-setup-nav-option').forEach(option => {
+    option.addEventListener('click', () => {
+      screen.querySelectorAll('.mobile-setup-nav-option').forEach(o => o.classList.remove('active'));
+      option.classList.add('active');
+      state.navigationMode = option.dataset.nav;
+      localStorage.setItem('navigationMode', state.navigationMode);
+      
+      // Sync main nav toggles
+      document.querySelectorAll('.nav-option').forEach(o => o.classList.remove('active'));
+      const mainOpt = document.querySelector(`.nav-option[data-nav="${option.dataset.nav}"]`);
+      if (mainOpt) mainOpt.classList.add('active');
+    });
+  });
+  
+  // Start button
+  screen.querySelector('#mobileStartBtn').addEventListener('click', startMobileChallenge);
+  
+  updateMobileSetupSelectors();
+  screen.classList.remove('hidden');
+}
+
+function updateMobileSetupSelectors() {
+  const container = document.getElementById('mobileSetupSelectors');
+  if (!container) return;
+  
+  container.innerHTML = '';
+  
+  if (state.practiceMode === 'block') {
+    container.innerHTML = `
+      <div class="mobile-setup-selector-grid">
+        ${['s', 'p', 'd', 'f'].map(block => `
+          <label class="mobile-setup-checkbox-option">
+            <input type="checkbox" value="${block}" class="mobile-block-checkbox">
+            <span>${block.toUpperCase()}-Block</span>
+          </label>
+        `).join('')}
+      </div>
+    `;
+  } else if (state.practiceMode === 'group') {
+    const groups = Array.from({length: 18}, (_, i) => i + 1);
+    container.innerHTML = `
+      <div class="mobile-setup-selector-grid">
+        ${groups.map(g => `
+          <label class="mobile-setup-checkbox-option">
+            <input type="checkbox" value="${g}" class="mobile-group-checkbox">
+            <span>Group ${g}</span>
+          </label>
+        `).join('')}
+      </div>
+    `;
+  } else if (state.practiceMode === 'period') {
+    const periods = Array.from({length: 7}, (_, i) => i + 1);
+    container.innerHTML = `
+      <div class="mobile-setup-selector-grid">
+        ${periods.map(p => `
+          <label class="mobile-setup-checkbox-option">
+            <input type="checkbox" value="${p}" class="mobile-period-checkbox">
+            <span>Period ${p}</span>
+          </label>
+        `).join('')}
+      </div>
+    `;
+  }
+}
+
+function hideMobileSetupScreen() {
+  mobileSetupScreen.classList.add('hidden');
+}
+
+function startMobileChallenge() {
+  const mode = state.practiceMode;
+  
+  if (mode === 'block') {
+    state.selectedBlocks = Array.from(document.querySelectorAll('.mobile-block-checkbox:checked')).map(cb => cb.value);
+    if (state.selectedBlocks.length === 0) {
+      showHintToast('Please select at least one block');
+      return;
+    }
+  } else if (mode === 'group') {
+    state.selectedGroups = Array.from(document.querySelectorAll('.mobile-group-checkbox:checked')).map(cb => parseInt(cb.value));
+    if (state.selectedGroups.length === 0) {
+      showHintToast('Please select at least one group');
+      return;
+    }
+  } else if (mode === 'period') {
+    state.selectedPeriods = Array.from(document.querySelectorAll('.mobile-period-checkbox:checked')).map(cb => parseInt(cb.value));
+    if (state.selectedPeriods.length === 0) {
+      showHintToast('Please select at least one period');
+      return;
+    }
+  }
+  
+  hideMobileSetupScreen();
+  
+  // Apply mode
+  if (mode === 'full') {
+    handleModeChange('full');
+  } else {
+    handleModeChange(mode);
+    applySelection();
+  }
+  
+  // Find first active element and open persistent modal
+  const firstElement = findFirstActiveElement();
+  if (firstElement) {
+    openMobileInput(firstElement);
+  }
+}
+
+function findFirstActiveElement() {
+  const elements = Array.from(document.querySelectorAll('.element'))
+    .filter(el => !el.classList.contains('placeholder'))
+    .filter(el => state.activeElements.has(parseInt(el.dataset.atomic)))
+    .filter(el => !el.classList.contains('correct'))
+    .sort((a, b) => parseInt(a.dataset.atomic) - parseInt(b.dataset.atomic));
+  
+  return elements[0] || null;
+}
+
+function renderMiniTable() {
+  const miniTable = document.getElementById('miniPeriodicTable');
+  if (!miniTable) return;
+  miniTable.innerHTML = '';
+  
+  // Build the same layout as renderPeriodicTable()
+  const layout = [];
+  
+  // Period 1: H (1), 16 spacers, He (2)
+  layout.push(1);
+  for (let i = 0; i < 16; i++) layout.push('spacer');
+  layout.push(2);
+  
+  // Period 2: Li (3), Be (4), 10 spacers, B-Ne (5-10)
+  layout.push(3, 4);
+  for (let i = 0; i < 10; i++) layout.push('spacer');
+  for (let i = 5; i <= 10; i++) layout.push(i);
+  
+  // Period 3: Na (11), Mg (12), 10 spacers, Al-Ar (13-18)
+  layout.push(11, 12);
+  for (let i = 0; i < 10; i++) layout.push('spacer');
+  for (let i = 13; i <= 18; i++) layout.push(i);
+  
+  // Periods 4-5: K-Xe (19-54)
+  for (let i = 19; i <= 54; i++) layout.push(i);
+  
+  // Period 6: Cs (55), Ba (56), placeholder, Lu-At (72-86)
+  layout.push(55, 56, 'placeholder');
+  for (let i = 72; i <= 86; i++) layout.push(i);
+  
+  // Period 7: Fr (87), Ra (88), placeholder, Lr-Og (103-118)
+  layout.push(87, 88, 'placeholder');
+  for (let i = 103; i <= 118; i++) layout.push(i);
+  
+  // Spacer row
+  for (let i = 0; i < 18; i++) layout.push('spacer');
+  
+  // Lanthanides: 2 spacers, label, La-Lu (57-71)
+  layout.push('spacer', 'spacer', 'label');
+  for (let i = 57; i <= 71; i++) layout.push(i);
+  
+  // Actinides: 2 spacers, label, Ac-Lr (89-103)
+  layout.push('spacer', 'spacer', 'label');
+  for (let i = 89; i <= 103; i++) layout.push(i);
+  
+  // Build mini cells
+  layout.forEach(item => {
+    if (item === 'spacer' || item === 'label' || item === 'placeholder') {
+      const spacer = document.createElement('div');
+      spacer.className = 'mini-spacer';
+      miniTable.appendChild(spacer);
+    } else {
+      const cell = document.createElement('div');
+      cell.className = 'mini-cell';
+      cell.dataset.atomic = item;
+      
+      // Color by category
+      const elData = ELEMENTS.find(e => e.atomicNumber === item);
+      if (elData) {
+        cell.style.background = getCategoryColor(elData.category);
+        cell.style.borderColor = getCategoryColor(elData.category);
+      }
+      
+      // Mark disabled if not active
+      if (!state.activeElements.has(item)) {
+        cell.classList.add('mini-disabled');
+      }
+      
+      // Mark correct if already answered
+      if (state.correctElements.has(item)) {
+        cell.classList.add('mini-correct');
+      }
+      
+      miniTable.appendChild(cell);
+    }
+  });
+}
+
+function getCategoryColor(category) {
+  const colors = {
+    'alkali metal': 'var(--cat-alkali)',
+    'alkaline earth metal': 'var(--cat-alkaline)',
+    'transition metal': 'var(--cat-transition)',
+    'post-transition metal': 'var(--cat-post-transition)',
+    'metalloid': 'var(--cat-metalloid)',
+    'nonmetal': 'var(--cat-nonmetal)',
+    'halogen': 'var(--cat-halogen)',
+    'noble gas': 'var(--cat-noble)',
+    'lanthanide': 'var(--cat-lanthanide)',
+    'actinide': 'var(--cat-actinide)'
+  };
+  return colors[category] || 'var(--bg-tertiary)';
+}
+
+function updateMiniTable(atomicNumber, status) {
+  const miniTable = document.getElementById('miniPeriodicTable');
+  if (!miniTable) return;
+  
+  // Remove current highlight from all cells
+  miniTable.querySelectorAll('.mini-current').forEach(cell => {
+    cell.classList.remove('mini-current');
+  });
+  
+  const cell = miniTable.querySelector(`.mini-cell[data-atomic="${atomicNumber}"]`);
+  if (!cell) return;
+  
+  if (status === 'correct') {
+    cell.classList.remove('mini-incorrect');
+    cell.classList.add('mini-correct');
+    cell.style.background = '';
+    cell.style.borderColor = '';
+  } else if (status === 'incorrect') {
+    cell.classList.add('mini-incorrect');
+    cell.style.background = '';
+    cell.style.borderColor = '';
+    // Flash red then revert
+    setTimeout(() => {
+      cell.classList.remove('mini-incorrect');
+      const elData = ELEMENTS.find(e => e.atomicNumber === atomicNumber);
+      if (elData && !state.correctElements.has(atomicNumber)) {
+        cell.style.background = getCategoryColor(elData.category);
+        cell.style.borderColor = getCategoryColor(elData.category);
+      }
+    }, 600);
+  } else if (status === 'current') {
+    cell.classList.add('mini-current');
+  }
+}
+
+function updateMobileInputForElement(element) {
+  state.currentElement = element;
+  
+  const number = mobileInputModal.querySelector('.mobile-input-number');
+  const category = mobileInputModal.querySelector('.mobile-input-category');
+  
+  number.textContent = `Element #${element.dataset.atomic}`;
+  category.textContent = element.dataset.category;
+  
+  mobileInput.value = '';
+  mobileInputModal.querySelector('.mobile-input-hint').classList.add('hidden');
+  
+  // Update mini table to highlight new current element
+  updateMiniTable(parseInt(element.dataset.atomic), 'current');
+  updateMobileStats();
+  
+  setTimeout(() => mobileInput.focus(), 50);
+}
+
+function updateMobileStats() {
+  const correct = state.correctElements.size;
+  const total = state.activeElements.size;
+  const accuracy = state.totalAttempts > 0 ? Math.round((state.correctAttempts / state.totalAttempts) * 100) : 100;
+  
+  const progressEl = document.getElementById('mobileProgressDisplay');
+  const streakEl = document.getElementById('mobileStreakDisplay');
+  const accuracyEl = document.getElementById('mobileAccuracyDisplay');
+  const timerEl = document.getElementById('mobileTimerDisplay');
+  
+  if (progressEl) progressEl.textContent = `${correct}/${total}`;
+  if (streakEl) streakEl.textContent = state.streak;
+  if (accuracyEl) accuracyEl.textContent = `${accuracy}%`;
+  if (timerEl) {
+    const minutes = Math.floor(state.elapsedTime / 60);
+    const seconds = state.elapsedTime % 60;
+    timerEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  }
+}
+
+function findNextElementAuto(currentElement) {
+  const atomic = parseInt(currentElement.dataset.atomic);
+  const currentPeriod = parseInt(currentElement.dataset.period);
+  const currentGroup = parseInt(currentElement.dataset.group) || null;
+  const currentCategory = currentElement.dataset.category;
+  
+  let nextElement = null;
+  
+  if (state.navigationMode === 'period') {
+    if (currentCategory === 'lanthanide') {
+      nextElement = findNextInCategory('lanthanide', atomic);
+      if (!nextElement) {
+        nextElement = findFirstInPeriod(6, 71);
+      }
+    } else if (currentCategory === 'actinide') {
+      nextElement = findNextInCategory('actinide', atomic);
+      if (!nextElement) {
+        nextElement = findFirstInPeriod(7, 103);
+      }
+    } else if (currentGroup === 18) {
+      nextElement = findFirstInPeriod(currentPeriod + 1);
+    } else {
+      nextElement = findNextInPeriod(currentPeriod, atomic);
+      if (!nextElement) {
+        nextElement = findFirstInPeriod(currentPeriod + 1);
+      }
+    }
+  } else {
+    if (currentCategory === 'lanthanide' || currentCategory === 'actinide') {
+      nextElement = findNextInCategory(currentCategory, atomic);
+      if (!nextElement && currentCategory === 'lanthanide') {
+        nextElement = findFirstInCategory('actinide');
+      }
+    } else if (currentGroup) {
+      nextElement = findNextInGroup(currentGroup, currentPeriod);
+      if (!nextElement) {
+        nextElement = findFirstInGroup(currentGroup + 1);
+      }
+    }
+  }
+  
+  // If the found element is already correct or disabled, try to find any unanswered element
+  if (nextElement && (nextElement.classList.contains('correct') || nextElement.classList.contains('disabled'))) {
+    nextElement = findFirstActiveElement();
+  }
+  
+  if (!nextElement || nextElement.classList.contains('correct') || nextElement.classList.contains('disabled')) {
+    return null;
+  }
+  
+  return nextElement;
 }

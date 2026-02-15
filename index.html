@@ -107,6 +107,11 @@
       </div>
     </div>
 
+    <!-- Mobile Setup Screen -->
+    <div id="mobileSetupScreen" class="mobile-setup-screen hidden">
+      <!-- content will be populated by JS -->
+    </div>
+
     <!-- Score Display (Prominent) -->
     <div class="score-section">
       <div class="score-main">
@@ -243,6 +248,32 @@
       <!-- Mobile Input Modal -->
       <div id="mobileInputModal" class="mobile-input-modal hidden">
         <div class="mobile-input-content">
+          <!-- Mini Table Preview -->
+          <div id="miniTableContainer" class="mini-table-container">
+            <div id="miniPeriodicTable" class="mini-periodic-table"></div>
+          </div>
+
+          <!-- Stats Bar -->
+          <div class="mobile-modal-stats">
+            <div class="mobile-modal-stat">
+              <div class="mobile-modal-stat-value" id="mobileProgressDisplay">0/118</div>
+              <div class="mobile-modal-stat-label">Progress</div>
+            </div>
+            <div class="mobile-modal-stat">
+              <div class="mobile-modal-stat-value" id="mobileStreakDisplay">0</div>
+              <div class="mobile-modal-stat-label">Streak</div>
+            </div>
+            <div class="mobile-modal-stat">
+              <div class="mobile-modal-stat-value" id="mobileAccuracyDisplay">100%</div>
+              <div class="mobile-modal-stat-label">Accuracy</div>
+            </div>
+            <div class="mobile-modal-stat">
+              <div class="mobile-modal-stat-value" id="mobileTimerDisplay">00:00</div>
+              <div class="mobile-modal-stat-label">Time</div>
+            </div>
+          </div>
+
+          <!-- Element Info & Input -->
           <div class="mobile-input-header">
             <div class="mobile-input-element-info">
               <span class="mobile-input-number"></span>
@@ -252,11 +283,15 @@
               <i class="ri-close-line" aria-hidden="true"></i>
             </button>
           </div>
-          <input type="text" id="mobileInput" class="mobile-input-field" maxlength="3" autocomplete="off" placeholder="Enter symbol">
+          <input type="text" id="mobileInput" class="mobile-input-field" maxlength="3" autocomplete="off" placeholder="Enter symbol" inputmode="text">
           <div class="mobile-input-actions">
             <button id="mobileHintBtn" class="mobile-hint-btn">
               <i class="ri-lightbulb-line"></i>
-              Hint (-50)
+              Hint
+            </button>
+            <button id="mobileSkipBtn" class="mobile-skip-btn">
+              <i class="ri-skip-forward-line"></i>
+              Skip
             </button>
             <button id="mobileSubmitBtn" class="mobile-submit-btn">
               <i class="ri-check-line"></i>
