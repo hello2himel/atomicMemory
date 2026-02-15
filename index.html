@@ -248,6 +248,12 @@
       <!-- Mobile Input Modal -->
       <div id="mobileInputModal" class="mobile-input-modal hidden">
         <div class="mobile-input-content">
+          <!-- Score Row -->
+          <div class="mobile-modal-score-row">
+            <div class="mobile-modal-score-value" id="mobileScoreDisplay">0</div>
+            <span class="mobile-modal-rank" id="mobileRankDisplay">Novice</span>
+          </div>
+
           <!-- Mini Table Preview -->
           <div id="miniTableContainer" class="mini-table-container">
             <div id="miniPeriodicTable" class="mini-periodic-table"></div>
@@ -271,6 +277,25 @@
               <div class="mobile-modal-stat-value" id="mobileTimerDisplay">00:00</div>
               <div class="mobile-modal-stat-label">Time</div>
             </div>
+          </div>
+
+          <!-- Toolbar -->
+          <div class="mobile-modal-toolbar">
+            <button class="mobile-toolbar-btn" id="mobileToolbarHistory" title="History">
+              <i class="ri-history-line"></i>
+            </button>
+            <button class="mobile-toolbar-btn" id="mobileToolbarLeaderboard" title="Leaderboard">
+              <i class="ri-trophy-line"></i>
+            </button>
+            <button class="mobile-toolbar-btn" id="mobileToolbarAchievements" title="Achievements">
+              <i class="ri-medal-line"></i>
+            </button>
+            <button class="mobile-toolbar-btn" id="mobileToolbarTheme" title="Toggle theme">
+              <i class="ri-moon-line"></i>
+            </button>
+            <button class="mobile-toolbar-btn" id="mobileToolbarReset" title="Reset">
+              <i class="ri-restart-line"></i>
+            </button>
           </div>
 
           <!-- Element Info & Input -->

@@ -200,6 +200,25 @@ function setupEventListeners() {
   });
   document.querySelector('.mobile-input-close').addEventListener('click', closeMobileInput);
   
+  // Mobile toolbar buttons
+  document.getElementById('mobileToolbarHistory').addEventListener('click', openHistoryModal);
+  document.getElementById('mobileToolbarLeaderboard').addEventListener('click', openLeaderboardModal);
+  document.getElementById('mobileToolbarAchievements').addEventListener('click', openAchievementsModal);
+  document.getElementById('mobileToolbarTheme').addEventListener('click', () => {
+    darkModeBtn.click();
+    // Update the toolbar icon
+    const icon = document.querySelector('#mobileToolbarTheme i');
+    icon.className = document.body.dataset.theme === 'dark' ? 'ri-sun-line' : 'ri-moon-line';
+  });
+  document.getElementById('mobileToolbarReset').addEventListener('click', () => {
+    if (confirm('Reset current challenge?')) {
+      resetChallenge();
+      if (state.isMobile) {
+        showMobileSetupScreen();
+      }
+    }
+  });
+  
   // Complete modal
   playAgainBtn.addEventListener('click', () => {
     closeModal(completeModal);
@@ -559,6 +578,12 @@ function openMobileInput(element) {
   mobileInputModal.querySelector('.mobile-input-hint').classList.add('hidden');
   mobileInputModal.classList.remove('hidden');
   
+  // Sync theme icon in modal toolbar
+  const themeIcon = document.querySelector('#mobileToolbarTheme i');
+  if (themeIcon) {
+    themeIcon.className = document.body.dataset.theme === 'dark' ? 'ri-sun-line' : 'ri-moon-line';
+  }
+  
   // Highlight current element in mini table
   updateMiniTable(parseInt(element.dataset.atomic), 'current');
   updateMobileStats();
@@ -569,6 +594,10 @@ function openMobileInput(element) {
 function closeMobileInput() {
   mobileInputModal.classList.add('hidden');
   state.currentElement = null;
+  // On mobile, go back to setup screen since there's no desktop UI
+  if (state.isMobile) {
+    showMobileSetupScreen();
+  }
 }
 
 function handleMobileSubmit() {
@@ -1337,6 +1366,21 @@ function showMobileSetupScreen() {
       <i class="ri-play-fill"></i>
       Start Challenge
     </button>
+    
+    <div class="mobile-setup-toolbar">
+      <button class="mobile-setup-toolbar-btn" id="setupHistoryBtn" title="History">
+        <i class="ri-history-line"></i>
+      </button>
+      <button class="mobile-setup-toolbar-btn" id="setupLeaderboardBtn" title="Leaderboard">
+        <i class="ri-trophy-line"></i>
+      </button>
+      <button class="mobile-setup-toolbar-btn" id="setupAchievementsBtn" title="Achievements">
+        <i class="ri-medal-line"></i>
+      </button>
+      <button class="mobile-setup-toolbar-btn" id="setupThemeBtn" title="Toggle theme">
+        <i class="${document.body.dataset.theme === 'dark' ? 'ri-sun-line' : 'ri-moon-line'}"></i>
+      </button>
+    </div>
   `;
   
   // Mode tab listeners
@@ -1372,6 +1416,16 @@ function showMobileSetupScreen() {
   
   // Start button
   screen.querySelector('#mobileStartBtn').addEventListener('click', startMobileChallenge);
+  
+  // Setup toolbar listeners
+  screen.querySelector('#setupHistoryBtn').addEventListener('click', openHistoryModal);
+  screen.querySelector('#setupLeaderboardBtn').addEventListener('click', openLeaderboardModal);
+  screen.querySelector('#setupAchievementsBtn').addEventListener('click', openAchievementsModal);
+  screen.querySelector('#setupThemeBtn').addEventListener('click', () => {
+    darkModeBtn.click();
+    const icon = screen.querySelector('#setupThemeBtn i');
+    icon.className = document.body.dataset.theme === 'dark' ? 'ri-sun-line' : 'ri-moon-line';
+  });
   
   updateMobileSetupSelectors();
   screen.classList.remove('hidden');
@@ -1640,6 +1694,18 @@ function updateMobileStats() {
     const minutes = Math.floor(state.elapsedTime / 60);
     const seconds = state.elapsedTime % 60;
     timerEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  }
+  
+  // Update score and rank
+  const scoreEl = document.getElementById('mobileScoreDisplay');
+  const rankEl = document.getElementById('mobileRankDisplay');
+  if (scoreEl && typeof scoringSystem !== 'undefined') {
+    scoreEl.textContent = scoringSystem.formatScore(scoringSystem.score);
+  }
+  if (rankEl && typeof scoringSystem !== 'undefined') {
+    const rank = scoringSystem.getRank();
+    rankEl.textContent = rank.name;
+    rankEl.style.background = `linear-gradient(135deg, ${rank.color} 0%, ${rank.color}dd 100%)`;
   }
 }
 

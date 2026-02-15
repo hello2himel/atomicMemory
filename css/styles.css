@@ -2365,158 +2365,156 @@ body {
     --space-2xl: 24px;
   }
   
-  /* Reorder layout to put table first */
+  /* Hide desktop UI entirely on mobile - mobile setup & modal are the only UI */
+  .header,
+  .score-section,
+  .quick-settings,
+  .mode-selection-panel,
+  .footer {
+    display: none !important;
+  }
+  
   .main-app {
     display: flex;
     flex-direction: column;
   }
   
-  .header {
-    padding: 0 var(--space-md);
-    height: 60px;
-    order: 1;
-  }
-  
-  /* TABLE GOES TO TOP - Most important change */
+  /* Table container holds the periodic table (hidden behind modal) and the mobile modal */
   .table-container {
-    padding: var(--space-md);
-    order: 2;
-    min-height: 50vh;
-    overflow-x: auto;
-    overflow-y: visible;
-    -webkit-overflow-scrolling: touch;
+    padding: 0;
+    order: 1;
+    min-height: 0;
+    overflow: hidden;
   }
   
-  /* Score section below table */
-  .score-section {
-    padding: var(--space-md);
-    order: 3;
-  }
-  
-  /* Settings below score */
-  .quick-settings {
-    padding: var(--space-md);
-    order: 4;
-  }
-  
-  .mode-selection-panel {
-    padding: var(--space-md);
-    order: 5;
-  }
-  
-  .footer {
-    order: 6;
-  }
-  
-  /* Table wrapper for horizontal scroll */
+  /* Table wrapper - hidden behind mobile UI */
   .table-wrapper {
-    min-width: max-content;
-    overflow-x: visible;
-  }
-  
-  /* KEEP FULL 18-COLUMN STRUCTURE */
-  .periodic-table {
-    grid-template-columns: repeat(18, 1fr);
-    grid-auto-rows: minmax(48px, auto);
-    gap: 3px;
-    min-width: 900px; /* Force horizontal scroll instead of collapsing */
-  }
-  
-  .element {
-    min-height: 48px;
-    min-width: 48px;
-    padding: 4px;
-  }
-  
-  .element-symbol {
-    font-size: 14px;
-  }
-  
-  .element-name {
-    font-size: 7px;
-  }
-  
-  .element-number {
-    font-size: 7px;
-  }
-  
-  /* Keep spacers and labels visible */
-  .spacer {
-    min-width: 48px;
-  }
-  
-  .lanthanide-label,
-  .actinide-label {
-    font-size: 8px;
-  }
-  
-  .header-subtitle {
     display: none;
   }
-  
-  .logo {
-    width: 36px;
-    height: 36px;
+
+  /* Mobile input modal becomes full-screen */
+  .mobile-input-modal {
+    align-items: stretch;
   }
   
-  .site-title {
-    font-size: 18px;
-  }
-  
-  .header-icon-btn {
-    width: 36px;
-    height: 36px;
-    font-size: 18px;
-  }
-  
-  .header-icon-btn:not(.mobile-menu-btn) {
-    display: none;
-  }
-  
-  .mobile-menu-btn {
+  .mobile-input-content {
+    border-radius: 0;
+    height: 100%;
     display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    padding: var(--space-lg) var(--space-md);
   }
-  
-  .score-value {
-    font-size: 40px;
+
+  /* Current element blink animation on mini table */
+  .mini-cell.mini-current {
+    animation: mini-cell-blink 1s ease-in-out infinite;
   }
-  
-  .score-stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-sm);
+
+  @keyframes mini-cell-blink {
+    0%, 100% {
+      box-shadow: 0 0 4px rgba(16, 185, 129, 0.5);
+      border-color: var(--accent-primary);
+    }
+    50% {
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.9), 0 0 20px rgba(16, 185, 129, 0.4);
+      border-color: #34d399;
+    }
   }
-  
-  .mini-stat {
-    padding: var(--space-sm);
+
+  /* Mobile score display in modal */
+  .mobile-modal-score-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-sm) var(--space-md);
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-sm);
   }
-  
-  .mini-stat-icon {
-    width: 32px;
-    height: 32px;
-    font-size: 16px;
+
+  .mobile-modal-score-value {
+    font-size: 22px;
+    font-weight: 800;
+    font-family: var(--font-mono);
+    color: var(--accent-primary);
   }
-  
-  .mini-stat-value {
+
+  .mobile-modal-rank {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
+    color: white;
+    background: var(--accent-gradient);
+  }
+
+  /* Mobile toolbar in modal */
+  .mobile-modal-toolbar {
+    display: flex;
+    justify-content: space-around;
+    padding: var(--space-xs) 0;
+    margin-bottom: var(--space-sm);
+    gap: var(--space-xs);
+  }
+
+  .mobile-toolbar-btn {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: var(--space-sm) var(--space-md);
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-family: var(--font-body);
+    flex: 1;
+    justify-content: center;
+    transition: all 150ms ease;
+  }
+
+  .mobile-toolbar-btn:active {
+    background: var(--bg-hover);
+  }
+
+  .mobile-toolbar-btn i {
     font-size: 14px;
   }
-  
-  .mini-stat-label {
-    font-size: 10px;
+
+  /* Mobile setup screen toolbar */
+  .mobile-setup-toolbar {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-sm);
+    margin-top: auto;
+    padding-top: var(--space-md);
   }
-  
-  .mode-tabs {
-    flex-wrap: wrap;
+
+  .mobile-setup-toolbar-btn {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: var(--space-sm) var(--space-md);
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-family: var(--font-body);
+    transition: all 150ms ease;
   }
-  
-  .mode-tab span,
-  .nav-option span,
-  .action-btn span {
-    display: none;
+
+  .mobile-setup-toolbar-btn:active {
+    background: var(--bg-hover);
   }
-  
-  .mode-tab,
-  .nav-option {
-    padding: 10px 12px;
+
+  .mobile-setup-toolbar-btn i {
+    font-size: 16px;
   }
   
   .intro-title {
@@ -2598,39 +2596,6 @@ body {
 
 /* Small Mobile */
 @media (max-width: 480px) {
-  /* Keep 18-column structure but make smaller */
-  .periodic-table {
-    grid-auto-rows: minmax(42px, auto);
-    gap: 2px;
-    min-width: 800px;
-  }
-  
-  .element {
-    min-height: 42px;
-    min-width: 42px;
-    padding: 2px;
-  }
-  
-  .element-symbol {
-    font-size: 12px;
-  }
-  
-  .element-name {
-    font-size: 6px;
-  }
-  
-  .element-number {
-    font-size: 6px;
-  }
-  
-  .spacer {
-    min-width: 42px;
-  }
-  
-  .score-stats-grid {
-    grid-template-columns: 1fr;
-  }
-  
   .complete-stats-grid {
     grid-template-columns: 1fr;
   }
