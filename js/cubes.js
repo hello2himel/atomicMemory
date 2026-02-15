@@ -3,7 +3,7 @@
   const container = document.getElementById('introPeriodicTable');
   if (!container) return;
 
-  const RANDOM_COLORS = ['#ef4444', '#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6', '#06b6d4', '#eab308'];
+  const FLASH_COLORS = ['#ef4444', '#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6', '#06b6d4', '#eab308'];
 
   const CATEGORY_COLORS = {
     'alkali metal': '#ef4444',
@@ -62,7 +62,7 @@
       const cell = document.createElement('div');
       cell.className = 'intro-table-cell';
       cell.dataset.atomic = item;
-      var elData = elemMap[item];
+      const elData = elemMap[item];
       if (elData) {
         cell.dataset.category = elData.category;
       }
@@ -71,9 +71,24 @@
     }
   });
 
-  // Animation state
-  var animationId = null;
-  var stopped = false;
+  // Animation state — persistent timer list for proper cleanup
+  let stopped = false;
+  const activeTimers = [];
+
+  function addTimer(fn, delay) {
+    const id = setTimeout(function() {
+      const idx = activeTimers.indexOf(id);
+      if (idx > -1) activeTimers.splice(idx, 1);
+      fn();
+    }, delay);
+    activeTimers.push(id);
+    return id;
+  }
+
+  function clearAllTimers() {
+    activeTimers.forEach(function(t) { clearTimeout(t); });
+    activeTimers.length = 0;
+  }
 
   // Phase 1: Random color flashes on random cells
   // Phase 2: All cells settle to proper category colors
@@ -81,45 +96,40 @@
     if (stopped) return;
 
     // Phase 1: Random flashes for ~3 seconds
-    var flashTimers = [];
-    var flashCount = 0;
-    var maxFlashes = 40;
+    let flashCount = 0;
+    const maxFlashes = 40;
 
     function scheduleFlash() {
       if (stopped || flashCount >= maxFlashes) return;
       flashCount++;
-      var delay = Math.random() * 75;
-      var timer = setTimeout(function() {
+      const delay = Math.random() * 75;
+      addTimer(function() {
         if (stopped) return;
-        // Pick a random cell
-        var cell = cells[Math.floor(Math.random() * cells.length)];
-        var color = RANDOM_COLORS[Math.floor(Math.random() * RANDOM_COLORS.length)];
+        const cell = cells[Math.floor(Math.random() * cells.length)];
+        const color = FLASH_COLORS[Math.floor(Math.random() * FLASH_COLORS.length)];
         cell.style.background = color;
         cell.style.borderColor = color;
         scheduleFlash();
       }, delay);
-      flashTimers.push(timer);
     }
 
     // Start several flash chains in parallel
-    for (var i = 0; i < 6; i++) {
+    for (let i = 0; i < 6; i++) {
       scheduleFlash();
     }
 
     // Phase 2: After random phase, settle to proper colors
-    var settleTimer = setTimeout(function() {
+    addTimer(function() {
       if (stopped) return;
-      // Clear any remaining flash timers
-      flashTimers.forEach(function(t) { clearTimeout(t); });
 
       // Settle cells to proper colors with staggered timing
       cells.forEach(function(cell, index) {
-        var delay = index * 8;
-        setTimeout(function() {
+        const delay = index * 8;
+        addTimer(function() {
           if (stopped) return;
-          var elData = elemMap[cell.dataset.atomic];
+          const elData = elemMap[cell.dataset.atomic];
           if (elData) {
-            var properColor = CATEGORY_COLORS[elData.category] || '#334155';
+            const properColor = CATEGORY_COLORS[elData.category] || '#334155';
             cell.style.background = properColor;
             cell.style.borderColor = properColor;
           }
@@ -127,7 +137,7 @@
       });
 
       // Hold proper colors for 2 seconds, then reset and cycle
-      var holdTimer = setTimeout(function() {
+      addTimer(function() {
         if (stopped) return;
         // Reset all cells to dim
         cells.forEach(function(cell) {
@@ -135,14 +145,11 @@
           cell.style.borderColor = '#475569';
         });
         // Start next cycle after brief pause
-        var nextTimer = setTimeout(function() {
+        addTimer(function() {
           runCycle();
         }, 500);
-        flashTimers.push(nextTimer);
       }, 2500);
-      flashTimers.push(holdTimer);
     }, 3000);
-    flashTimers.push(settleTimer);
   }
 
   // Start animation
@@ -151,6 +158,7 @@
   // Cleanup on start
   document.getElementById('startBtn').addEventListener('click', function() {
     stopped = true;
+    clearAllTimers();
     setTimeout(function() {
       container.innerHTML = '';
     }, 600);
