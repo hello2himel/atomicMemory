@@ -86,7 +86,6 @@ Novice → Apprentice → Chemist → Expert → Master → Grand Master → Leg
 │   ├── scoring.js          # Scoring system, rank tiers, leaderboard, localStorage
 │   ├── achievements.js     # 15 achievement definitions and unlock manager
 │   └── cubes.js            # Intro animation and logo grid animation
-└── index.html              # Main app (intro, header, table, modals)
 ```
 
 ---
