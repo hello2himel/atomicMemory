@@ -374,62 +374,74 @@
     <div id="completeModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Challenge Complete">
       <div class="modal-overlay"></div>
       <div class="modal-content complete-modal-content">
-        <button id="closeCompleteBtn" class="close-modal-btn complete-close-btn" aria-label="Close">
-          <i class="ri-close-line" aria-hidden="true"></i>
-        </button>
-        <div class="complete-confetti"></div>
+        <!-- Header: icon + title + close -->
         <div class="complete-header">
           <div class="complete-icon">
             <i class="ri-trophy-line"></i>
           </div>
           <h2 class="complete-title">Challenge Complete!</h2>
-          <p class="complete-subtitle">Congratulations on mastering the elements</p>
+          <button id="closeCompleteBtn" class="close-modal-btn complete-close-btn" aria-label="Close">
+            <i class="ri-close-line" aria-hidden="true"></i>
+          </button>
         </div>
+
+        <!-- Score block -->
         <div class="complete-score">
           <div class="complete-score-label">Final Score</div>
           <div class="complete-score-value" id="finalScoreDisplay">0</div>
           <div class="complete-rank" id="finalRankDisplay">Novice</div>
         </div>
+
+        <!-- Stats row (3-column inline) -->
         <div class="complete-stats-grid">
           <div class="complete-stat">
-            <div class="complete-stat-icon"><i class="ri-timer-line"></i></div>
-            <div class="complete-stat-value" id="completeTime">00:00</div>
-            <div class="complete-stat-label">Time</div>
+            <i class="ri-timer-line"></i>
+            <span class="complete-stat-value" id="completeTime">00:00</span>
+            <span class="complete-stat-label">Time</span>
           </div>
           <div class="complete-stat">
-            <div class="complete-stat-icon"><i class="ri-percent-line"></i></div>
-            <div class="complete-stat-value" id="completeAccuracy">100%</div>
-            <div class="complete-stat-label">Accuracy</div>
+            <i class="ri-focus-3-line"></i>
+            <span class="complete-stat-value" id="completeAccuracy">100%</span>
+            <span class="complete-stat-label">Accuracy</span>
           </div>
           <div class="complete-stat">
-            <div class="complete-stat-icon"><i class="ri-fire-line"></i></div>
-            <div class="complete-stat-value" id="completeStreak">0</div>
-            <div class="complete-stat-label">Best Streak</div>
+            <i class="ri-fire-line"></i>
+            <span class="complete-stat-value" id="completeStreak">0</span>
+            <span class="complete-stat-label">Best Streak</span>
           </div>
         </div>
+
+        <!-- Collapsible breakdown -->
         <div class="complete-breakdown">
-          <h4>Score Breakdown</h4>
-          <div class="breakdown-item">
-            <span>Base Score (Speed × Elements)</span>
-            <span id="breakdownBase">0</span>
-          </div>
-          <div class="breakdown-item bonus">
-            <span>Bonuses (Streaks, Perfect)</span>
-            <span id="breakdownBonus">+0</span>
-          </div>
-          <div class="breakdown-item penalty">
-            <span>Penalties (Mistakes, Hints)</span>
-            <span id="breakdownPenalty">-0</span>
+          <button class="breakdown-toggle" id="breakdownToggle" aria-expanded="false">
+            <span>Score Breakdown</span>
+            <i class="ri-arrow-down-s-line"></i>
+          </button>
+          <div class="breakdown-content hidden" id="breakdownContent">
+            <div class="breakdown-item">
+              <span>Base Score</span>
+              <span id="breakdownBase">0</span>
+            </div>
+            <div class="breakdown-item bonus">
+              <span>Bonuses</span>
+              <span id="breakdownBonus">+0</span>
+            </div>
+            <div class="breakdown-item penalty">
+              <span>Penalties</span>
+              <span id="breakdownPenalty">-0</span>
+            </div>
           </div>
         </div>
+
+        <!-- Actions -->
         <div class="complete-actions">
-          <button id="shareScoreBtn" class="complete-btn secondary-btn">
-            <i class="ri-share-line"></i>
-            Share Score
-          </button>
           <button id="playAgainBtn" class="complete-btn primary-btn">
             <i class="ri-restart-line"></i>
             Play Again
+          </button>
+          <button id="shareScoreBtn" class="complete-btn secondary-btn">
+            <i class="ri-share-line"></i>
+            Share
           </button>
         </div>
       </div>

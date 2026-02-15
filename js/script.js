@@ -238,6 +238,17 @@ function setupEventListeners() {
   });
   shareScoreBtn.addEventListener('click', shareScore);
   
+  // Breakdown toggle
+  const breakdownToggle = document.getElementById('breakdownToggle');
+  if (breakdownToggle) {
+    breakdownToggle.addEventListener('click', () => {
+      const content = document.getElementById('breakdownContent');
+      const expanded = breakdownToggle.getAttribute('aria-expanded') === 'true';
+      breakdownToggle.setAttribute('aria-expanded', String(!expanded));
+      content.classList.toggle('hidden');
+    });
+  }
+  
   // Close modals on overlay click
   [historyModal, leaderboardModal, achievementsModal, completeModal, infoModal].forEach(modal => {
     modal.querySelector('.modal-overlay')?.addEventListener('click', () => closeModal(modal));
@@ -1257,7 +1268,9 @@ function showCompleteModal() {
   
   finalScoreDisplay.textContent = scoringSystem.formatScore(scoringSystem.score);
   finalRankDisplay.textContent = rank.name;
-  finalRankDisplay.style.background = `linear-gradient(135deg, ${rank.color} 0%, ${rank.color}dd 100%)`;
+  if (/^#[0-9a-fA-F]{6}$/.test(rank.color)) {
+    finalRankDisplay.style.background = rank.color;
+  }
   
   const minutes = Math.floor(state.elapsedTime / 60);
   const seconds = state.elapsedTime % 60;
@@ -1269,8 +1282,11 @@ function showCompleteModal() {
   breakdownBonus.textContent = `+${scoringSystem.formatScore(scoringSystem.bonusPoints)}`;
   breakdownPenalty.textContent = `-${scoringSystem.formatScore(scoringSystem.penaltyPoints)}`;
   
-  // Add confetti effect
-  createConfetti();
+  // Ensure breakdown is collapsed
+  const breakdownContent = document.getElementById('breakdownContent');
+  const breakdownToggle = document.getElementById('breakdownToggle');
+  if (breakdownContent) breakdownContent.classList.add('hidden');
+  if (breakdownToggle) breakdownToggle.setAttribute('aria-expanded', 'false');
   
   completeModal.classList.remove('hidden');
   
@@ -1278,52 +1294,36 @@ function showCompleteModal() {
   saveToHistory();
 }
 
-function createConfetti() {
-  const confettiContainer = document.querySelector('.complete-confetti');
-  confettiContainer.innerHTML = '';
-  
-  const colors = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
-  
-  for (let i = 0; i < 50; i++) {
-    const confetti = document.createElement('div');
-    confetti.style.position = 'absolute';
-    confetti.style.width = '10px';
-    confetti.style.height = '10px';
-    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-    confetti.style.left = Math.random() * 100 + '%';
-    confetti.style.top = '-10px';
-    confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
-    confetti.style.animation = `confetti-fall ${2 + Math.random() * 2}s linear forwards`;
-    confetti.style.opacity = '0.8';
-    
-    confettiContainer.appendChild(confetti);
-  }
-  
-  // Add keyframe animation
-  if (!document.getElementById('confetti-animation')) {
-    const style = document.createElement('style');
-    style.id = 'confetti-animation';
-    style.textContent = `
-      @keyframes confetti-fall {
-        to {
-          transform: translateY(600px) rotate(${Math.random() * 720}deg);
-          opacity: 0;
-        }
-      }
-    `;
-    document.head.appendChild(style);
-  }
+function getShareFocusLabel() {
+  if (state.practiceMode === 'full') return 'All 118 Elements';
+  if (state.practiceMode === 'block') return `${state.selectedBlocks.map(b => b + '-block').join(', ')}`;
+  if (state.practiceMode === 'group') return `Group ${state.selectedGroups.join(', ')}`;
+  if (state.practiceMode === 'period') return `Period ${state.selectedPeriods.join(', ')}`;
+  return 'Custom';
+}
+
+function getShareModeLabel() {
+  if (state.practiceMode === 'full') return 'Full Table';
+  if (state.practiceMode === 'block') return 'Block Practice';
+  if (state.practiceMode === 'group') return 'Group Practice';
+  if (state.practiceMode === 'period') return 'Period Practice';
+  return 'Custom';
 }
 
 function shareScore() {
   const rank = scoringSystem.getRank();
-  const text = `🎓 I just scored ${scoringSystem.formatScore(scoringSystem.score)} points on AtomicMemory!\n\n🏆 Rank: ${rank.name}\n⏱️ Time: ${Math.floor(state.elapsedTime / 60)}:${String(state.elapsedTime % 60).padStart(2, '0')}\n🎯 Accuracy: ${state.accuracy}%\n\nCan you beat my score?`;
+  const minutes = Math.floor(state.elapsedTime / 60);
+  const seconds = String(state.elapsedTime % 60).padStart(2, '0');
+  const modeLabel = getShareModeLabel();
+  const focusLabel = getShareFocusLabel();
+  
+  const text = `🎓 I just scored ${scoringSystem.formatScore(scoringSystem.score)} points on AtomicMemory!\n\n🏆 Rank: ${rank.name}\n🧪 Mode: ${modeLabel}\n📚 Focus: ${focusLabel}\n⏱️ Time: ${minutes}:${seconds}\n🎯 Accuracy: ${state.accuracy}%\n\nCan you beat my score?\nPlay now → https://atomicmemory.netlify.app`;
   
   if (navigator.share) {
     navigator.share({
       title: 'AtomicMemory Score',
       text: text,
-      url: window.location.href
+      url: 'https://atomicmemory.netlify.app'
     }).catch(() => {});
   } else {
     navigator.clipboard.writeText(text).then(() => {
