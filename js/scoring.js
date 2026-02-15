@@ -238,13 +238,14 @@ class ScoringSystem {
     }
   }
 
-  saveScore(config, elementsCount, time, mistakes) {
+  saveScore(config, elementsCount, time, mistakes, modeLabel) {
     const leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]');
     
     const entry = {
       score: this.score,
       rank: this.getRank().name,
       config: config,
+      modeLabel: modeLabel || config,
       elementsCount: elementsCount,
       time: time,
       mistakes: mistakes,

@@ -1062,7 +1062,6 @@ body {
   font-size: 16px;
   font-weight: 700;
   text-align: center;
-  text-transform: uppercase;
   outline: none;
   color: var(--text-primary);
   border-radius: var(--radius-sm);
@@ -1174,7 +1173,6 @@ body {
   font-size: 32px;
   font-weight: 700;
   text-align: center;
-  text-transform: uppercase;
   outline: none;
   color: var(--text-primary);
   border-radius: var(--radius-lg);
