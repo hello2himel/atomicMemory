@@ -201,9 +201,6 @@ function setupEventListeners() {
   document.querySelector('.mobile-input-close').addEventListener('click', closeMobileInput);
   
   // Mobile toolbar buttons
-  document.getElementById('mobileToolbarHistory').addEventListener('click', openHistoryModal);
-  document.getElementById('mobileToolbarLeaderboard').addEventListener('click', openLeaderboardModal);
-  document.getElementById('mobileToolbarAchievements').addEventListener('click', openAchievementsModal);
   document.getElementById('mobileToolbarTheme').addEventListener('click', () => {
     darkModeBtn.click();
     // Update the toolbar icon
@@ -1350,8 +1347,15 @@ function showMobileSetupScreen() {
   
   screen.innerHTML = `
     <div class="mobile-setup-header">
-      <div class="mobile-setup-title">⚛️ AtomicMemory</div>
+      <div class="mobile-setup-logo-row">
+        <img src="res/logo.svg" alt="AtomicMemory" class="mobile-setup-logo">
+        <div class="mobile-setup-title">AtomicMemory</div>
+      </div>
       <div class="mobile-setup-subtitle">Configure your challenge</div>
+    </div>
+
+    <div id="mobileSetupPreviewContainer" class="mobile-setup-preview">
+      <div id="mobileSetupPreviewTable" class="mini-periodic-table"></div>
     </div>
     
     <div class="mobile-setup-section">
@@ -1411,6 +1415,9 @@ function showMobileSetupScreen() {
       <button class="mobile-setup-toolbar-btn" id="setupThemeBtn" title="Toggle theme">
         <i class="${document.body.dataset.theme === 'dark' ? 'ri-sun-line' : 'ri-moon-line'}"></i>
       </button>
+      <button class="mobile-setup-toolbar-btn" id="setupInfoBtn" title="Info">
+        <i class="ri-information-line"></i>
+      </button>
     </div>
   `;
   
@@ -1430,6 +1437,7 @@ function showMobileSetupScreen() {
       setNavigationForMode(tab.dataset.mode);
       
       updateMobileSetupSelectors();
+      renderSetupPreviewTable();
     });
   });
   
@@ -1460,8 +1468,12 @@ function showMobileSetupScreen() {
     const icon = screen.querySelector('#setupThemeBtn i');
     icon.className = document.body.dataset.theme === 'dark' ? 'ri-sun-line' : 'ri-moon-line';
   });
+  screen.querySelector('#setupInfoBtn').addEventListener('click', () => {
+    alert('Made with ❤️ by @hello2himel from 🇧🇩\n\nThis is an open source software.\nhttps://github.com/hello2himel/atomicmemory');
+  });
   
   updateMobileSetupSelectors();
+  renderSetupPreviewTable();
   screen.classList.remove('hidden');
 }
 
@@ -1507,6 +1519,88 @@ function updateMobileSetupSelectors() {
       </div>
     `;
   }
+  
+  // Listen to checkbox changes to update preview table
+  container.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', () => renderSetupPreviewTable());
+  });
+}
+
+function renderSetupPreviewTable() {
+  const previewTable = document.getElementById('mobileSetupPreviewTable');
+  if (!previewTable) return;
+  previewTable.innerHTML = '';
+  
+  // Determine which elements are active based on current mode/selections
+  const activeSet = new Set();
+  const mode = state.practiceMode;
+  
+  if (mode === 'full') {
+    ELEMENTS.forEach(el => activeSet.add(el.atomicNumber));
+  } else if (mode === 'block') {
+    const checked = Array.from(document.querySelectorAll('.mobile-block-checkbox:checked')).map(cb => cb.value);
+    if (checked.length > 0) {
+      ELEMENTS.forEach(el => { if (checked.includes(el.block)) activeSet.add(el.atomicNumber); });
+    } else {
+      ELEMENTS.forEach(el => activeSet.add(el.atomicNumber));
+    }
+  } else if (mode === 'group') {
+    const checked = Array.from(document.querySelectorAll('.mobile-group-checkbox:checked')).map(cb => parseInt(cb.value));
+    if (checked.length > 0) {
+      ELEMENTS.forEach(el => { if (el.group && checked.includes(el.group)) activeSet.add(el.atomicNumber); });
+    } else {
+      ELEMENTS.forEach(el => activeSet.add(el.atomicNumber));
+    }
+  } else if (mode === 'period') {
+    const checked = Array.from(document.querySelectorAll('.mobile-period-checkbox:checked')).map(cb => parseInt(cb.value));
+    if (checked.length > 0) {
+      ELEMENTS.forEach(el => { if (checked.includes(el.period)) activeSet.add(el.atomicNumber); });
+    } else {
+      ELEMENTS.forEach(el => activeSet.add(el.atomicNumber));
+    }
+  }
+  
+  // Build layout (same as renderMiniTable)
+  const layout = [];
+  layout.push(1);
+  for (let i = 0; i < 16; i++) layout.push('spacer');
+  layout.push(2);
+  layout.push(3, 4);
+  for (let i = 0; i < 10; i++) layout.push('spacer');
+  for (let i = 5; i <= 10; i++) layout.push(i);
+  layout.push(11, 12);
+  for (let i = 0; i < 10; i++) layout.push('spacer');
+  for (let i = 13; i <= 18; i++) layout.push(i);
+  for (let i = 19; i <= 54; i++) layout.push(i);
+  layout.push(55, 56, 'placeholder');
+  for (let i = 72; i <= 86; i++) layout.push(i);
+  layout.push(87, 88, 'placeholder');
+  for (let i = 104; i <= 118; i++) layout.push(i);
+  for (let i = 0; i < 18; i++) layout.push('spacer');
+  layout.push('spacer', 'spacer', 'label');
+  for (let i = 57; i <= 71; i++) layout.push(i);
+  layout.push('spacer', 'spacer', 'label');
+  for (let i = 89; i <= 103; i++) layout.push(i);
+  
+  layout.forEach(item => {
+    if (item === 'spacer' || item === 'label' || item === 'placeholder') {
+      const spacer = document.createElement('div');
+      spacer.className = 'mini-spacer';
+      previewTable.appendChild(spacer);
+    } else {
+      const cell = document.createElement('div');
+      cell.className = 'mini-cell';
+      const elData = ELEMENTS_MAP[item];
+      if (elData) {
+        cell.style.background = getCategoryColor(elData.category);
+        cell.style.borderColor = getCategoryColor(elData.category);
+      }
+      if (!activeSet.has(item)) {
+        cell.classList.add('mini-disabled');
+      }
+      previewTable.appendChild(cell);
+    }
+  });
 }
 
 function hideMobileSetupScreen() {

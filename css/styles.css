@@ -374,11 +374,11 @@ body {
 
 /* ===== HEADER ===== */
 .header {
-  height: 70px;
+  height: 50px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 var(--space-xl);
+  padding: 0 var(--space-lg);
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-color);
   box-shadow: var(--shadow-sm);
@@ -395,8 +395,8 @@ body {
 }
 
 .logo {
-  width: 48px;
-  height: 48px;
+  width: 36px;
+  height: 36px;
   transition: transform 300ms ease;
 }
 
@@ -411,7 +411,7 @@ body {
 }
 
 .site-title {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 800;
   background: var(--accent-gradient);
   -webkit-background-clip: text;
@@ -438,15 +438,15 @@ body {
 .header-icon-btn {
   background: var(--bg-tertiary);
   border: none;
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   color: var(--text-primary);
-  font-size: 20px;
+  font-size: 18px;
   transition: all 200ms ease;
   position: relative;
 }
@@ -545,7 +545,7 @@ body {
 
 /* ===== SCORE SECTION ===== */
 .score-section {
-  padding: var(--space-lg) var(--space-xl);
+  padding: var(--space-sm) var(--space-xl);
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-color);
   position: relative;
@@ -553,7 +553,7 @@ body {
 
 .score-main {
   text-align: center;
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-sm);
 }
 
 .score-label {
@@ -576,7 +576,7 @@ body {
 }
 
 .score-value {
-  font-size: 56px;
+  font-size: 40px;
   font-weight: 900;
   background: var(--accent-gradient);
   -webkit-background-clip: text;
@@ -657,11 +657,11 @@ body {
 
 .mini-stat {
   background: var(--bg-tertiary);
-  padding: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
   border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   transition: all 200ms ease;
 }
 
@@ -670,13 +670,13 @@ body {
 }
 
 .mini-stat-icon {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  font-size: 16px;
   flex-shrink: 0;
 }
 
@@ -764,17 +764,17 @@ body {
 .quick-settings {
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-color);
-  padding: var(--space-lg) var(--space-xl);
+  padding: var(--space-sm) var(--space-xl);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: var(--space-xl);
+  gap: var(--space-lg);
   flex-wrap: wrap;
 }
 
 .settings-left {
   display: flex;
-  gap: var(--space-xl);
+  gap: var(--space-lg);
   align-items: center;
   flex-wrap: wrap;
   flex: 1;
@@ -788,7 +788,7 @@ body {
 .setting-group {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
 }
 
 .setting-label {
@@ -813,7 +813,7 @@ body {
 .mode-tab, .nav-option {
   background: transparent;
   border: none;
-  padding: 10px 16px;
+  padding: 8px 14px;
   border-radius: var(--radius-sm);
   font-size: 13px;
   font-weight: 600;
@@ -845,9 +845,9 @@ body {
 .action-btn {
   background: var(--bg-tertiary);
   border: none;
-  padding: 12px 20px;
+  padding: 8px 16px;
   border-radius: var(--radius-md);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--text-primary);
   cursor: pointer;
@@ -1386,20 +1386,41 @@ body {
 
 .mobile-setup-header {
   text-align: center;
-  padding-top: var(--space-lg);
+  padding-top: var(--space-md);
+}
+
+.mobile-setup-logo-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
+}
+
+.mobile-setup-logo {
+  width: 36px;
+  height: 36px;
 }
 
 .mobile-setup-title {
   font-size: 24px;
   font-weight: 800;
-  color: var(--text-primary);
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   font-family: var(--font-display);
-  margin-bottom: var(--space-xs);
 }
 
 .mobile-setup-subtitle {
   font-size: 14px;
   color: var(--text-tertiary);
+}
+
+.mobile-setup-preview {
+  padding: var(--space-sm);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .mobile-setup-section {
