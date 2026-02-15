@@ -194,6 +194,23 @@ function setupEventListeners() {
     modal.querySelector('.modal-overlay')?.addEventListener('click', () => closeModal(modal));
   });
   
+  // Close modals on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      [historyModal, leaderboardModal, achievementsModal, completeModal].forEach(modal => {
+        if (!modal.classList.contains('hidden')) {
+          closeModal(modal);
+        }
+      });
+      if (!mobileMenu.classList.contains('hidden')) {
+        mobileMenu.classList.add('hidden');
+      }
+      if (!mobileInputModal.classList.contains('hidden')) {
+        closeMobileInput();
+      }
+    }
+  });
+  
   // Table interaction
   periodicTable.addEventListener('click', handleElementClick);
   
@@ -280,7 +297,7 @@ function createBlockSelector() {
   document.querySelector('.apply-selection-btn').addEventListener('click', () => {
     state.selectedBlocks = Array.from(document.querySelectorAll('.block-checkbox:checked')).map(cb => cb.value);
     if (state.selectedBlocks.length === 0) {
-      alert('Please select at least one block');
+      showHintToast('Please select at least one block');
       return;
     }
     applySelection();
@@ -305,7 +322,7 @@ function createGroupSelector() {
   document.querySelector('.apply-selection-btn').addEventListener('click', () => {
     state.selectedGroups = Array.from(document.querySelectorAll('.group-checkbox:checked')).map(cb => parseInt(cb.value));
     if (state.selectedGroups.length === 0) {
-      alert('Please select at least one group');
+      showHintToast('Please select at least one group');
       return;
     }
     applySelection();
@@ -330,7 +347,7 @@ function createPeriodSelector() {
   document.querySelector('.apply-selection-btn').addEventListener('click', () => {
     state.selectedPeriods = Array.from(document.querySelectorAll('.period-checkbox:checked')).map(cb => parseInt(cb.value));
     if (state.selectedPeriods.length === 0) {
-      alert('Please select at least one period');
+      showHintToast('Please select at least one period');
       return;
     }
     applySelection();
@@ -649,7 +666,7 @@ function validateInput(element, userInput) {
 
 function showHint() {
   if (!state.currentElement) {
-    alert('Please select an element first!');
+    showHintToast('Please select an element first!');
     return;
   }
   
@@ -672,8 +689,19 @@ function showHint() {
     hintDiv.textContent = hintText;
     hintDiv.classList.remove('hidden');
   } else {
-    alert(hintText);
+    showHintToast(hintText);
   }
+}
+
+function showHintToast(message) {
+  const toast = document.getElementById('hintToast');
+  toast.textContent = message;
+  toast.classList.remove('hidden');
+  
+  clearTimeout(toast._hideTimeout);
+  toast._hideTimeout = setTimeout(() => {
+    toast.classList.add('hidden');
+  }, 3000);
 }
 
 function moveToNextElement(currentElement) {
@@ -1137,7 +1165,7 @@ function shareScore() {
     }).catch(() => {});
   } else {
     navigator.clipboard.writeText(text).then(() => {
-      alert('Score copied to clipboard!');
+      showHintToast('Score copied to clipboard!');
     });
   }
 }

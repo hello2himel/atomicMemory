@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#0f172a">
+  <meta name="description" content="Master all 118 elements of the periodic table through competitive practice. Test your knowledge with score tracking, achievements, and leaderboards.">
+  <meta property="og:title" content="AtomicMemory - Master the Elements">
+  <meta property="og:description" content="Master all 118 elements of the periodic table through competitive practice. Test your knowledge with score tracking, achievements, and leaderboards.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://atomicmemory.netlify.app">
   <title>AtomicMemory - Master the Elements</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -68,21 +73,21 @@
         </div>
       </div>
       <div class="header-right">
-        <button id="achievementsBtn" class="header-icon-btn" title="Achievements">
-          <i class="ri-medal-line"></i>
+        <button id="achievementsBtn" class="header-icon-btn" title="Achievements" aria-label="Achievements">
+          <i class="ri-medal-line" aria-hidden="true"></i>
           <span id="achievementBadge" class="notification-badge hidden">0</span>
         </button>
-        <button id="historyBtn" class="header-icon-btn" title="History">
-          <i class="ri-history-line"></i>
+        <button id="historyBtn" class="header-icon-btn" title="History" aria-label="Practice history">
+          <i class="ri-history-line" aria-hidden="true"></i>
         </button>
-        <button id="leaderboardBtn" class="header-icon-btn" title="Leaderboard">
-          <i class="ri-trophy-line"></i>
+        <button id="leaderboardBtn" class="header-icon-btn" title="Leaderboard" aria-label="Leaderboard">
+          <i class="ri-trophy-line" aria-hidden="true"></i>
         </button>
-        <button id="darkModeBtn" class="header-icon-btn" title="Toggle theme">
-          <i class="ri-moon-line"></i>
+        <button id="darkModeBtn" class="header-icon-btn" title="Toggle theme" aria-label="Toggle theme">
+          <i class="ri-moon-line" aria-hidden="true"></i>
         </button>
-        <button id="menuBtn" class="header-icon-btn mobile-menu-btn" title="Menu">
-          <i class="ri-menu-line"></i>
+        <button id="menuBtn" class="header-icon-btn mobile-menu-btn" title="Menu" aria-label="Menu">
+          <i class="ri-menu-line" aria-hidden="true"></i>
         </button>
       </div>
     </header>
@@ -92,8 +97,8 @@
       <div class="mobile-menu-content">
         <div class="mobile-menu-header">
           <h3>Menu</h3>
-          <button id="closeMobileMenu" class="close-btn">
-            <i class="ri-close-line"></i>
+          <button id="closeMobileMenu" class="close-btn" aria-label="Close menu">
+            <i class="ri-close-line" aria-hidden="true"></i>
           </button>
         </div>
         <div id="mobileMenuBody" class="mobile-menu-body">
@@ -243,8 +248,8 @@
               <span class="mobile-input-number"></span>
               <span class="mobile-input-category"></span>
             </div>
-            <button class="mobile-input-close">
-              <i class="ri-close-line"></i>
+            <button class="mobile-input-close" aria-label="Close input">
+              <i class="ri-close-line" aria-hidden="true"></i>
             </button>
           </div>
           <input type="text" id="mobileInput" class="mobile-input-field" maxlength="3" autocomplete="off" placeholder="Enter symbol">
@@ -266,7 +271,7 @@
     <!-- Achievement Toast -->
     <div id="achievementToast" class="achievement-toast hidden">
       <div class="achievement-icon">
-        <i class="ri-trophy-line"></i>
+        <i class="ri-trophy-line" aria-hidden="true"></i>
       </div>
       <div class="achievement-info">
         <div class="achievement-title"></div>
@@ -274,22 +279,25 @@
       </div>
     </div>
 
+    <!-- Hint Toast -->
+    <div id="hintToast" class="hint-toast hidden" role="status" aria-live="polite"></div>
+
     <!-- Score Change Floater -->
     <div id="scoreFloater" class="score-floater hidden"></div>
 
     <!-- Modals -->
     
     <!-- History Modal -->
-    <div id="historyModal" class="modal hidden">
+    <div id="historyModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Practice History">
       <div class="modal-overlay"></div>
       <div class="modal-content">
         <div class="modal-header">
           <h3>
-            <i class="ri-history-line"></i>
+            <i class="ri-history-line" aria-hidden="true"></i>
             Practice History
           </h3>
-          <button id="closeHistoryBtn" class="close-modal-btn">
-            <i class="ri-close-line"></i>
+          <button id="closeHistoryBtn" class="close-modal-btn" aria-label="Close">
+            <i class="ri-close-line" aria-hidden="true"></i>
           </button>
         </div>
         <div id="historyModalBody" class="modal-body">
@@ -299,16 +307,16 @@
     </div>
 
     <!-- Leaderboard Modal -->
-    <div id="leaderboardModal" class="modal hidden">
+    <div id="leaderboardModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Your Top Scores">
       <div class="modal-overlay"></div>
       <div class="modal-content">
         <div class="modal-header">
           <h3>
-            <i class="ri-trophy-line"></i>
+            <i class="ri-trophy-line" aria-hidden="true"></i>
             Your Top Scores
           </h3>
-          <button id="closeLeaderboardBtn" class="close-modal-btn">
-            <i class="ri-close-line"></i>
+          <button id="closeLeaderboardBtn" class="close-modal-btn" aria-label="Close">
+            <i class="ri-close-line" aria-hidden="true"></i>
           </button>
         </div>
         <div id="leaderboardModalBody" class="modal-body">
@@ -318,16 +326,16 @@
     </div>
 
     <!-- Achievements Modal -->
-    <div id="achievementsModal" class="modal hidden">
+    <div id="achievementsModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Achievements">
       <div class="modal-overlay"></div>
       <div class="modal-content achievements-modal-content">
         <div class="modal-header">
           <h3>
-            <i class="ri-medal-line"></i>
+            <i class="ri-medal-line" aria-hidden="true"></i>
             Achievements
           </h3>
-          <button id="closeAchievementsBtn" class="close-modal-btn">
-            <i class="ri-close-line"></i>
+          <button id="closeAchievementsBtn" class="close-modal-btn" aria-label="Close">
+            <i class="ri-close-line" aria-hidden="true"></i>
           </button>
         </div>
         <div id="achievementsModalBody" class="modal-body">
@@ -337,7 +345,7 @@
     </div>
 
     <!-- Challenge Complete Modal -->
-    <div id="completeModal" class="modal hidden">
+    <div id="completeModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Challenge Complete">
       <div class="modal-overlay"></div>
       <div class="modal-content complete-modal-content">
         <div class="complete-confetti"></div>
@@ -401,8 +409,8 @@
     <!-- Footer -->
     <footer class="footer">
       <p>
-        This project is <a href="https://github.com/hello2himel/atomicmemory" target="_blank" rel="noopener">fully open source</a>. 
-        Built with love by <a href="https://hello2himel.netlify.app" target="_blank" rel="noopener">@hello2himel</a> from Bangladesh.
+        This project is <a href="https://github.com/hello2himel/atomicmemory" target="_blank" rel="noopener noreferrer">fully open source</a>. 
+        Built with love by <a href="https://hello2himel.netlify.app" target="_blank" rel="noopener noreferrer">@hello2himel</a> from Bangladesh.
       </p>
     </footer>
   </div>

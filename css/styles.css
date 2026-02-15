@@ -1413,6 +1413,27 @@ body {
   color: var(--text-secondary);
 }
 
+/* ===== HINT TOAST ===== */
+.hint-toast {
+  position: fixed;
+  top: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-secondary);
+  border: 2px solid var(--warning);
+  border-radius: var(--radius-lg);
+  padding: var(--space-sm) var(--space-lg);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  box-shadow: var(--shadow-xl);
+  z-index: var(--z-toast);
+  animation: toast-slide-in 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  max-width: 400px;
+  text-align: center;
+  font-family: var(--font-mono);
+}
+
 /* ===== SCORE FLOATER ===== */
 .score-floater {
   position: fixed;
