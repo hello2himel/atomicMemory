@@ -299,6 +299,9 @@ function openMobileMenu() {
 function handleModeChange(mode) {
   modeSelectionPanel.innerHTML = '';
   
+  // Auto-select best navigation for the mode
+  setNavigationForMode(mode);
+  
   switch (mode) {
     case 'full':
       modeSelectionPanel.classList.add('hidden');
@@ -317,6 +320,23 @@ function handleModeChange(mode) {
       createPeriodSelector();
       break;
   }
+}
+
+// Auto-select navigation direction based on practice mode
+function setNavigationForMode(mode) {
+  const nav = (mode === 'group') ? 'group' : 'period';
+  state.navigationMode = nav;
+  localStorage.setItem('navigationMode', nav);
+  
+  // Sync desktop nav toggle UI
+  document.querySelectorAll('.nav-option').forEach(o => o.classList.remove('active'));
+  const mainOpt = document.querySelector(`.nav-option[data-nav="${nav}"]`);
+  if (mainOpt) mainOpt.classList.add('active');
+  
+  // Sync mobile setup nav toggle UI
+  document.querySelectorAll('.mobile-setup-nav-option').forEach(o => o.classList.remove('active'));
+  const mobileOpt = document.querySelector(`.mobile-setup-nav-option[data-nav="${nav}"]`);
+  if (mobileOpt) mobileOpt.classList.add('active');
 }
 
 // Selectors
@@ -561,6 +581,17 @@ function handleElementClick(e) {
   }
 }
 
+function formatMobileElementInfo(element) {
+  const atomic = element.dataset.atomic;
+  const period = element.dataset.period;
+  const group = element.dataset.group;
+  let info = `Element #${atomic} · Period ${period}`;
+  if (group) {
+    info += ` · Group ${group}`;
+  }
+  return info;
+}
+
 function openMobileInput(element) {
   state.currentElement = element;
   
@@ -570,7 +601,7 @@ function openMobileInput(element) {
   const number = mobileInputModal.querySelector('.mobile-input-number');
   const category = mobileInputModal.querySelector('.mobile-input-category');
   
-  number.textContent = `Element #${element.dataset.atomic}`;
+  number.textContent = formatMobileElementInfo(element);
   category.textContent = element.dataset.category;
   
   mobileInput.value = '';
@@ -1395,6 +1426,9 @@ function showMobileSetupScreen() {
       const mainTab = document.querySelector(`.mode-tab[data-mode="${tab.dataset.mode}"]`);
       if (mainTab) mainTab.classList.add('active');
       
+      // Auto-select best navigation for the mode
+      setNavigationForMode(tab.dataset.mode);
+      
       updateMobileSetupSelectors();
     });
   });
@@ -1664,7 +1698,7 @@ function updateMobileInputForElement(element) {
   const number = mobileInputModal.querySelector('.mobile-input-number');
   const category = mobileInputModal.querySelector('.mobile-input-category');
   
-  number.textContent = `Element #${element.dataset.atomic}`;
+  number.textContent = formatMobileElementInfo(element);
   category.textContent = element.dataset.category;
   
   mobileInput.value = '';
@@ -1752,8 +1786,8 @@ function findNextElementAuto(currentElement) {
     }
   }
   
-  // If the found element is already correct or disabled, try to find any unanswered element
-  if (nextElement && (nextElement.classList.contains('correct') || nextElement.classList.contains('disabled'))) {
+  // If no next element found or it's already correct/disabled, find any unanswered element
+  if (!nextElement || nextElement.classList.contains('correct') || nextElement.classList.contains('disabled')) {
     nextElement = findFirstActiveElement();
   }
   
