@@ -2422,6 +2422,13 @@ body {
     }
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .mini-cell.mini-current {
+      animation: none;
+      box-shadow: 0 0 6px rgba(16, 185, 129, 0.7);
+    }
+  }
+
   /* Mobile score display in modal */
   .mobile-modal-score-row {
     display: flex;

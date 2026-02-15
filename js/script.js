@@ -1705,7 +1705,9 @@ function updateMobileStats() {
   if (rankEl && typeof scoringSystem !== 'undefined') {
     const rank = scoringSystem.getRank();
     rankEl.textContent = rank.name;
-    rankEl.style.background = `linear-gradient(135deg, ${rank.color} 0%, ${rank.color}dd 100%)`;
+    if (/^#[0-9a-fA-F]{6}$/.test(rank.color)) {
+      rankEl.style.background = `linear-gradient(135deg, ${rank.color} 0%, ${rank.color}dd 100%)`;
+    }
   }
 }
 
