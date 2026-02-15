@@ -206,6 +206,9 @@ function setupEventListeners() {
       handleMobileSubmit();
     }
   });
+  mobileInput.addEventListener('input', () => {
+    formatSymbolInput(mobileInput);
+  });
   document.querySelector('.mobile-input-close').addEventListener('click', closeMobileInput);
   
   // Mobile toolbar buttons
@@ -698,6 +701,23 @@ function handleMobileSubmit() {
   }
 }
 
+function formatSymbolInput(input) {
+  const val = input.value;
+  if (!val) return;
+  const pos = input.selectionStart;
+  const formatted = val.charAt(0).toUpperCase() + val.slice(1).toLowerCase();
+  if (input.value !== formatted) {
+    input.value = formatted;
+    input.setSelectionRange(pos, pos);
+  }
+}
+
+function formatTime(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+}
+
 function activateElement(element) {
   document.querySelectorAll('.element input').forEach(input => input.remove());
   document.querySelectorAll('.element').forEach(el => el.classList.remove('active'));
@@ -713,6 +733,10 @@ function activateElement(element) {
   
   element.appendChild(input);
   input.focus();
+  
+  input.addEventListener('input', () => {
+    formatSymbolInput(input);
+  });
   
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
@@ -1064,7 +1088,7 @@ function completeChallenge() {
   
   // Save score
   const configKey = getConfigKey();
-  scoringSystem.saveScore(configKey, state.correctElements.size, state.elapsedTime, totalMistakes);
+  scoringSystem.saveScore(configKey, state.correctElements.size, state.elapsedTime, totalMistakes, getModeLabel());
   
   // Update stats
   state.totalChallengesCompleted++;
@@ -1240,8 +1264,8 @@ function loadLeaderboard() {
           ${index + 1}
         </div>
         <div class="leaderboard-info">
-          <div class="leaderboard-mode">${getModeLabel()}</div>
-          <div class="leaderboard-date">${dateStr} • ${entry.time}s • ${entry.accuracy}% acc</div>
+          <div class="leaderboard-mode">${entry.modeLabel || entry.config || 'Unknown'}</div>
+          <div class="leaderboard-date">${dateStr} • ${formatTime(entry.time)} • ${entry.accuracy}% acc</div>
         </div>
         <div class="leaderboard-score">
           ${scoringSystem.formatScore(entry.score)}

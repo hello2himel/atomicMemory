@@ -1,115 +1,166 @@
-// Floating 3D Cubes for Intro
+// Animated Periodic Table for Intro
 (function() {
-  const container = document.getElementById('floatingCubes');
+  const container = document.getElementById('introPeriodicTable');
   if (!container) return;
 
-  // Select 40 random elements to display
-  const selectedElements = [];
-  const elementCount = 40;
-  
-  // Get a random selection of elements
-  for (let i = 0; i < elementCount; i++) {
-    const randomIndex = Math.floor(Math.random() * ELEMENTS.length);
-    selectedElements.push(ELEMENTS[randomIndex]);
+  const FLASH_COLORS = ['#ef4444', '#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6', '#06b6d4', '#eab308'];
+
+  const CATEGORY_COLORS = {
+    'alkali metal': '#ef4444',
+    'alkaline earth metal': '#f97316',
+    'transition metal': '#3b82f6',
+    'post-transition metal': '#06b6d4',
+    'metalloid': '#8b5cf6',
+    'nonmetal': '#10b981',
+    'halogen': '#eab308',
+    'noble gas': '#ec4899',
+    'lanthanide': '#f59e0b',
+    'actinide': '#84cc16'
+  };
+
+  // Build layout (same as getMiniTableLayout in script.js)
+  function getLayout() {
+    const layout = [];
+    layout.push(1);
+    for (let i = 0; i < 16; i++) layout.push('spacer');
+    layout.push(2);
+    layout.push(3, 4);
+    for (let i = 0; i < 10; i++) layout.push('spacer');
+    for (let i = 5; i <= 10; i++) layout.push(i);
+    layout.push(11, 12);
+    for (let i = 0; i < 10; i++) layout.push('spacer');
+    for (let i = 13; i <= 18; i++) layout.push(i);
+    for (let i = 19; i <= 54; i++) layout.push(i);
+    layout.push(55, 56, 'placeholder');
+    for (let i = 72; i <= 86; i++) layout.push(i);
+    layout.push(87, 88, 'placeholder');
+    for (let i = 104; i <= 118; i++) layout.push(i);
+    for (let i = 0; i < 18; i++) layout.push('spacer');
+    layout.push('spacer', 'spacer', 'label');
+    for (let i = 57; i <= 71; i++) layout.push(i);
+    layout.push('spacer', 'spacer', 'label');
+    for (let i = 89; i <= 103; i++) layout.push(i);
+    return layout;
   }
 
-  // Highlight a few elements in green
-  const highlightIndices = new Set();
-  for (let i = 0; i < 8; i++) {
-    highlightIndices.add(Math.floor(Math.random() * elementCount));
+  // Build element map
+  const elemMap = {};
+  if (typeof ELEMENTS !== 'undefined') {
+    ELEMENTS.forEach(function(el) { elemMap[el.atomicNumber] = el; });
   }
 
-  // Create cubes
-  selectedElements.forEach((element, index) => {
-    const cube = document.createElement('div');
-    cube.className = 'cube';
-    if (highlightIndices.has(index)) {
-      cube.classList.add('highlight');
-    }
+  // Create cells
+  const layout = getLayout();
+  const cells = [];
 
-    // Random positioning
-    const x = Math.random() * 100;
-    const y = Math.random() * 100;
-    cube.style.left = `${x}%`;
-    cube.style.top = `${y}%`;
-
-    // Random cube size between 35-45px
-    const size = 35 + Math.random() * 10;
-    cube.style.width = `${size}px`;
-    cube.style.height = `${size}px`;
-
-    // Random animation duration (20-40 seconds for slow float)
-    const duration = 20 + Math.random() * 20;
-    cube.style.animationDuration = `${duration}s`;
-
-    // Random drift values
-    const driftX = (Math.random() - 0.5) * 100;
-    const driftY = (Math.random() - 0.5) * 100;
-    const rotateX = Math.random() * 360;
-    const rotateY = Math.random() * 360;
-    
-    cube.style.setProperty('--drift-x', `${driftX}px`);
-    cube.style.setProperty('--drift-y', `${driftY}px`);
-    cube.style.setProperty('--rotate-x', `${rotateX}deg`);
-    cube.style.setProperty('--rotate-y', `${rotateY}deg`);
-
-    // Random animation delay
-    cube.style.animationDelay = `${Math.random() * 5}s`;
-
-    // Create 6 faces
-    const faces = ['front', 'back', 'right', 'left', 'top', 'bottom'];
-    faces.forEach(face => {
-      const faceDiv = document.createElement('div');
-      faceDiv.className = `cube-face ${face}`;
-      faceDiv.style.width = `${size}px`;
-      faceDiv.style.height = `${size}px`;
-      
-      // Only show symbol on front face
-      if (face === 'front') {
-        faceDiv.textContent = element.symbol;
+  layout.forEach(function(item) {
+    if (item === 'spacer' || item === 'label' || item === 'placeholder') {
+      const spacer = document.createElement('div');
+      spacer.className = 'intro-table-spacer';
+      container.appendChild(spacer);
+    } else {
+      const cell = document.createElement('div');
+      cell.className = 'intro-table-cell';
+      cell.dataset.atomic = item;
+      const elData = elemMap[item];
+      if (elData) {
+        cell.dataset.category = elData.category;
       }
-      
-      cube.appendChild(faceDiv);
-    });
-
-    container.appendChild(cube);
-  });
-
-  // Parallax effect on mouse move
-  let mouseX = 0;
-  let mouseY = 0;
-  
-  document.addEventListener('mousemove', (e) => {
-    if (!document.getElementById('introOverlay').classList.contains('fade-out')) {
-      mouseX = (e.clientX / window.innerWidth - 0.5) * 20;
-      mouseY = (e.clientY / window.innerHeight - 0.5) * 20;
+      cells.push(cell);
+      container.appendChild(cell);
     }
   });
 
-  // Smooth parallax animation
-  function animateParallax() {
-    const cubes = container.querySelectorAll('.cube');
-    cubes.forEach((cube, index) => {
-      const speed = 0.5 + (index % 3) * 0.3; // Different speeds for depth
-      const parallaxX = mouseX * speed;
-      const parallaxY = mouseY * speed;
-      
-      cube.style.transform = `translate(${parallaxX}px, ${parallaxY}px)`;
-    });
-    
-    if (!document.getElementById('introOverlay').classList.contains('fade-out')) {
-      requestAnimationFrame(animateParallax);
-    }
+  // Animation state — persistent timer list for proper cleanup
+  let stopped = false;
+  const activeTimers = [];
+
+  function addTimer(fn, delay) {
+    const id = setTimeout(function() {
+      const idx = activeTimers.indexOf(id);
+      if (idx > -1) activeTimers.splice(idx, 1);
+      fn();
+    }, delay);
+    activeTimers.push(id);
+    return id;
   }
 
-  animateParallax();
+  function clearAllTimers() {
+    activeTimers.forEach(function(t) { clearTimeout(t); });
+    activeTimers.length = 0;
+  }
+
+  // Phase 1: Random color flashes on random cells
+  // Phase 2: All cells settle to proper category colors
+  function runCycle() {
+    if (stopped) return;
+
+    // Phase 1: Random flashes for ~3 seconds
+    let flashCount = 0;
+    const maxFlashes = 40;
+
+    function scheduleFlash() {
+      if (stopped || flashCount >= maxFlashes) return;
+      flashCount++;
+      const delay = Math.random() * 75;
+      addTimer(function() {
+        if (stopped) return;
+        const cell = cells[Math.floor(Math.random() * cells.length)];
+        const color = FLASH_COLORS[Math.floor(Math.random() * FLASH_COLORS.length)];
+        cell.style.background = color;
+        cell.style.borderColor = color;
+        scheduleFlash();
+      }, delay);
+    }
+
+    // Start several flash chains in parallel
+    for (let i = 0; i < 6; i++) {
+      scheduleFlash();
+    }
+
+    // Phase 2: After random phase, settle to proper colors
+    addTimer(function() {
+      if (stopped) return;
+
+      // Settle cells to proper colors with staggered timing
+      cells.forEach(function(cell, index) {
+        const delay = index * 8;
+        addTimer(function() {
+          if (stopped) return;
+          const elData = elemMap[cell.dataset.atomic];
+          if (elData) {
+            const properColor = CATEGORY_COLORS[elData.category] || '#334155';
+            cell.style.background = properColor;
+            cell.style.borderColor = properColor;
+          }
+        }, delay);
+      });
+
+      // Hold proper colors for 2 seconds, then reset and cycle
+      addTimer(function() {
+        if (stopped) return;
+        // Reset all cells to dim
+        cells.forEach(function(cell) {
+          cell.style.background = '#334155';
+          cell.style.borderColor = '#475569';
+        });
+        // Start next cycle after brief pause
+        addTimer(function() {
+          runCycle();
+        }, 500);
+      }, 2500);
+    }, 3000);
+  }
+
+  // Start animation
+  runCycle();
 
   // Cleanup on start
-  document.getElementById('startBtn').addEventListener('click', () => {
-    setTimeout(() => {
-      if (container) {
-        container.innerHTML = '';
-      }
+  document.getElementById('startBtn').addEventListener('click', function() {
+    stopped = true;
+    clearAllTimers();
+    setTimeout(function() {
+      container.innerHTML = '';
     }, 600);
   });
 })();
