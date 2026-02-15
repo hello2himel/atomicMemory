@@ -348,6 +348,31 @@ body {
   transform: rotate(5deg) scale(1.05);
 }
 
+/* Logo Grid - Mini periodic table shape */
+.logo-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 5px);
+  grid-template-rows: repeat(4, 5px);
+  gap: 1px;
+  flex-shrink: 0;
+  transition: transform 300ms ease;
+}
+
+.logo-grid:hover {
+  transform: scale(1.1);
+}
+
+.lg-cell {
+  width: 5px;
+  height: 5px;
+  border-radius: 1px;
+}
+
+.lg-empty {
+  width: 5px;
+  height: 5px;
+}
+
 .site-title {
   font-size: 18px;
   font-weight: 800;
@@ -703,6 +728,121 @@ body {
 
 .reset-btn {
   border-color: var(--border-color);
+}
+
+.view-btn {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.view-btn:hover {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--accent-secondary);
+}
+
+/* View Periodic Table Modal */
+.view-table-modal-content {
+  max-width: 95vw;
+  width: fit-content;
+}
+
+.view-periodic-table {
+  display: grid;
+  grid-template-columns: repeat(18, minmax(36px, 1fr));
+  gap: 2px;
+  overflow-x: auto;
+  padding-bottom: var(--space-md);
+}
+
+.view-element {
+  padding: 3px;
+  border-radius: 3px;
+  text-align: center;
+  cursor: default;
+  border: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
+  transition: transform 150ms ease, box-shadow 150ms ease;
+  min-width: 36px;
+}
+
+.view-element:hover {
+  transform: scale(1.1);
+  box-shadow: var(--shadow-lg);
+  z-index: 2;
+  position: relative;
+}
+
+.view-element .ve-number {
+  font-size: 8px;
+  color: var(--text-tertiary);
+  display: block;
+  line-height: 1;
+}
+
+.view-element .ve-symbol {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: block;
+  line-height: 1.2;
+  font-family: var(--font-mono);
+}
+
+.view-element .ve-name {
+  font-size: 6px;
+  color: var(--text-tertiary);
+  display: block;
+  line-height: 1.1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.view-spacer {
+  min-width: 36px;
+}
+
+.view-placeholder {
+  min-width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+
+.view-label {
+  min-width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 7px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.view-table-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border-color);
+  justify-content: center;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+.legend-color {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
 }
 
 /* ===== MODE SELECTION PANEL ===== */

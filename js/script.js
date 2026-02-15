@@ -73,6 +73,9 @@ const playAgainBtn = document.getElementById('playAgainBtn');
 const shareScoreBtn = document.getElementById('shareScoreBtn');
 const infoModal = document.getElementById('infoModal');
 const closeInfoBtn = document.getElementById('closeInfoBtn');
+const viewTableBtn = document.getElementById('viewTableBtn');
+const viewTableModal = document.getElementById('viewTableModal');
+const closeViewTableBtn = document.getElementById('closeViewTableBtn');
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -182,6 +185,10 @@ function setupEventListeners() {
   
   // Info modal
   closeInfoBtn.addEventListener('click', () => closeModal(infoModal));
+  
+  // View table button
+  viewTableBtn.addEventListener('click', openViewTableModal);
+  closeViewTableBtn.addEventListener('click', () => closeModal(viewTableModal));
   
   // Mobile menu
   menuBtn.addEventListener('click', openMobileMenu);
@@ -1000,6 +1007,7 @@ function findFirstInCategory(category) {
 function startTimer() {
   state.timerStarted = true;
   state.startTime = Date.now();
+  viewTableBtn.classList.add('hidden');
   
   state.timerInterval = setInterval(() => {
     state.elapsedTime = Math.floor((Date.now() - state.startTime) / 1000);
@@ -1063,6 +1071,7 @@ function resetChallenge() {
   
   updateElementStates();
   updateStats();
+  viewTableBtn.classList.remove('hidden');
   
   // Reset mini table if it exists
   const miniTable = document.getElementById('miniPeriodicTable');
@@ -1076,6 +1085,7 @@ function resetChallenge() {
 
 function completeChallenge() {
   stopTimer();
+  viewTableBtn.classList.remove('hidden');
   
   const totalMistakes = Object.values(state.wrongAttempts).reduce((a, b) => a + b, 0);
   
@@ -1190,6 +1200,118 @@ function closeModal(modal) {
 
 function openInfoModal() {
   infoModal.classList.remove('hidden');
+}
+
+function openViewTableModal() {
+  renderViewPeriodicTable();
+  viewTableModal.classList.remove('hidden');
+}
+
+function renderViewPeriodicTable() {
+  const container = document.getElementById('viewPeriodicTable');
+  const legend = document.getElementById('viewTableLegend');
+  container.innerHTML = '';
+  legend.innerHTML = '';
+
+  const CATEGORY_COLORS = {
+    'alkali metal': '#ef4444',
+    'alkaline earth metal': '#f97316',
+    'transition metal': '#3b82f6',
+    'post-transition metal': '#06b6d4',
+    'metalloid': '#8b5cf6',
+    'nonmetal': '#10b981',
+    'halogen': '#eab308',
+    'noble gas': '#ec4899',
+    'lanthanide': '#f59e0b',
+    'actinide': '#84cc16'
+  };
+
+  function createViewElement(element) {
+    const div = document.createElement('div');
+    div.className = 'view-element';
+    const color = CATEGORY_COLORS[element.category] || '#334155';
+    div.style.borderColor = color;
+    div.style.background = color + '18';
+
+    div.innerHTML =
+      '<span class="ve-number">' + element.atomicNumber + '</span>' +
+      '<span class="ve-symbol">' + element.symbol + '</span>' +
+      '<span class="ve-name">' + element.name + '</span>';
+    return div;
+  }
+
+  function createViewSpacer() {
+    const s = document.createElement('div');
+    s.className = 'view-spacer';
+    return s;
+  }
+
+  function createViewPlaceholder(text) {
+    const d = document.createElement('div');
+    d.className = 'view-placeholder';
+    d.textContent = text;
+    return d;
+  }
+
+  function createViewLabel(text) {
+    const d = document.createElement('div');
+    d.className = 'view-label';
+    d.textContent = text;
+    return d;
+  }
+
+  // Period 1
+  container.appendChild(createViewElement(ELEMENTS[0]));
+  for (let i = 0; i < 16; i++) container.appendChild(createViewSpacer());
+  container.appendChild(createViewElement(ELEMENTS[1]));
+
+  // Period 2
+  container.appendChild(createViewElement(ELEMENTS[2]));
+  container.appendChild(createViewElement(ELEMENTS[3]));
+  for (let i = 0; i < 10; i++) container.appendChild(createViewSpacer());
+  for (let i = 4; i <= 9; i++) container.appendChild(createViewElement(ELEMENTS[i]));
+
+  // Period 3
+  container.appendChild(createViewElement(ELEMENTS[10]));
+  container.appendChild(createViewElement(ELEMENTS[11]));
+  for (let i = 0; i < 10; i++) container.appendChild(createViewSpacer());
+  for (let i = 12; i <= 17; i++) container.appendChild(createViewElement(ELEMENTS[i]));
+
+  // Periods 4-5
+  for (let i = 18; i <= 53; i++) container.appendChild(createViewElement(ELEMENTS[i]));
+
+  // Period 6 with lanthanides placeholder
+  container.appendChild(createViewElement(ELEMENTS[54]));
+  container.appendChild(createViewElement(ELEMENTS[55]));
+  container.appendChild(createViewPlaceholder('*'));
+  for (let i = 71; i <= 85; i++) container.appendChild(createViewElement(ELEMENTS[i]));
+
+  // Period 7 with actinides placeholder
+  container.appendChild(createViewElement(ELEMENTS[86]));
+  container.appendChild(createViewElement(ELEMENTS[87]));
+  container.appendChild(createViewPlaceholder('**'));
+  for (let i = 103; i <= 117; i++) container.appendChild(createViewElement(ELEMENTS[i]));
+
+  // Spacer row
+  for (let i = 0; i < 18; i++) container.appendChild(createViewSpacer());
+
+  // Lanthanides
+  for (let i = 0; i < 2; i++) container.appendChild(createViewSpacer());
+  container.appendChild(createViewLabel('Lan'));
+  for (let i = 56; i <= 70; i++) container.appendChild(createViewElement(ELEMENTS[i]));
+
+  // Actinides
+  for (let i = 0; i < 2; i++) container.appendChild(createViewSpacer());
+  container.appendChild(createViewLabel('Act'));
+  for (let i = 88; i <= 102; i++) container.appendChild(createViewElement(ELEMENTS[i]));
+
+  // Legend
+  Object.entries(CATEGORY_COLORS).forEach(function(entry) {
+    const item = document.createElement('div');
+    item.className = 'legend-item';
+    item.innerHTML = '<span class="legend-color" style="background:' + entry[1] + '"></span>' + entry[0];
+    legend.appendChild(item);
+  });
 }
 
 function openHistoryModal() {

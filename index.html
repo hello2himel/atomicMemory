@@ -45,7 +45,31 @@
     <!-- Unified Top Bar -->
     <header class="header">
       <div class="header-left">
-        <img src="res/logo.svg" alt="AtomicMemory" class="logo">
+        <div class="logo-grid" aria-label="AtomicMemory">
+          <span class="lg-cell" style="background:#ef4444"></span>
+          <span class="lg-empty"></span>
+          <span class="lg-empty"></span>
+          <span class="lg-empty"></span>
+          <span class="lg-cell" style="background:#ec4899"></span>
+
+          <span class="lg-cell" style="background:#ef4444"></span>
+          <span class="lg-cell" style="background:#f97316"></span>
+          <span class="lg-empty"></span>
+          <span class="lg-empty"></span>
+          <span class="lg-cell" style="background:#10b981"></span>
+
+          <span class="lg-cell" style="background:#3b82f6"></span>
+          <span class="lg-cell" style="background:#8b5cf6"></span>
+          <span class="lg-cell" style="background:#06b6d4"></span>
+          <span class="lg-cell" style="background:#eab308"></span>
+          <span class="lg-cell" style="background:#ec4899"></span>
+
+          <span class="lg-empty"></span>
+          <span class="lg-cell" style="background:#f59e0b"></span>
+          <span class="lg-cell" style="background:#84cc16"></span>
+          <span class="lg-cell" style="background:#3b82f6"></span>
+          <span class="lg-empty"></span>
+        </div>
         <h1 class="site-title">AtomicMemory</h1>
         <span id="currentRank" class="rank-badge" aria-label="Current rank">Novice</span>
       </div>
@@ -159,6 +183,10 @@
       </div>
 
       <div class="settings-right">
+        <button id="viewTableBtn" class="action-btn view-btn" title="View periodic table">
+          <i class="ri-eye-line"></i>
+          <span>View</span>
+        </button>
         <button id="hintBtn" class="action-btn hint-btn" title="Get a hint (-50 points)">
           <i class="ri-lightbulb-line"></i>
           <span>Hint</span>
@@ -345,6 +373,26 @@
         <div class="modal-body info-modal-body">
           <p>Made with <span aria-label="love">❤️</span> by <a href="https://hello2himel.netlify.app" target="_blank" rel="noopener noreferrer">@hello2himel</a> from <span aria-label="Bangladesh">🇧🇩</span></p>
           <p>This is an open source software. <a href="https://github.com/hello2himel/atomicmemory" target="_blank" rel="noopener noreferrer">View Source Code</a></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- View Periodic Table Modal -->
+    <div id="viewTableModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Periodic Table">
+      <div class="modal-overlay"></div>
+      <div class="modal-content view-table-modal-content">
+        <div class="modal-header">
+          <h3>
+            <i class="ri-table-2" aria-hidden="true"></i>
+            Periodic Table
+          </h3>
+          <button id="closeViewTableBtn" class="close-modal-btn" aria-label="Close">
+            <i class="ri-close-line" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div id="viewPeriodicTable" class="view-periodic-table"></div>
+          <div class="view-table-legend" id="viewTableLegend"></div>
         </div>
       </div>
     </div>
