@@ -91,7 +91,6 @@
     const cubes = container.querySelectorAll('.cube');
     cubes.forEach((cube, index) => {
       const speed = 0.5 + (index % 3) * 0.3; // Different speeds for depth
-      const currentTransform = cube.style.transform || '';
       const parallaxX = mouseX * speed;
       const parallaxY = mouseY * speed;
       

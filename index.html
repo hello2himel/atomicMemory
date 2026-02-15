@@ -2,26 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0f172a">
   <title>AtomicMemory - Master the Elements</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
   <!-- Intro Overlay -->
   <div id="introOverlay" class="intro-overlay">
-    <!-- Floating 3D Cubes Background -->
     <div id="floatingCubes" class="floating-cubes"></div>
     
     <div class="intro-content">
       <div class="intro-logo-wrapper">
-        <img src="res/logo.png" alt="AtomicMemory" class="intro-logo">
+        <img src="res/logo.svg" alt="AtomicMemory" class="intro-logo">
         <div class="logo-glow"></div>
       </div>
       <h1 class="intro-title">
         <span class="title-word">Atomic</span><span class="title-word">Memory</span>
       </h1>
-      <p class="intro-tagline">Master all 118 elements through focused practice</p>
+      <p class="intro-tagline">Master all 118 elements through competitive practice</p>
       
       <div class="intro-stats">
         <div class="intro-stat">
@@ -35,9 +38,9 @@
           <div class="stat-label">Groups</div>
         </div>
         <div class="intro-stat">
-          <div class="stat-icon"><i class="ri-bar-chart-horizontal-line"></i></div>
-          <div class="stat-number">7</div>
-          <div class="stat-label">Periods</div>
+          <div class="stat-icon"><i class="ri-trophy-line"></i></div>
+          <div class="stat-number">∞</div>
+          <div class="stat-label">High Scores</div>
         </div>
       </div>
 
@@ -58,140 +61,342 @@
     <!-- Header -->
     <header class="header">
       <div class="header-left">
-        <img src="res/logo.png" alt="AtomicMemory" class="logo">
-        <h1 class="site-title">AtomicMemory</h1>
+        <img src="res/logo.svg" alt="AtomicMemory" class="logo">
+        <div class="header-title-group">
+          <h1 class="site-title">AtomicMemory</h1>
+          <span class="header-subtitle">Score Attack Mode</span>
+        </div>
       </div>
       <div class="header-right">
-        <button id="historyBtn" class="mode-toggle-btn" title="View history">
+        <button id="achievementsBtn" class="header-icon-btn" title="Achievements">
+          <i class="ri-medal-line"></i>
+          <span id="achievementBadge" class="notification-badge hidden">0</span>
+        </button>
+        <button id="historyBtn" class="header-icon-btn" title="History">
           <i class="ri-history-line"></i>
         </button>
-        <button id="darkModeBtn" class="mode-toggle-btn" title="Toggle theme">
+        <button id="leaderboardBtn" class="header-icon-btn" title="Leaderboard">
+          <i class="ri-trophy-line"></i>
+        </button>
+        <button id="darkModeBtn" class="header-icon-btn" title="Toggle theme">
           <i class="ri-moon-line"></i>
+        </button>
+        <button id="menuBtn" class="header-icon-btn mobile-menu-btn" title="Menu">
+          <i class="ri-menu-line"></i>
         </button>
       </div>
     </header>
 
-    <!-- Quick Settings Bar -->
-    <div class="quick-settings">
-      <div class="setting-group">
-        <label class="setting-label">
-          <i class="ri-gamepad-line"></i>
-          Game Mode
-        </label>
-        <div class="mode-tabs">
-          <button class="mode-tab active" data-mode="full">
-            <i class="ri-table-2"></i>
-            <span>Full Table</span>
-          </button>
-          <button class="mode-tab" data-mode="block">
-            <i class="ri-shapes-line"></i>
-            <span>Blocks</span>
-          </button>
-          <button class="mode-tab" data-mode="group">
-            <i class="ri-layout-column-line"></i>
-            <span>Groups</span>
-          </button>
-          <button class="mode-tab" data-mode="period">
-            <i class="ri-layout-row-line"></i>
-            <span>Periods</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="setting-group">
-        <label class="setting-label">
-          <i class="ri-compass-3-line"></i>
-          Navigation
-        </label>
-        <div class="nav-toggle">
-          <button class="nav-option active" data-nav="period">
-            <i class="ri-arrow-right-line"></i>
-            <span>Horizontal</span>
-          </button>
-          <button class="nav-option" data-nav="group">
-            <i class="ri-arrow-down-line"></i>
-            <span>Vertical</span>
-          </button>
-        </div>
-      </div>
-
-      <button id="resetBtn" class="reset-btn">
-        <i class="ri-restart-line"></i>
-        <span>Reset</span>
-      </button>
-    </div>
-
-    <!-- Mode Selection Panel -->
-    <div id="modeSelectionPanel" class="mode-selection-panel hidden"></div>
-
-    <!-- History Modal -->
-    <div id="historyModal" class="history-modal hidden">
-      <div class="history-modal-content">
-        <div class="history-modal-header">
-          <h3>Practice History</h3>
-          <button id="closeHistoryBtn" class="close-modal-btn">
+    <!-- Mobile Menu Overlay -->
+    <div id="mobileMenu" class="mobile-menu hidden">
+      <div class="mobile-menu-content">
+        <div class="mobile-menu-header">
+          <h3>Menu</h3>
+          <button id="closeMobileMenu" class="close-btn">
             <i class="ri-close-line"></i>
           </button>
         </div>
-        <div id="historyModalBody" class="history-modal-body">
+        <div id="mobileMenuBody" class="mobile-menu-body">
           <!-- Populated by JS -->
         </div>
       </div>
     </div>
 
-    <!-- Stats Bar -->
-    <div class="stats-bar">
-      <div class="stat-card">
-        <div class="stat-icon timer-icon">
-          <i class="ri-timer-line"></i>
+    <!-- Score Display (Prominent) -->
+    <div class="score-section">
+      <div class="score-main">
+        <div class="score-label">
+          <i class="ri-star-line"></i>
+          Current Score
         </div>
-        <div class="stat-content">
-          <div class="stat-label">Time</div>
-          <div class="stat-value" id="timerDisplay">00:00</div>
+        <div class="score-value-wrapper">
+          <span id="currentScore" class="score-value">0</span>
+          <div id="scoreChangeIndicator" class="score-change"></div>
+        </div>
+        <div class="score-rank">
+          <span id="currentRank" class="rank-badge">Novice</span>
+          <span id="scoreProgress" class="score-progress-text">Start typing to score!</span>
         </div>
       </div>
-
-      <div class="stat-card">
-        <div class="stat-icon progress-icon">
-          <i class="ri-check-double-line"></i>
+      
+      <div class="score-stats-grid">
+        <div class="mini-stat">
+          <div class="mini-stat-icon timer-icon">
+            <i class="ri-timer-line"></i>
+          </div>
+          <div class="mini-stat-content">
+            <div class="mini-stat-label">Time</div>
+            <div class="mini-stat-value" id="timerDisplay">00:00</div>
+          </div>
         </div>
-        <div class="stat-content">
-          <div class="stat-label">Progress</div>
-          <div class="stat-value">
-            <span id="correctCount">0</span>/<span id="totalCount">118</span>
+
+        <div class="mini-stat">
+          <div class="mini-stat-icon progress-icon">
+            <i class="ri-check-double-line"></i>
+          </div>
+          <div class="mini-stat-content">
+            <div class="mini-stat-label">Progress</div>
+            <div class="mini-stat-value">
+              <span id="correctCount">0</span>/<span id="totalCount">118</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mini-stat">
+          <div class="mini-stat-icon streak-icon">
+            <i class="ri-fire-line"></i>
+          </div>
+          <div class="mini-stat-content">
+            <div class="mini-stat-label">Streak</div>
+            <div class="mini-stat-value" id="streakDisplay">0</div>
+          </div>
+        </div>
+
+        <div class="mini-stat">
+          <div class="mini-stat-icon accuracy-icon">
+            <i class="ri-percent-line"></i>
+          </div>
+          <div class="mini-stat-content">
+            <div class="mini-stat-label">Accuracy</div>
+            <div class="mini-stat-value" id="accuracyDisplay">100%</div>
           </div>
         </div>
       </div>
-
-      <div class="stat-card">
-        <div class="stat-icon percent-icon">
-          <i class="ri-percent-line"></i>
-        </div>
-        <div class="stat-content">
-          <div class="stat-label">Complete</div>
-          <div class="stat-value"><span id="percentComplete">0</span>%</div>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon trophy-icon">
-          <i class="ri-trophy-line"></i>
-        </div>
-        <div class="stat-content">
-          <div class="stat-label">Best Time</div>
-          <div class="stat-value" id="bestTime">--:--</div>
-        </div>
-      </div>
-
+      
       <div class="progress-bar-container">
         <div id="progressFill" class="progress-fill"></div>
       </div>
     </div>
 
-    <!-- Periodic Table -->
+    <!-- Quick Settings Bar -->
+    <div class="quick-settings">
+      <div class="settings-left">
+        <div class="setting-group">
+          <label class="setting-label">
+            <i class="ri-gamepad-line"></i>
+            Mode
+          </label>
+          <div class="mode-tabs">
+            <button class="mode-tab active" data-mode="full" title="All 118 elements">
+              <i class="ri-table-2"></i>
+              <span>Full</span>
+            </button>
+            <button class="mode-tab" data-mode="block" title="Practice by blocks">
+              <i class="ri-shapes-line"></i>
+              <span>Blocks</span>
+            </button>
+            <button class="mode-tab" data-mode="group" title="Practice by groups">
+              <i class="ri-layout-column-line"></i>
+              <span>Groups</span>
+            </button>
+            <button class="mode-tab" data-mode="period" title="Practice by periods">
+              <i class="ri-layout-row-line"></i>
+              <span>Periods</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="setting-group">
+          <label class="setting-label">
+            <i class="ri-compass-3-line"></i>
+            Navigation
+          </label>
+          <div class="nav-toggle">
+            <button class="nav-option active" data-nav="period" title="Move horizontally">
+              <i class="ri-arrow-right-line"></i>
+              <span>Horizontal</span>
+            </button>
+            <button class="nav-option" data-nav="group" title="Move vertically">
+              <i class="ri-arrow-down-line"></i>
+              <span>Vertical</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-right">
+        <button id="hintBtn" class="action-btn hint-btn" title="Get a hint (-50 points)">
+          <i class="ri-lightbulb-line"></i>
+          <span>Hint</span>
+        </button>
+        <button id="resetBtn" class="action-btn reset-btn" title="Reset challenge">
+          <i class="ri-restart-line"></i>
+          <span>Reset</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mode Selection Panel -->
+    <div id="modeSelectionPanel" class="mode-selection-panel hidden"></div>
+
+    <!-- Periodic Table Container -->
     <main class="table-container">
-      <div id="periodicTable" class="periodic-table"></div>
+      <div class="table-wrapper">
+        <div id="periodicTable" class="periodic-table"></div>
+      </div>
+      
+      <!-- Mobile Input Modal -->
+      <div id="mobileInputModal" class="mobile-input-modal hidden">
+        <div class="mobile-input-content">
+          <div class="mobile-input-header">
+            <div class="mobile-input-element-info">
+              <span class="mobile-input-number"></span>
+              <span class="mobile-input-category"></span>
+            </div>
+            <button class="mobile-input-close">
+              <i class="ri-close-line"></i>
+            </button>
+          </div>
+          <input type="text" id="mobileInput" class="mobile-input-field" maxlength="3" autocomplete="off" placeholder="Enter symbol">
+          <div class="mobile-input-actions">
+            <button id="mobileHintBtn" class="mobile-hint-btn">
+              <i class="ri-lightbulb-line"></i>
+              Hint (-50)
+            </button>
+            <button id="mobileSubmitBtn" class="mobile-submit-btn">
+              <i class="ri-check-line"></i>
+              Submit
+            </button>
+          </div>
+          <div class="mobile-input-hint hidden"></div>
+        </div>
+      </div>
     </main>
+
+    <!-- Achievement Toast -->
+    <div id="achievementToast" class="achievement-toast hidden">
+      <div class="achievement-icon">
+        <i class="ri-trophy-line"></i>
+      </div>
+      <div class="achievement-info">
+        <div class="achievement-title"></div>
+        <div class="achievement-description"></div>
+      </div>
+    </div>
+
+    <!-- Score Change Floater -->
+    <div id="scoreFloater" class="score-floater hidden"></div>
+
+    <!-- Modals -->
+    
+    <!-- History Modal -->
+    <div id="historyModal" class="modal hidden">
+      <div class="modal-overlay"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>
+            <i class="ri-history-line"></i>
+            Practice History
+          </h3>
+          <button id="closeHistoryBtn" class="close-modal-btn">
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+        <div id="historyModalBody" class="modal-body">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Leaderboard Modal -->
+    <div id="leaderboardModal" class="modal hidden">
+      <div class="modal-overlay"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>
+            <i class="ri-trophy-line"></i>
+            Your Top Scores
+          </h3>
+          <button id="closeLeaderboardBtn" class="close-modal-btn">
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+        <div id="leaderboardModalBody" class="modal-body">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Achievements Modal -->
+    <div id="achievementsModal" class="modal hidden">
+      <div class="modal-overlay"></div>
+      <div class="modal-content achievements-modal-content">
+        <div class="modal-header">
+          <h3>
+            <i class="ri-medal-line"></i>
+            Achievements
+          </h3>
+          <button id="closeAchievementsBtn" class="close-modal-btn">
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+        <div id="achievementsModalBody" class="modal-body">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Challenge Complete Modal -->
+    <div id="completeModal" class="modal hidden">
+      <div class="modal-overlay"></div>
+      <div class="modal-content complete-modal-content">
+        <div class="complete-confetti"></div>
+        <div class="complete-header">
+          <div class="complete-icon">
+            <i class="ri-trophy-line"></i>
+          </div>
+          <h2 class="complete-title">Challenge Complete!</h2>
+          <p class="complete-subtitle">Congratulations on mastering the elements</p>
+        </div>
+        <div class="complete-score">
+          <div class="complete-score-label">Final Score</div>
+          <div class="complete-score-value" id="finalScoreDisplay">0</div>
+          <div class="complete-rank" id="finalRankDisplay">Novice</div>
+        </div>
+        <div class="complete-stats-grid">
+          <div class="complete-stat">
+            <div class="complete-stat-icon"><i class="ri-timer-line"></i></div>
+            <div class="complete-stat-value" id="completeTime">00:00</div>
+            <div class="complete-stat-label">Time</div>
+          </div>
+          <div class="complete-stat">
+            <div class="complete-stat-icon"><i class="ri-percent-line"></i></div>
+            <div class="complete-stat-value" id="completeAccuracy">100%</div>
+            <div class="complete-stat-label">Accuracy</div>
+          </div>
+          <div class="complete-stat">
+            <div class="complete-stat-icon"><i class="ri-fire-line"></i></div>
+            <div class="complete-stat-value" id="completeStreak">0</div>
+            <div class="complete-stat-label">Best Streak</div>
+          </div>
+        </div>
+        <div class="complete-breakdown">
+          <h4>Score Breakdown</h4>
+          <div class="breakdown-item">
+            <span>Base Score (Speed × Elements)</span>
+            <span id="breakdownBase">0</span>
+          </div>
+          <div class="breakdown-item bonus">
+            <span>Bonuses (Streaks, Perfect)</span>
+            <span id="breakdownBonus">+0</span>
+          </div>
+          <div class="breakdown-item penalty">
+            <span>Penalties (Mistakes, Hints)</span>
+            <span id="breakdownPenalty">-0</span>
+          </div>
+        </div>
+        <div class="complete-actions">
+          <button id="shareScoreBtn" class="complete-btn secondary-btn">
+            <i class="ri-share-line"></i>
+            Share Score
+          </button>
+          <button id="playAgainBtn" class="complete-btn primary-btn">
+            <i class="ri-restart-line"></i>
+            Play Again
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- Footer -->
     <footer class="footer">
@@ -203,6 +408,8 @@
   </div>
 
   <script src="js/elements.js"></script>
+  <script src="js/achievements.js"></script>
+  <script src="js/scoring.js"></script>
   <script src="js/cubes.js"></script>
   <script src="js/script.js"></script>
 </body>
