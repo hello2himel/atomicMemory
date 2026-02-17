@@ -749,11 +749,6 @@ body {
   border-color: var(--border-color);
 }
 
-/* Add padding to main to account for fixed bottom bar */
-.table-container {
-  padding-bottom: 100px;
-}
-
 /* ===== MODE SELECTION PANEL ===== */
 .mode-selection-panel {
   padding: var(--space-sm) var(--space-xl);
@@ -850,6 +845,7 @@ body {
 .table-container {
   flex: 1;
   padding: var(--space-xl);
+  padding-bottom: 110px;
   overflow: auto;
   position: relative;
 }
@@ -2494,6 +2490,7 @@ body {
   /* Table container holds the periodic table (hidden behind modal) and the mobile modal */
   .table-container {
     padding: 0;
+    padding-bottom: 0;
     order: 1;
     min-height: 0;
     overflow: hidden;
