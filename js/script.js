@@ -115,7 +115,6 @@ const aboutBtn = document.getElementById('aboutBtn');
 const viewTableBtn = document.getElementById('viewTableBtn');
 const donateBtn = document.getElementById('donateBtn');
 const donateModal = document.getElementById('donateModal');
-const closeDonateBtn = document.getElementById('closeDonateBtn');
 const donateDismissBtn = document.getElementById('donateDismissBtn');
 
 // Initialize
@@ -233,7 +232,6 @@ function setupEventListeners() {
   
   // Donate modal
   donateBtn.addEventListener('click', openDonateModal);
-  closeDonateBtn.addEventListener('click', () => closeModal(donateModal));
   donateDismissBtn.addEventListener('click', () => closeModal(donateModal));
   
   // View table button (toggle element visibility on existing table)
