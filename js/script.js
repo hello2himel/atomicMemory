@@ -107,7 +107,7 @@ function startApp() {
     renderPeriodicTable();
     initializeFullTable();
     if (state.isMobile) {
-      // On mobile, directly start the challenge
+      // Open input for the first active element
       const firstElement = findFirstActiveElement();
       if (firstElement) {
         openMobileInput(firstElement);
@@ -716,6 +716,23 @@ function showHintToast(message) {
 }
 
 function moveToNextElement(currentElement) {
+  const nextElement = findNextElementByPeriod(currentElement);
+  
+  if (nextElement && !nextElement.classList.contains('correct') && !nextElement.classList.contains('disabled')) {
+    if (state.isMobile) {
+      if (!mobileInputModal.classList.contains('hidden')) {
+        updateMobileInputForElement(nextElement);
+      } else {
+        openMobileInput(nextElement);
+      }
+    } else {
+      activateElement(nextElement);
+    }
+  }
+}
+
+// Find the next element using period-based (horizontal) navigation
+function findNextElementByPeriod(currentElement) {
   const atomic = parseInt(currentElement.dataset.atomic);
   const currentPeriod = parseInt(currentElement.dataset.period);
   const currentGroup = parseInt(currentElement.dataset.group) || null;
@@ -723,7 +740,6 @@ function moveToNextElement(currentElement) {
   
   let nextElement = null;
   
-  // Always use horizontal (period) navigation for auto-advance
   if (currentCategory === 'lanthanide') {
     nextElement = findNextInCategory('lanthanide', atomic);
     if (!nextElement) {
@@ -743,17 +759,7 @@ function moveToNextElement(currentElement) {
     }
   }
   
-  if (nextElement && !nextElement.classList.contains('correct') && !nextElement.classList.contains('disabled')) {
-    if (state.isMobile) {
-      if (!mobileInputModal.classList.contains('hidden')) {
-        updateMobileInputForElement(nextElement);
-      } else {
-        openMobileInput(nextElement);
-      }
-    } else {
-      activateElement(nextElement);
-    }
-  }
+  return nextElement;
 }
 
 function findNextInPeriod(period, afterAtomic) {
@@ -1394,32 +1400,7 @@ function updateMobileStats() {
 }
 
 function findNextElementAuto(currentElement) {
-  const atomic = parseInt(currentElement.dataset.atomic);
-  const currentPeriod = parseInt(currentElement.dataset.period);
-  const currentGroup = parseInt(currentElement.dataset.group) || null;
-  const currentCategory = currentElement.dataset.category;
-  
-  let nextElement = null;
-  
-  // Always use horizontal (period) navigation for auto-advance
-  if (currentCategory === 'lanthanide') {
-    nextElement = findNextInCategory('lanthanide', atomic);
-    if (!nextElement) {
-      nextElement = findFirstInPeriod(6, 71);
-    }
-  } else if (currentCategory === 'actinide') {
-    nextElement = findNextInCategory('actinide', atomic);
-    if (!nextElement) {
-      nextElement = findFirstInPeriod(7, 103);
-    }
-  } else if (currentGroup === 18) {
-    nextElement = findFirstInPeriod(currentPeriod + 1);
-  } else {
-    nextElement = findNextInPeriod(currentPeriod, atomic);
-    if (!nextElement) {
-      nextElement = findFirstInPeriod(currentPeriod + 1);
-    }
-  }
+  let nextElement = findNextElementByPeriod(currentElement);
   
   // If no next element found or it's already correct/disabled, find any unanswered element
   if (!nextElement || nextElement.classList.contains('correct') || nextElement.classList.contains('disabled')) {
@@ -1516,7 +1497,7 @@ function navigateToAdjacentElement(direction) {
 // Finish challenge early (with partial completion)
 function finishChallenge() {
   if (state.correctElements.size === 0) {
-    showHintToast('Answer at least one element before finishing!');
+    showHintToast('Please answer at least one element before finishing.');
     return;
   }
   
