@@ -316,7 +316,6 @@ function setupEventListeners() {
   playAgainBtn.addEventListener('click', () => {
     closeModal(completeModal);
     resetChallenge();
-    showIntroScreen();
   });
   shareScoreBtn.addEventListener('click', shareScore);
   
@@ -417,19 +416,29 @@ function renderPeriodicTable() {
   
   // Period 1
   renderElement(ELEMENTS[0]); // H
-  for (let i = 0; i < 16; i++) periodicTable.appendChild(createSpacer());
+  // 1 spacer for col 2, then brand title spans cols 3-12, then 5 spacers for cols 13-17
+  periodicTable.appendChild(createSpacer());
+  const brandTitle = document.createElement('div');
+  brandTitle.className = 'table-brand-title';
+  brandTitle.textContent = 'AtomicMemory';
+  periodicTable.appendChild(brandTitle);
+  for (let i = 0; i < 5; i++) periodicTable.appendChild(createSpacer());
   renderElement(ELEMENTS[1]); // He
   
   // Period 2
   renderElement(ELEMENTS[2]); // Li
   renderElement(ELEMENTS[3]); // Be
-  for (let i = 0; i < 10; i++) periodicTable.appendChild(createSpacer());
+  // Brand tagline spans the 10 empty columns in rows 2-3
+  const brandTagline = document.createElement('div');
+  brandTagline.className = 'table-brand-tagline';
+  brandTagline.textContent = 'Learn the periodic table through an interactive, gamified experience.';
+  periodicTable.appendChild(brandTagline);
   for (let i = 4; i <= 9; i++) renderElement(ELEMENTS[i]);
   
   // Period 3
   renderElement(ELEMENTS[10]); // Na
   renderElement(ELEMENTS[11]); // Mg
-  for (let i = 0; i < 10; i++) periodicTable.appendChild(createSpacer());
+  // Row 3 cols 3-12 are covered by the tagline's grid-row: span 2
   for (let i = 12; i <= 17; i++) renderElement(ELEMENTS[i]);
   
   // Periods 4-5
@@ -983,7 +992,6 @@ function startTimer() {
   if (viewTableBtn.classList.contains('viewing')) {
     toggleViewTable();
   }
-  viewTableBtn.classList.add('hidden');
   
   state.timerInterval = setInterval(() => {
     state.elapsedTime = Math.floor((Date.now() - state.startTime) / 1000);
@@ -1055,6 +1063,9 @@ function resetChallenge() {
   viewTableBtn.querySelector('i').className = 'ri-eye-line';
   viewTableBtn.querySelector('span').textContent = 'Reveal Table';
   
+  // Restore Finish button if it was changed to Play Again
+  restoreFinishButton();
+  
   // Reset mini table if it exists
   const miniTable = document.getElementById('miniPeriodicTable');
   if (miniTable) miniTable.innerHTML = '';
@@ -1081,8 +1092,7 @@ function completeChallenge() {
   );
   
   // Save score
-  const configKey = getConfigKey();
-  scoringSystem.saveScore(configKey, state.correctElements.size, state.elapsedTime, totalMistakes, getModeLabel());
+  scoringSystem.saveScore('full', state.correctElements.size, state.elapsedTime, totalMistakes);
   
   // Update stats
   state.totalChallengesCompleted++;
@@ -1091,8 +1101,31 @@ function completeChallenge() {
   // Check achievements
   checkAchievements(true);
   
+  // Replace Finish button with Play Again
+  setFinishButtonToPlayAgain();
+  
   // Show complete modal
   showCompleteModal();
+}
+
+function setFinishButtonToPlayAgain() {
+  finishBtn.querySelector('i').className = 'ri-restart-line';
+  finishBtn.querySelector('span').textContent = 'Play Again';
+  finishBtn.classList.add('play-again');
+  finishBtn.removeEventListener('click', finishChallenge);
+  finishBtn.addEventListener('click', handlePlayAgain);
+}
+
+function restoreFinishButton() {
+  finishBtn.querySelector('i').className = 'ri-flag-line';
+  finishBtn.querySelector('span').textContent = 'Finish';
+  finishBtn.classList.remove('play-again');
+  finishBtn.removeEventListener('click', handlePlayAgain);
+  finishBtn.addEventListener('click', finishChallenge);
+}
+
+function handlePlayAgain() {
+  resetChallenge();
 }
 
 function checkAchievements(challengeComplete = false) {
@@ -1100,7 +1133,6 @@ function checkAchievements(challengeComplete = false) {
     correct: state.correctElements.size,
     mistakes: Object.values(state.wrongAttempts).reduce((a, b) => a + b, 0),
     time: state.elapsedTime,
-    elementsCount: state.activeElements.size,
     score: scoringSystem.score,
     maxStreak: state.maxStreak,
     challengeComplete: challengeComplete,
@@ -1114,15 +1146,6 @@ function checkAchievements(challengeComplete = false) {
       achievementManager.showAchievementToast(achievement);
     }, 500);
   });
-}
-
-// Config
-function getConfigKey() {
-  return 'full';
-}
-
-function getModeLabel() {
-  return 'Full Table (118 elements)';
 }
 
 // Stats
@@ -1172,39 +1195,52 @@ function openInfoModal() {
 }
 
 function toggleViewTable() {
-  // Block viewing while game is active
-  if (state.timerStarted) {
-    showHintToast("Can't view while playing. Finish the game first.");
+  // Block reveal while a challenge is in progress; allow hide toggle when already viewing
+  if (state.totalAttempts > 0 && state.correctElements.size < state.activeElements.size && !viewTableBtn.classList.contains('viewing')) {
+    showHintToast('Can\'t reveal the table during a challenge. Finish or reset first!');
     return;
   }
 
-  const isViewing = viewTableBtn.classList.toggle('viewing');
+  // If currently viewing, just hide
+  if (viewTableBtn.classList.contains('viewing')) {
+    viewTableBtn.classList.remove('viewing');
+    const icon = viewTableBtn.querySelector('i');
+
+    document.querySelectorAll('.element').forEach(el => {
+      if (el.classList.contains('placeholder')) return;
+
+      const symbolSpan = el.querySelector('.element-symbol');
+      const nameSpan = el.querySelector('.element-name');
+      if (!symbolSpan || !nameSpan) return;
+
+      symbolSpan.textContent = '';
+      nameSpan.textContent = '';
+    });
+
+    icon.className = 'ri-eye-line';
+    viewTableBtn.querySelector('span').textContent = 'Reveal Table';
+    return;
+  }
+
+  // Reset the challenge first, then reveal
+  resetChallenge();
+
+  viewTableBtn.classList.add('viewing');
   const icon = viewTableBtn.querySelector('i');
 
   document.querySelectorAll('.element').forEach(el => {
     if (el.classList.contains('placeholder')) return;
-    if (el.classList.contains('correct')) return;
 
     const symbolSpan = el.querySelector('.element-symbol');
     const nameSpan = el.querySelector('.element-name');
     if (!symbolSpan || !nameSpan) return;
 
-    if (isViewing) {
-      symbolSpan.textContent = el.dataset.symbol;
-      nameSpan.textContent = el.dataset.name;
-    } else {
-      symbolSpan.textContent = '';
-      nameSpan.textContent = '';
-    }
+    symbolSpan.textContent = el.dataset.symbol;
+    nameSpan.textContent = el.dataset.name;
   });
 
-  if (isViewing) {
-    icon.className = 'ri-eye-off-line';
-    viewTableBtn.querySelector('span').textContent = 'Hide Table';
-  } else {
-    icon.className = 'ri-eye-line';
-    viewTableBtn.querySelector('span').textContent = 'Reveal Table';
-  }
+  icon.className = 'ri-eye-off-line';
+  viewTableBtn.querySelector('span').textContent = 'Hide Table';
 }
 
 function openHistoryModal() {
@@ -1237,12 +1273,12 @@ function loadHistory() {
     return `
       <div class="history-item">
         <div class="history-info">
-          <div class="history-mode">${record.mode}</div>
+          <div class="history-mode">${record.elementsCount || 118}/118 Elements</div>
           <div class="history-score">Score: ${scoringSystem.formatScore(record.score || 0)}</div>
           <div class="history-details">
             <span><i class="ri-calendar-line"></i> ${dateStr} ${timeStr}</span>
             <span><i class="ri-close-circle-line"></i> ${record.wrongAttempts} errors</span>
-            <span><i class="ri-checkbox-circle-line"></i> ${record.elementsCount} elements</span>
+            <span><i class="ri-fire-line"></i> ${record.maxStreak || 0} streak</span>
           </div>
         </div>
         <div class="history-time">${durationStr}</div>
@@ -1279,8 +1315,8 @@ function loadLeaderboard() {
           ${index + 1}
         </div>
         <div class="leaderboard-info">
-          <div class="leaderboard-mode">${entry.modeLabel || entry.config || 'Unknown'}</div>
-          <div class="leaderboard-date">${dateStr} • ${formatTime(entry.time)} • ${entry.accuracy}% acc</div>
+          <div class="leaderboard-mode">${entry.rank || 'Novice'}</div>
+          <div class="leaderboard-date">${dateStr} • ${entry.elementsCount || 118}/118 • ${formatTime(entry.time)} • ${entry.accuracy}% acc</div>
         </div>
         <div class="leaderboard-score">
           ${scoringSystem.formatScore(entry.score)}
@@ -1335,22 +1371,14 @@ function showCompleteModal() {
   saveToHistory();
 }
 
-function getShareFocusLabel() {
-  return 'All 118 Elements';
-}
-
-function getShareModeLabel() {
-  return 'Full Table';
-}
-
 function shareScore() {
   const rank = scoringSystem.getRank();
   const minutes = Math.floor(state.elapsedTime / 60);
   const seconds = String(state.elapsedTime % 60).padStart(2, '0');
-  const modeLabel = getShareModeLabel();
-  const focusLabel = getShareFocusLabel();
+  const completed = state.correctElements.size;
+  const total = state.activeElements.size;
   
-  const text = `🎓 I just scored ${scoringSystem.formatScore(scoringSystem.score)} points on AtomicMemory!\n\n🏆 Rank: ${rank.name}\n🧪 Mode: ${modeLabel}\n📚 Focus: ${focusLabel}\n⏱️ Time: ${minutes}:${seconds}\n🎯 Accuracy: ${state.accuracy}%\n\nCan you beat my score?\nPlay now → ${APP_URL}`;
+  const text = `🧪 I just scored ${scoringSystem.formatScore(scoringSystem.score)} points on AtomicMemory!\n\n🏆 Rank: ${rank.name}\n🧩 Elements: ${completed}/${total}\n⏱️ Time: ${minutes}:${seconds}\n🎯 Accuracy: ${state.accuracy}%\n🔥 Best Streak: ${state.maxStreak}\n\nCan you beat my score?\nPlay now → ${APP_URL}`;
   
   if (navigator.share) {
     navigator.share({
@@ -1368,14 +1396,13 @@ function shareScore() {
 function saveToHistory() {
   const history = JSON.parse(localStorage.getItem('history') || '[]');
   
-  const modeLabel = getModeLabel();
   const wrongAttempts = Object.values(state.wrongAttempts).reduce((a, b) => a + b, 0);
   
   const record = {
-    mode: modeLabel,
+    mode: 'Full Table',
     time: state.elapsedTime,
     wrongAttempts: wrongAttempts,
-    elementsCount: state.activeElements.size,
+    elementsCount: state.correctElements.size,
     score: scoringSystem.score,
     accuracy: state.accuracy,
     maxStreak: state.maxStreak,

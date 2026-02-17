@@ -11,7 +11,7 @@ const ACHIEVEMENTS = [
   {
     id: 'ten_elements',
     title: 'Getting Started',
-    description: 'Correctly identify 10 elements',
+    description: 'Correctly identify 10 elements in a single run',
     icon: 'ri-plant-line',
     condition: (stats) => stats.correct >= 10,
     unlocked: false
@@ -19,33 +19,33 @@ const ACHIEVEMENTS = [
   {
     id: 'fifty_elements',
     title: 'Half Way There',
-    description: 'Correctly identify 50 elements',
+    description: 'Correctly identify 50 elements in a single run',
     icon: 'ri-leaf-line',
     condition: (stats) => stats.correct >= 50,
     unlocked: false
   },
   {
-    id: 'complete_challenge',
-    title: 'Completionist',
-    description: 'Complete a full challenge',
+    id: 'complete_table',
+    title: 'Full Table',
+    description: 'Complete all 118 elements',
     icon: 'ri-trophy-line',
-    condition: (stats) => stats.challengeComplete,
+    condition: (stats) => stats.challengeComplete && stats.correct === 118,
     unlocked: false
   },
   {
     id: 'perfect_run',
     title: 'Perfectionist',
-    description: 'Complete a challenge with zero mistakes',
+    description: 'Complete all 118 elements with zero mistakes',
     icon: 'ri-star-line',
-    condition: (stats) => stats.challengeComplete && stats.mistakes === 0,
+    condition: (stats) => stats.challengeComplete && stats.correct === 118 && stats.mistakes === 0,
     unlocked: false
   },
   {
     id: 'speed_demon',
     title: 'Speed Demon',
-    description: 'Complete 118 elements in under 5 minutes',
+    description: 'Complete all 118 elements in under 5 minutes',
     icon: 'ri-flashlight-line',
-    condition: (stats) => stats.challengeComplete && stats.elementsCount === 118 && stats.time < 300,
+    condition: (stats) => stats.challengeComplete && stats.correct === 118 && stats.time < 300,
     unlocked: false
   },
   {
@@ -65,9 +65,17 @@ const ACHIEVEMENTS = [
     unlocked: false
   },
   {
+    id: 'streak_all',
+    title: 'Flawless Run',
+    description: 'Get all 118 correct in a row without breaking your streak',
+    icon: 'ri-shining-line',
+    condition: (stats) => stats.maxStreak >= 118,
+    unlocked: false
+  },
+  {
     id: 'first_milestone',
     title: 'First Milestone',
-    description: 'Reach 10,000 points in a single challenge',
+    description: 'Reach 10,000 points',
     icon: 'ri-medal-line',
     condition: (stats) => stats.score >= 10000,
     unlocked: false
@@ -75,7 +83,7 @@ const ACHIEVEMENTS = [
   {
     id: 'half_century',
     title: 'Half Century',
-    description: 'Reach 50,000 points in a single challenge',
+    description: 'Reach 50,000 points',
     icon: 'ri-medal-2-line',
     condition: (stats) => stats.score >= 50000,
     unlocked: false
@@ -83,7 +91,7 @@ const ACHIEVEMENTS = [
   {
     id: 'centurion',
     title: 'Centurion',
-    description: 'Reach 100,000 points in a single challenge',
+    description: 'Reach 100,000 points',
     icon: 'ri-vip-crown-line',
     condition: (stats) => stats.score >= 100000,
     unlocked: false
@@ -92,13 +100,13 @@ const ACHIEVEMENTS = [
     id: 'five_challenges',
     title: 'Dedicated',
     description: 'Complete 5 challenges',
-    icon: 'ri-medal-line',
+    icon: 'ri-calendar-check-line',
     condition: (stats) => stats.totalChallenges >= 5,
     unlocked: false
   },
   {
     id: 'twenty_challenges',
-    title: 'Expert',
+    title: 'Veteran',
     description: 'Complete 20 challenges',
     icon: 'ri-award-line',
     condition: (stats) => stats.totalChallenges >= 20,
@@ -107,15 +115,15 @@ const ACHIEVEMENTS = [
   {
     id: 'fast_learner',
     title: 'Fast Learner',
-    description: 'Average under 3 seconds per element',
+    description: 'Average under 3 seconds per element across all 118',
     icon: 'ri-rocket-line',
-    condition: (stats) => stats.challengeComplete && (stats.time / stats.elementsCount) < 3,
+    condition: (stats) => stats.challengeComplete && stats.correct === 118 && (stats.time / 118) < 3,
     unlocked: false
   },
   {
     id: 'comeback_kid',
     title: 'Comeback Kid',
-    description: 'Score 50,000+ after starting with 5+ mistakes',
+    description: 'Score 50,000+ despite making 5 or more mistakes',
     icon: 'ri-emotion-laugh-line',
     condition: (stats) => stats.score >= 50000 && stats.mistakes >= 5,
     unlocked: false
