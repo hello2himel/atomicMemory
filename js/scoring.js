@@ -65,8 +65,8 @@ class ScoringSystem {
     // Type Rate = Elements / Time
     const typeRate = elementsCompleted / timeInSeconds;
     
-    // Base Score = Type Rate × Elements × Multiplier
-    const base = typeRate * elementsCompleted * SCORING.BASE_MULTIPLIER;
+    // Base Score = Type Rate × Multiplier (linear scaling)
+    const base = typeRate * SCORING.BASE_MULTIPLIER;
     
     return Math.round(base);
   }
