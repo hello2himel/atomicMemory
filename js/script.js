@@ -316,7 +316,6 @@ function setupEventListeners() {
   playAgainBtn.addEventListener('click', () => {
     closeModal(completeModal);
     resetChallenge();
-    showIntroScreen();
   });
   shareScoreBtn.addEventListener('click', shareScore);
   
@@ -1055,6 +1054,9 @@ function resetChallenge() {
   viewTableBtn.querySelector('i').className = 'ri-eye-line';
   viewTableBtn.querySelector('span').textContent = 'Reveal Table';
   
+  // Restore Finish button if it was changed to Play Again
+  restoreFinishButton();
+  
   // Reset mini table if it exists
   const miniTable = document.getElementById('miniPeriodicTable');
   if (miniTable) miniTable.innerHTML = '';
@@ -1090,8 +1092,31 @@ function completeChallenge() {
   // Check achievements
   checkAchievements(true);
   
+  // Replace Finish button with Play Again
+  setFinishButtonToPlayAgain();
+  
   // Show complete modal
   showCompleteModal();
+}
+
+function setFinishButtonToPlayAgain() {
+  finishBtn.querySelector('i').className = 'ri-restart-line';
+  finishBtn.querySelector('span').textContent = 'Play Again';
+  finishBtn.classList.add('play-again');
+  finishBtn.removeEventListener('click', finishChallenge);
+  finishBtn.addEventListener('click', handlePlayAgain);
+}
+
+function restoreFinishButton() {
+  finishBtn.querySelector('i').className = 'ri-flag-line';
+  finishBtn.querySelector('span').textContent = 'Finish';
+  finishBtn.classList.remove('play-again');
+  finishBtn.removeEventListener('click', handlePlayAgain);
+  finishBtn.addEventListener('click', finishChallenge);
+}
+
+function handlePlayAgain() {
+  resetChallenge();
 }
 
 function checkAchievements(challengeComplete = false) {
@@ -1161,39 +1186,46 @@ function openInfoModal() {
 }
 
 function toggleViewTable() {
-  // Block viewing while game is active
-  if (state.timerStarted) {
-    showHintToast("Can't view while playing. Finish the game first.");
+  // If currently viewing, just hide
+  if (viewTableBtn.classList.contains('viewing')) {
+    viewTableBtn.classList.remove('viewing');
+    const icon = viewTableBtn.querySelector('i');
+
+    document.querySelectorAll('.element').forEach(el => {
+      if (el.classList.contains('placeholder')) return;
+
+      const symbolSpan = el.querySelector('.element-symbol');
+      const nameSpan = el.querySelector('.element-name');
+      if (!symbolSpan || !nameSpan) return;
+
+      symbolSpan.textContent = '';
+      nameSpan.textContent = '';
+    });
+
+    icon.className = 'ri-eye-line';
+    viewTableBtn.querySelector('span').textContent = 'Reveal Table';
     return;
   }
 
-  const isViewing = viewTableBtn.classList.toggle('viewing');
+  // Reset the challenge first, then reveal
+  resetChallenge();
+
+  viewTableBtn.classList.add('viewing');
   const icon = viewTableBtn.querySelector('i');
 
   document.querySelectorAll('.element').forEach(el => {
     if (el.classList.contains('placeholder')) return;
-    if (el.classList.contains('correct')) return;
 
     const symbolSpan = el.querySelector('.element-symbol');
     const nameSpan = el.querySelector('.element-name');
     if (!symbolSpan || !nameSpan) return;
 
-    if (isViewing) {
-      symbolSpan.textContent = el.dataset.symbol;
-      nameSpan.textContent = el.dataset.name;
-    } else {
-      symbolSpan.textContent = '';
-      nameSpan.textContent = '';
-    }
+    symbolSpan.textContent = el.dataset.symbol;
+    nameSpan.textContent = el.dataset.name;
   });
 
-  if (isViewing) {
-    icon.className = 'ri-eye-off-line';
-    viewTableBtn.querySelector('span').textContent = 'Hide Table';
-  } else {
-    icon.className = 'ri-eye-line';
-    viewTableBtn.querySelector('span').textContent = 'Reveal Table';
-  }
+  icon.className = 'ri-eye-off-line';
+  viewTableBtn.querySelector('span').textContent = 'Hide Table';
 }
 
 function openHistoryModal() {
