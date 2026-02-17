@@ -733,6 +733,14 @@ body {
   gap: var(--space-md);
 }
 
+.bottom-bar-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  white-space: nowrap;
+}
+
 .bottom-bar-stats {
   display: flex;
   align-items: center;
