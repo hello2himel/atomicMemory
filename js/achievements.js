@@ -138,7 +138,8 @@ class AchievementManager {
   }
 
   loadAchievements() {
-    const saved = localStorage.getItem('achievements');
+    let saved;
+    try { saved = localStorage.getItem('achievements'); } catch (e) { saved = null; }
     if (saved) {
       const savedData = JSON.parse(saved);
       this.achievements.forEach(achievement => {
@@ -157,7 +158,7 @@ class AchievementManager {
       unlocked: a.unlocked,
       unlockedAt: a.unlockedAt
     }));
-    localStorage.setItem('achievements', JSON.stringify(data));
+    try { localStorage.setItem('achievements', JSON.stringify(data)); } catch (e) { /* quota exceeded or disabled */ }
   }
 
   checkAchievements(stats) {

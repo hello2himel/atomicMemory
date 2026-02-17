@@ -296,7 +296,7 @@
           </div>
 
           <!-- QWERTY Keyboard -->
-          <div class="qwerty-keyboard" id="qwertyKeyboard">
+          <div class="qwerty-keyboard" id="qwertyKeyboard" role="group" aria-label="On-screen keyboard">
             <div class="qwerty-row">
               <button class="qwerty-key" data-key="Q">Q</button>
               <button class="qwerty-key" data-key="W">W</button>
@@ -321,6 +321,7 @@
               <button class="qwerty-key" data-key="L">L</button>
             </div>
             <div class="qwerty-row">
+              <button class="qwerty-key qwerty-shift" data-key="SHIFT" aria-label="Shift">⇧</button>
               <button class="qwerty-key" data-key="Z">Z</button>
               <button class="qwerty-key" data-key="X">X</button>
               <button class="qwerty-key" data-key="C">C</button>
@@ -328,10 +329,10 @@
               <button class="qwerty-key" data-key="B">B</button>
               <button class="qwerty-key" data-key="N">N</button>
               <button class="qwerty-key" data-key="M">M</button>
-              <button class="qwerty-key qwerty-backspace" data-key="BACKSPACE"><i class="ri-delete-back-2-line"></i></button>
+              <button class="qwerty-key qwerty-backspace" data-key="BACKSPACE" aria-label="Backspace">⌫</button>
             </div>
             <div class="qwerty-row qwerty-action-row">
-              <button class="qwerty-key qwerty-submit" data-key="SUBMIT"><i class="ri-check-line"></i> Enter</button>
+              <button class="qwerty-key qwerty-submit" data-key="SUBMIT" aria-label="Submit answer"><i class="ri-check-line"></i> Enter</button>
             </div>
           </div>
 
@@ -358,7 +359,7 @@
     <div id="hintToast" class="hint-toast hidden" role="status" aria-live="polite"></div>
 
     <!-- Score Change Floater -->
-    <div id="scoreFloater" class="score-floater hidden"></div>
+    <div id="scoreFloater" class="score-floater hidden" aria-live="polite" aria-atomic="true"></div>
 
     <!-- Modals -->
     
