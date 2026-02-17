@@ -71,28 +71,10 @@
   <div id="mainApp" class="main-app hidden">
     <!-- Unified Top Bar -->
     <header class="header">
-      <!-- Row 1: Title -->
       <div class="header-title-row">
         <h1 class="site-title">AtomicMemory</h1>
       </div>
-      <!-- Row 2: Action Buttons -->
       <div class="header-buttons-row">
-        <button id="achievementsBtn" class="header-icon-btn" title="Achievements" aria-label="Achievements">
-          <i class="ri-medal-line" aria-hidden="true"></i>
-          <span id="achievementBadge" class="notification-badge hidden">0</span>
-        </button>
-        <button id="historyBtn" class="header-icon-btn" title="History" aria-label="Practice history">
-          <i class="ri-history-line" aria-hidden="true"></i>
-        </button>
-        <button id="leaderboardBtn" class="header-icon-btn" title="Leaderboard" aria-label="Leaderboard">
-          <i class="ri-trophy-line" aria-hidden="true"></i>
-        </button>
-        <button id="aboutBtn" class="header-icon-btn" title="About" aria-label="About">
-          <i class="ri-information-line" aria-hidden="true"></i>
-        </button>
-        <button id="darkModeBtn" class="header-icon-btn" title="Toggle theme" aria-label="Toggle theme">
-          <i class="ri-moon-line" aria-hidden="true"></i>
-        </button>
         <button id="menuBtn" class="header-icon-btn mobile-menu-btn" title="Menu" aria-label="Menu">
           <i class="ri-menu-line" aria-hidden="true"></i>
         </button>
@@ -134,6 +116,7 @@
 
     <!-- Desktop Bottom HUD -->
     <div id="desktopBottomBar" class="desktop-bottom-bar">
+      <div class="bottom-bar-title">AtomicMemory</div>
       <div class="bottom-bar-stats">
         <div class="bottom-stat" title="Score">
           <i class="ri-star-line"></i>
@@ -157,9 +140,9 @@
         </div>
       </div>
       <div class="bottom-bar-action-row">
-        <button id="hintBtn" class="bottom-action-btn hint-btn" title="Get a hint (-50 points)">
-          <i class="ri-lightbulb-line"></i>
-          <span>Hint</span>
+        <button id="leaderboardBtn" class="bottom-action-btn trophy-btn" title="Leaderboard" aria-label="Leaderboard">
+          <i class="ri-trophy-line"></i>
+          <span>Leaderboard</span>
         </button>
         <button id="finishBtn" class="bottom-action-btn finish-btn" title="Finish challenge">
           <i class="ri-flag-line"></i>
@@ -178,10 +161,24 @@
             <button class="hud-nav-option" data-nav="vertical">↓ Next in Group</button>
           </div>
         </div>
-        <button id="resetBtn" class="bottom-action-btn reset-btn" title="Reset challenge">
-          <i class="ri-restart-line"></i>
-          <span>Reset</span>
-        </button>
+        <div class="hud-nav-btns">
+          <button id="achievementsBtn" class="header-icon-btn" title="Achievements" aria-label="Achievements">
+            <i class="ri-medal-line" aria-hidden="true"></i>
+            <span id="achievementBadge" class="notification-badge hidden">0</span>
+          </button>
+          <button id="historyBtn" class="header-icon-btn" title="History" aria-label="Practice history">
+            <i class="ri-history-line" aria-hidden="true"></i>
+          </button>
+          <button id="aboutBtn" class="header-icon-btn" title="About" aria-label="About">
+            <i class="ri-information-line" aria-hidden="true"></i>
+          </button>
+          <button id="darkModeBtn" class="header-icon-btn" title="Toggle theme" aria-label="Toggle theme">
+            <i class="ri-moon-line" aria-hidden="true"></i>
+          </button>
+          <button id="resetBtn" class="header-icon-btn" title="Reset challenge" aria-label="Reset challenge">
+            <i class="ri-restart-line" aria-hidden="true"></i>
+          </button>
+        </div>
       </div>
     </div>
 

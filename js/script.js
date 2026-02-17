@@ -202,8 +202,8 @@ function setupEventListeners() {
   // Finish button
   finishBtn.addEventListener('click', finishChallenge);
   
-  // Hint button
-  hintBtn.addEventListener('click', showHint);
+  // Hint button (removed from UI, guard against null)
+  if (hintBtn) hintBtn.addEventListener('click', showHint);
   
   // History button
   historyBtn.addEventListener('click', openHistoryModal);
@@ -1172,6 +1172,12 @@ function openInfoModal() {
 }
 
 function toggleViewTable() {
+  // Block viewing while game is active
+  if (state.timerStarted) {
+    showHintToast("Can't view while playing. Finish the game first.");
+    return;
+  }
+
   const isViewing = viewTableBtn.classList.toggle('viewing');
   const icon = viewTableBtn.querySelector('i');
 
