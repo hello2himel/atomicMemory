@@ -992,7 +992,6 @@ function startTimer() {
   if (viewTableBtn.classList.contains('viewing')) {
     toggleViewTable();
   }
-  viewTableBtn.classList.add('hidden');
   
   state.timerInterval = setInterval(() => {
     state.elapsedTime = Math.floor((Date.now() - state.startTime) / 1000);

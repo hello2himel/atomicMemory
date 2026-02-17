@@ -70,7 +70,7 @@
   --radius-full: 9999px;
   
   /* Bottom bar height variable */
-  --bottom-bar-height: 120px;
+  --bottom-bar-height: 150px;
   
   /* Typography */
   --font-display: 'Outfit', sans-serif;
@@ -401,7 +401,7 @@ body {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  font-size: clamp(28px, 3vw, 42px);
+  font-size: clamp(36px, 4vw, 56px);
   font-weight: 900;
   color: var(--text-primary);
   font-family: var(--font-display);
@@ -418,7 +418,7 @@ body {
   align-items: flex-start;
   justify-content: center;
   text-align: center;
-  font-size: clamp(10px, 1.1vw, 14px);
+  font-size: clamp(11px, 1.3vw, 16px);
   font-weight: 500;
   color: var(--text-tertiary);
   font-family: var(--font-display);
@@ -759,11 +759,18 @@ body {
   gap: 6px;
 }
 
-.bottom-bar-main-row {
+.bottom-bar-stats-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: var(--space-md);
+}
+
+.bottom-bar-action-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
 }
 
 .bottom-bar-stats {
@@ -794,13 +801,6 @@ body {
   font-size: 16px;
   font-weight: 800;
   text-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
-}
-
-/* Action row: Leaderboard | FINISH | View (inline with stats) */
-.bottom-bar-action-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
 }
 
 /* Primary action: Finish button (mobile-inspired red gradient) */
