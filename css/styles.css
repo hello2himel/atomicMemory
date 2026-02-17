@@ -272,7 +272,7 @@ body {
 .intro-hint {
   margin-top: var(--space-md);
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.55);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -820,7 +820,7 @@ body:not([data-theme="dark"]) .bottom-action-btn:hover {
 /* Reset is de-emphasized */
 .bottom-action-btn.reset-btn {
   border-color: transparent;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.5);
   font-size: 12px;
   padding: var(--space-xs) var(--space-md);
   min-width: auto;
@@ -845,9 +845,9 @@ body:not([data-theme="dark"]) .bottom-action-btn.reset-btn {
 }
 
 .hud-nav-label {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.55);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   font-family: var(--font-mono);
@@ -864,7 +864,7 @@ body:not([data-theme="dark"]) .hud-nav-label {
   border-radius: var(--radius-sm);
   font-size: 11px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(255, 255, 255, 0.55);
   cursor: pointer;
   transition: all 150ms ease;
   font-family: var(--font-body);
