@@ -537,15 +537,13 @@ function handleElementClick(e) {
   }
 }
 
-function formatMobileElementInfo(element) {
-  const atomic = element.dataset.atomic;
+function formatCellPosition(element) {
   const period = element.dataset.period;
   const group = element.dataset.group;
-  let info = `Element #${atomic} · Period ${period}`;
   if (group) {
-    info += ` · Group ${group}`;
+    return `Period ${period} · Group ${group}`;
   }
-  return info;
+  return `Period ${period}`;
 }
 
 function openMobileInput(element) {
@@ -554,22 +552,18 @@ function openMobileInput(element) {
   // Render mini table on first open
   renderMiniTable();
   
-  const number = mobileInputModal.querySelector('.mobile-input-number');
-  const category = mobileInputModal.querySelector('.mobile-input-category');
-  
-  number.textContent = formatMobileElementInfo(element);
-  category.textContent = element.dataset.category;
-  
   // Update cell display
   const cellAtomicNum = document.getElementById('cellAtomicNumber');
   const cellSymbolDisplay = document.getElementById('cellSymbolDisplay');
   const cellNameDisplay = document.getElementById('cellNameDisplay');
+  const cellPosition = document.getElementById('cellPositionDisplay');
   if (cellAtomicNum) cellAtomicNum.textContent = element.dataset.atomic;
   if (cellSymbolDisplay) {
     cellSymbolDisplay.textContent = '—';
     cellSymbolDisplay.classList.add('empty');
   }
   if (cellNameDisplay) cellNameDisplay.textContent = '';
+  if (cellPosition) cellPosition.textContent = formatCellPosition(element);
   
   mobileInput.value = '';
   updateGcInputState();
@@ -1623,22 +1617,18 @@ function drawConnectorLine(atomicNumber) {
 function updateMobileInputForElement(element) {
   state.currentElement = element;
   
-  const number = mobileInputModal.querySelector('.mobile-input-number');
-  const category = mobileInputModal.querySelector('.mobile-input-category');
-  
-  number.textContent = formatMobileElementInfo(element);
-  category.textContent = element.dataset.category;
-  
   // Update cell display
   const cellAtomicNum = document.getElementById('cellAtomicNumber');
   const cellSymbolDisplay = document.getElementById('cellSymbolDisplay');
   const cellNameDisplay = document.getElementById('cellNameDisplay');
+  const cellPosition = document.getElementById('cellPositionDisplay');
   if (cellAtomicNum) cellAtomicNum.textContent = element.dataset.atomic;
   if (cellSymbolDisplay) {
     cellSymbolDisplay.textContent = '—';
     cellSymbolDisplay.classList.add('empty');
   }
   if (cellNameDisplay) cellNameDisplay.textContent = '';
+  if (cellPosition) cellPosition.textContent = formatCellPosition(element);
   
   mobileInput.value = '';
   updateGcInputState();
@@ -1716,28 +1706,55 @@ function navigateToAdjacentElement(direction) {
     .filter(el => !el.classList.contains('placeholder') && !el.classList.contains('disabled'));
   
   if (direction === 'left' || direction === 'right') {
-    // Navigate within the same period (or category for lanthanides/actinides)
+    // Navigate within the same period, including f-block elements in their period
     const sameRow = allElements
-      .filter(el => {
-        if (currentCategory === 'lanthanide' || currentCategory === 'actinide') {
-          return el.dataset.category === currentCategory;
-        }
-        return parseInt(el.dataset.period) === currentPeriod && 
-               el.dataset.category !== 'lanthanide' && el.dataset.category !== 'actinide';
-      })
+      .filter(el => parseInt(el.dataset.period) === currentPeriod)
       .sort((a, b) => parseInt(a.dataset.atomic) - parseInt(b.dataset.atomic));
     
     const currentIndex = sameRow.findIndex(el => parseInt(el.dataset.atomic) === currentAtomic);
     if (currentIndex !== -1) {
-      if (direction === 'left' && currentIndex > 0) {
-        targetElement = sameRow[currentIndex - 1];
-      } else if (direction === 'right' && currentIndex < sameRow.length - 1) {
-        targetElement = sameRow[currentIndex + 1];
+      // Scan past correct cells to find the next unanswered one
+      const step = direction === 'left' ? -1 : 1;
+      for (let i = currentIndex + step; i >= 0 && i < sameRow.length; i += step) {
+        if (!sameRow[i].classList.contains('correct')) {
+          targetElement = sameRow[i];
+          break;
+        }
       }
     }
   } else if (direction === 'up' || direction === 'down') {
-    // Navigate within the same group (column)
-    if (currentGroup) {
+    if (currentCategory === 'lanthanide' || currentCategory === 'actinide') {
+      // For lanthanides/actinides, up/down moves between the two series
+      const elData = ELEMENTS_MAP[currentAtomic];
+      if (elData) {
+        const offset = currentCategory === 'lanthanide' ? currentAtomic - 57 : currentAtomic - 89;
+        let targetAtomic;
+        if (direction === 'down' && currentCategory === 'lanthanide') {
+          targetAtomic = 89 + offset;
+        } else if (direction === 'up' && currentCategory === 'actinide') {
+          targetAtomic = 57 + offset;
+        } else if (direction === 'up' && currentCategory === 'lanthanide') {
+          // Go to the closest unanswered element in the main table in period 6 before lanthanides
+          const mainRow = allElements
+            .filter(el => parseInt(el.dataset.period) === 6 && el.dataset.category !== 'lanthanide')
+            .filter(el => parseInt(el.dataset.atomic) < 57)
+            .sort((a, b) => parseInt(b.dataset.atomic) - parseInt(a.dataset.atomic));
+          for (const el of mainRow) {
+            if (!el.classList.contains('correct')) {
+              targetElement = el;
+              break;
+            }
+          }
+        }
+        if (targetAtomic && !targetElement) {
+          const candidate = allElements.find(el => parseInt(el.dataset.atomic) === targetAtomic);
+          if (candidate && !candidate.classList.contains('correct')) {
+            targetElement = candidate;
+          }
+        }
+      }
+    } else if (currentGroup) {
+      // Navigate within the same group (column), skip over correct cells
       const sameCol = allElements
         .filter(el => parseInt(el.dataset.group) === currentGroup &&
                       el.dataset.category !== 'lanthanide' && el.dataset.category !== 'actinide')
@@ -1745,33 +1762,39 @@ function navigateToAdjacentElement(direction) {
       
       const currentIndex = sameCol.findIndex(el => parseInt(el.dataset.atomic) === currentAtomic);
       if (currentIndex !== -1) {
-        if (direction === 'up' && currentIndex > 0) {
-          targetElement = sameCol[currentIndex - 1];
-        } else if (direction === 'down' && currentIndex < sameCol.length - 1) {
-          targetElement = sameCol[currentIndex + 1];
+        const step = direction === 'up' ? -1 : 1;
+        for (let i = currentIndex + step; i >= 0 && i < sameCol.length; i += step) {
+          if (!sameCol[i].classList.contains('correct')) {
+            targetElement = sameCol[i];
+            break;
+          }
         }
       }
-    } else if (currentCategory === 'lanthanide' || currentCategory === 'actinide') {
-      // For lanthanides/actinides, up/down moves between the two series
-      const elData = ELEMENTS_MAP[currentAtomic];
-      if (elData) {
-        // Lanthanides are 57-71, Actinides are 89-103
-        // Map position within series
-        const offset = currentCategory === 'lanthanide' ? currentAtomic - 57 : currentAtomic - 89;
-        let targetAtomic;
-        if (direction === 'down' && currentCategory === 'lanthanide') {
-          targetAtomic = 89 + offset;
-        } else if (direction === 'up' && currentCategory === 'actinide') {
-          targetAtomic = 57 + offset;
-        }
-        if (targetAtomic) {
-          targetElement = allElements.find(el => parseInt(el.dataset.atomic) === targetAtomic) || null;
+      
+      // Special: going down from group 3 into f-block
+      if (!targetElement && direction === 'down' && currentGroup === 3) {
+        if (currentPeriod === 5) {
+          // Scan lanthanides for first unanswered
+          const lanthSeries = allElements
+            .filter(el => el.dataset.category === 'lanthanide')
+            .sort((a, b) => parseInt(a.dataset.atomic) - parseInt(b.dataset.atomic));
+          for (const el of lanthSeries) {
+            if (!el.classList.contains('correct')) { targetElement = el; break; }
+          }
+        } else if (currentPeriod === 6) {
+          // Scan actinides for first unanswered
+          const actSeries = allElements
+            .filter(el => el.dataset.category === 'actinide')
+            .sort((a, b) => parseInt(a.dataset.atomic) - parseInt(b.dataset.atomic));
+          for (const el of actSeries) {
+            if (!el.classList.contains('correct')) { targetElement = el; break; }
+          }
         }
       }
     }
   }
   
-  if (targetElement && !targetElement.classList.contains('correct')) {
+  if (targetElement) {
     if (state.isMobile) {
       updateMobileInputForElement(targetElement);
     } else {
