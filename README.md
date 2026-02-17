@@ -25,20 +25,24 @@ Live demo: [atomicmemory.netlify.app](https://atomicmemory.netlify.app)
 - **Timed Challenges** — Track speed and accuracy per session
 - **Dark / Light Theme** — Auto-detects system preference or toggle manually
 - **Responsive Design** — Full desktop and mobile support with dedicated mobile input UI
+- **Mobile QWERTY Keyboard** — Wordle-style on-screen keyboard; no native keyboard needed
+- **Cell-like Mobile Input** — Input display looks like a periodic table cell with atomic number and symbol
 - **Mobile Arrow Keys** — On-screen directional buttons for navigating between elements on mobile
-- **Animated Intro** — Periodic table animation with random color flashes and category-color settling
+- **Desktop Bottom Nav** — Game stats and action buttons in a fixed bottom navigation bar
+- **Animated Intro** — Periodic table animation with random color flashes and category-color settling (desktop); simplified setup screen (mobile)
 - **Fully Client-Side** — No server needed; all data stored in localStorage
 
 ---
 
 ## How It Works
 
-1. **Start the challenge** — All 118 elements are active; answer as many as you can
-2. **Click an element** — An input field appears; type the element's chemical symbol
-3. **Navigate with arrow keys** — Use arrow keys (desktop) or arrow buttons (mobile) to move between cells
-4. **Get feedback** — Correct answers are marked green; mistakes flash red with point penalties
-5. **Finish anytime** — Press the Finish button when you're done to see your score breakdown
-6. **Track progress** — View your history, achievements, and leaderboard from the header
+1. **Start the challenge** — On desktop, all 118 elements are shown in the periodic table; on mobile, a simplified setup screen appears
+2. **Click an element (desktop)** — An input field appears; type the element's chemical symbol
+3. **Type on QWERTY keyboard (mobile)** — Use the on-screen keyboard to type; input looks like a periodic table cell
+4. **Navigate with arrow keys** — Use arrow keys (desktop) or arrow buttons (mobile) to move between cells
+5. **Get feedback** — Correct answers are marked green; mistakes flash red with point penalties
+6. **Finish anytime** — Press the Finish button when you're done to see your score breakdown
+7. **Track progress** — View your history, achievements, and leaderboard
 
 ### Scoring
 
