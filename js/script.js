@@ -1081,8 +1081,7 @@ function completeChallenge() {
   );
   
   // Save score
-  const configKey = getConfigKey();
-  scoringSystem.saveScore(configKey, state.correctElements.size, state.elapsedTime, totalMistakes, getModeLabel());
+  scoringSystem.saveScore('full', state.correctElements.size, state.elapsedTime, totalMistakes);
   
   // Update stats
   state.totalChallengesCompleted++;
@@ -1100,7 +1099,6 @@ function checkAchievements(challengeComplete = false) {
     correct: state.correctElements.size,
     mistakes: Object.values(state.wrongAttempts).reduce((a, b) => a + b, 0),
     time: state.elapsedTime,
-    elementsCount: state.activeElements.size,
     score: scoringSystem.score,
     maxStreak: state.maxStreak,
     challengeComplete: challengeComplete,
@@ -1114,15 +1112,6 @@ function checkAchievements(challengeComplete = false) {
       achievementManager.showAchievementToast(achievement);
     }, 500);
   });
-}
-
-// Config
-function getConfigKey() {
-  return 'full';
-}
-
-function getModeLabel() {
-  return 'Full Table (118 elements)';
 }
 
 // Stats
@@ -1237,12 +1226,12 @@ function loadHistory() {
     return `
       <div class="history-item">
         <div class="history-info">
-          <div class="history-mode">${record.mode}</div>
+          <div class="history-mode">${record.elementsCount || 118}/118 Elements</div>
           <div class="history-score">Score: ${scoringSystem.formatScore(record.score || 0)}</div>
           <div class="history-details">
             <span><i class="ri-calendar-line"></i> ${dateStr} ${timeStr}</span>
             <span><i class="ri-close-circle-line"></i> ${record.wrongAttempts} errors</span>
-            <span><i class="ri-checkbox-circle-line"></i> ${record.elementsCount} elements</span>
+            <span><i class="ri-fire-line"></i> ${record.maxStreak || 0} streak</span>
           </div>
         </div>
         <div class="history-time">${durationStr}</div>
@@ -1279,8 +1268,8 @@ function loadLeaderboard() {
           ${index + 1}
         </div>
         <div class="leaderboard-info">
-          <div class="leaderboard-mode">${entry.modeLabel || entry.config || 'Unknown'}</div>
-          <div class="leaderboard-date">${dateStr} • ${formatTime(entry.time)} • ${entry.accuracy}% acc</div>
+          <div class="leaderboard-mode">${entry.rank || 'Novice'}</div>
+          <div class="leaderboard-date">${dateStr} • ${entry.elementsCount || 118}/118 • ${formatTime(entry.time)} • ${entry.accuracy}% acc</div>
         </div>
         <div class="leaderboard-score">
           ${scoringSystem.formatScore(entry.score)}
@@ -1335,22 +1324,14 @@ function showCompleteModal() {
   saveToHistory();
 }
 
-function getShareFocusLabel() {
-  return 'All 118 Elements';
-}
-
-function getShareModeLabel() {
-  return 'Full Table';
-}
-
 function shareScore() {
   const rank = scoringSystem.getRank();
   const minutes = Math.floor(state.elapsedTime / 60);
   const seconds = String(state.elapsedTime % 60).padStart(2, '0');
-  const modeLabel = getShareModeLabel();
-  const focusLabel = getShareFocusLabel();
+  const completed = state.correctElements.size;
+  const total = state.activeElements.size;
   
-  const text = `🎓 I just scored ${scoringSystem.formatScore(scoringSystem.score)} points on AtomicMemory!\n\n🏆 Rank: ${rank.name}\n🧪 Mode: ${modeLabel}\n📚 Focus: ${focusLabel}\n⏱️ Time: ${minutes}:${seconds}\n🎯 Accuracy: ${state.accuracy}%\n\nCan you beat my score?\nPlay now → ${APP_URL}`;
+  const text = `🧪 I just scored ${scoringSystem.formatScore(scoringSystem.score)} points on AtomicMemory!\n\n🏆 Rank: ${rank.name}\n🧩 Elements: ${completed}/${total}\n⏱️ Time: ${minutes}:${seconds}\n🎯 Accuracy: ${state.accuracy}%\n🔥 Best Streak: ${state.maxStreak}\n\nCan you beat my score?\nPlay now → ${APP_URL}`;
   
   if (navigator.share) {
     navigator.share({
@@ -1368,14 +1349,13 @@ function shareScore() {
 function saveToHistory() {
   const history = JSON.parse(localStorage.getItem('history') || '[]');
   
-  const modeLabel = getModeLabel();
   const wrongAttempts = Object.values(state.wrongAttempts).reduce((a, b) => a + b, 0);
   
   const record = {
-    mode: modeLabel,
+    mode: 'Full Table',
     time: state.elapsedTime,
     wrongAttempts: wrongAttempts,
-    elementsCount: state.activeElements.size,
+    elementsCount: state.correctElements.size,
     score: scoringSystem.score,
     accuracy: state.accuracy,
     maxStreak: state.maxStreak,

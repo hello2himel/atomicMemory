@@ -238,14 +238,12 @@ class ScoringSystem {
     }
   }
 
-  saveScore(config, elementsCount, time, mistakes, modeLabel) {
+  saveScore(config, elementsCount, time, mistakes) {
     const leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]');
     
     const entry = {
       score: this.score,
       rank: this.getRank().name,
-      config: config,
-      modeLabel: modeLabel || config,
       elementsCount: elementsCount,
       time: time,
       mistakes: mistakes,
@@ -274,13 +272,12 @@ class ScoringSystem {
     return leaderboard.slice(0, limit);
   }
 
-  getPersonalBest(config) {
+  getPersonalBest() {
     const leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]');
-    const configScores = leaderboard.filter(entry => entry.config === config);
     
-    if (configScores.length === 0) return null;
+    if (leaderboard.length === 0) return null;
     
-    return configScores.reduce((best, current) => {
+    return leaderboard.reduce((best, current) => {
       return current.score > best.score ? current : best;
     });
   }
