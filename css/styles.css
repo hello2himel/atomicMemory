@@ -395,6 +395,21 @@ body {
   display: none;
 }
 
+/* Desktop top-left branding */
+.desktop-brand {
+  position: fixed;
+  top: var(--space-md);
+  left: var(--space-lg);
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  letter-spacing: -0.03em;
+  z-index: var(--z-sticky);
+  pointer-events: none;
+  opacity: 0.7;
+}
+
 .header-title-row {
   display: flex;
   align-items: center;
@@ -733,15 +748,6 @@ body {
   gap: var(--space-md);
 }
 
-.bottom-bar-title {
-  font-size: 18px;
-  font-weight: 900;
-  color: var(--text-primary);
-  font-family: var(--font-display);
-  letter-spacing: -0.02em;
-  white-space: nowrap;
-}
-
 .bottom-bar-stats {
   display: flex;
   align-items: center;
@@ -1057,15 +1063,19 @@ body {
 /* ===== PERIODIC TABLE ===== */
 .table-container {
   flex: 1;
-  padding: var(--space-xl);
+  padding: var(--space-md) var(--space-xl);
   padding-bottom: var(--bottom-bar-height);
   overflow: auto;
   position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
 }
 
 .table-wrapper {
   max-width: 1600px;
-  margin: 0 auto;
+  margin: auto;
+  width: 100%;
 }
 
 .periodic-table {
@@ -2718,6 +2728,7 @@ body {
   .header,
   .progress-bar-container,
   .desktop-bottom-bar,
+  .desktop-brand,
   .mode-selection-panel {
     display: none !important;
   }
