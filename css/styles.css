@@ -410,7 +410,6 @@ body {
   user-select: none;
   height: 0;
   overflow: visible;
-  align-self: end;
   line-height: 1;
 }
 
@@ -430,7 +429,6 @@ body {
   user-select: none;
   height: 0;
   overflow: visible;
-  align-self: start;
 }
 
 .header-title-row {

@@ -1195,7 +1195,7 @@ function openInfoModal() {
 }
 
 function toggleViewTable() {
-  // Block reveal while a challenge is in progress (active elements not yet completed)
+  // Block reveal while a challenge is in progress; allow hide toggle when already viewing
   if (state.activeElements.size > 0 && state.correctElements.size < state.activeElements.size && !viewTableBtn.classList.contains('viewing')) {
     showHintToast('Can\'t reveal the table during a challenge. Finish or reset first!');
     return;
