@@ -45,10 +45,25 @@
         </div>
         <h1 class="intro-title-text">AtomicMemory</h1>
       </div>
-      <p class="intro-tagline">Learn the periodic table through an interactive, gamified experience.</p>
+      <p class="intro-tagline">Master all 118 elements through practice</p>
 
       <div class="intro-table-wrapper">
         <div id="introPeriodicTable" class="intro-periodic-table"></div>
+      </div>
+
+      <div class="intro-features">
+        <div class="intro-feature">
+          <i class="ri-fire-line"></i>
+          <span>Streaks</span>
+        </div>
+        <div class="intro-feature">
+          <i class="ri-medal-line"></i>
+          <span>Achievements</span>
+        </div>
+        <div class="intro-feature">
+          <i class="ri-trophy-line"></i>
+          <span>Leaderboard</span>
+        </div>
       </div>
 
       <button id="startBtn" class="start-button">
@@ -59,6 +74,10 @@
       <p class="intro-hint">
         <i class="ri-keyboard-line"></i>
         Press Enter to start
+      </p>
+
+      <p class="intro-footer">
+        <span id="introTotalChallenges"></span>
       </p>
     </div>
   </div>
@@ -313,12 +332,14 @@
             <button id="mobileArrowRight" class="mobile-nav-btn" title="Move right" aria-label="Move right">
               <i class="ri-arrow-right-line"></i>
             </button>
-            <button id="mobileHintBtn" class="mobile-nav-btn mobile-nav-hint" title="Hint" aria-label="Hint">
-              <i class="ri-lightbulb-line"></i>
-            </button>
-            <button id="mobileSkipBtn" class="mobile-nav-btn mobile-nav-skip" title="Skip" aria-label="Skip">
-              <i class="ri-skip-forward-line"></i>
-            </button>
+            <div class="mobile-nav-direction">
+              <button class="mobile-nav-dir-btn active" data-nav="horizontal" title="Horizontal entry">
+                <i class="ri-arrow-right-line"></i>
+              </button>
+              <button class="mobile-nav-dir-btn" data-nav="vertical" title="Vertical entry">
+                <i class="ri-arrow-down-line"></i>
+              </button>
+            </div>
             <button id="mobileFinishBtn" class="mobile-nav-btn mobile-nav-finish" title="Finish" aria-label="Finish">
               <i class="ri-flag-line"></i>
               <span>Finish</span>

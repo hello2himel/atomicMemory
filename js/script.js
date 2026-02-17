@@ -105,8 +105,6 @@ const mobileMenu = document.getElementById('mobileMenu');
 const closeMobileMenu = document.getElementById('closeMobileMenu');
 const mobileInputModal = document.getElementById('mobileInputModal');
 const mobileInput = document.getElementById('mobileInput');
-const mobileHintBtn = document.getElementById('mobileHintBtn');
-const mobileSkipBtn = document.getElementById('mobileSkipBtn');
 const completeModal = document.getElementById('completeModal');
 const closeCompleteBtn = document.getElementById('closeCompleteBtn');
 const playAgainBtn = document.getElementById('playAgainBtn');
@@ -120,9 +118,9 @@ const viewTableBtn = document.getElementById('viewTableBtn');
 document.addEventListener('DOMContentLoaded', () => {
   detectMobile();
   detectDarkMode();
+  loadTotalChallenges();
   setupIntro();
   setupEventListeners();
-  loadTotalChallenges();
   achievementManager.updateBadge();
 });
 
@@ -143,6 +141,16 @@ function setupIntro() {
       startApp();
     }
   });
+  
+  // Show total challenges completed on intro
+  updateIntroStats();
+}
+
+function updateIntroStats() {
+  const el = document.getElementById('introTotalChallenges');
+  if (el && state.totalChallengesCompleted > 0) {
+    el.textContent = `${state.totalChallengesCompleted} challenge${state.totalChallengesCompleted === 1 ? '' : 's'} completed`;
+  }
 }
 
 function startApp() {
@@ -220,18 +228,7 @@ function setupEventListeners() {
   menuBtn.addEventListener('click', openMobileMenu);
   closeMobileMenu.addEventListener('click', () => mobileMenu.classList.add('hidden'));
   
-  // Mobile input - QWERTY keyboard handles submit now
-  mobileHintBtn.addEventListener('click', () => {
-    showHint();
-    mobileInputModal.querySelector('.mobile-input-hint').classList.remove('hidden');
-  });
-  mobileSkipBtn.addEventListener('click', () => {
-    if (!state.currentElement) return;
-    const nextEl = findNextElementAuto(state.currentElement);
-    if (nextEl) {
-      updateMobileInputForElement(nextEl);
-    }
-  });
+  // Mobile input
   document.querySelector('.mobile-input-close').addEventListener('click', closeMobileInput);
   
   // Mobile arrow key buttons
@@ -252,18 +249,39 @@ function setupEventListeners() {
     });
   });
   
-  // Navigation direction toggle (HUD)
+  // Navigation direction toggle (HUD - desktop)
   document.querySelectorAll('.hud-nav-option').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.hud-nav-option').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       state.navDirection = btn.dataset.nav;
       localStorage.setItem('navDirection', state.navDirection);
+      // Sync mobile toggle
+      document.querySelectorAll('.mobile-nav-dir-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.nav === state.navDirection);
+      });
+    });
+  });
+  
+  // Navigation direction toggle (mobile)
+  document.querySelectorAll('.mobile-nav-dir-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.mobile-nav-dir-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.navDirection = btn.dataset.nav;
+      localStorage.setItem('navDirection', state.navDirection);
+      // Sync desktop toggle
+      document.querySelectorAll('.hud-nav-option').forEach(b => {
+        b.classList.toggle('active', b.dataset.nav === state.navDirection);
+      });
     });
   });
   
   // Set initial nav direction from state
   document.querySelectorAll('.hud-nav-option').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.nav === state.navDirection);
+  });
+  document.querySelectorAll('.mobile-nav-dir-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.nav === state.navDirection);
   });
   
@@ -1395,6 +1413,7 @@ function showIntroScreen() {
   // Show intro overlay again
   introOverlay.classList.remove('hidden', 'fade-out');
   mainApp.classList.add('hidden');
+  updateIntroStats();
 }
 
 // ===== DESKTOP BOTTOM BAR STATS =====
