@@ -397,7 +397,7 @@ body {
 
 /* In-table branding (between s-block and p-block) */
 .table-brand-title {
-  grid-column: span 16;
+  grid-column: span 10;
   display: flex;
   align-items: flex-end;
   justify-content: center;

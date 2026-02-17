@@ -416,11 +416,13 @@ function renderPeriodicTable() {
   
   // Period 1
   renderElement(ELEMENTS[0]); // H
-  // Brand title spans the 16 empty columns in row 1
+  // 1 spacer for col 2, then brand title spans cols 3-12, then 5 spacers for cols 13-17
+  periodicTable.appendChild(createSpacer());
   const brandTitle = document.createElement('div');
   brandTitle.className = 'table-brand-title';
   brandTitle.textContent = 'AtomicMemory';
   periodicTable.appendChild(brandTitle);
+  for (let i = 0; i < 5; i++) periodicTable.appendChild(createSpacer());
   renderElement(ELEMENTS[1]); // He
   
   // Period 2
