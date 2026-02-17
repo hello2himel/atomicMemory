@@ -152,11 +152,8 @@
     }, 3000);
   }
 
-  // Start animation only on desktop (mobile has its own intro)
-  var MOBILE_BREAKPOINT = 768;
-  if (window.innerWidth > MOBILE_BREAKPOINT) {
-    runCycle();
-  }
+  // Start animation on all screen sizes (unified intro)
+  runCycle();
 
   // Cleanup on start
   document.getElementById('startBtn').addEventListener('click', function() {

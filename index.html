@@ -17,22 +17,63 @@
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <!-- Intro Overlay -->
+  <!-- Unified Intro/Setup Screen (used on both desktop and mobile) -->
   <div id="introOverlay" class="intro-overlay">
     <div class="intro-content">
+      <div class="intro-setup-logo-row">
+        <div class="logo-grid intro-setup-logo" aria-label="AtomicMemory">
+          <span class="lg-cell" style="background:#ef4444"></span>
+          <span class="lg-empty"></span>
+          <span class="lg-empty"></span>
+          <span class="lg-empty"></span>
+          <span class="lg-cell" style="background:#ec4899"></span>
+          <span class="lg-cell" style="background:#f97316"></span>
+          <span class="lg-empty"></span>
+          <span class="lg-cell" style="background:#10b981"></span>
+          <span class="lg-cell" style="background:#3b82f6"></span>
+          <span class="lg-cell" style="background:#8b5cf6"></span>
+          <span class="lg-cell" style="background:#06b6d4"></span>
+          <span class="lg-cell" style="background:#eab308"></span>
+          <span class="lg-cell" style="background:#ec4899"></span>
+          <span class="lg-cell" style="background:#f59e0b"></span>
+          <span class="lg-cell" style="background:#84cc16"></span>
+          <span class="lg-empty"></span>
+          <span class="lg-cell" style="background:#3b82f6"></span>
+          <span class="lg-cell" style="background:#ef4444"></span>
+          <span class="lg-cell" style="background:#f97316"></span>
+          <span class="lg-empty"></span>
+        </div>
+        <h1 class="intro-title-text">AtomicMemory</h1>
+      </div>
+      <p class="intro-tagline">Master the periodic table</p>
+
       <div class="intro-table-wrapper">
         <div id="introPeriodicTable" class="intro-periodic-table"></div>
       </div>
-      <h1 class="intro-title">
-        <span class="title-word">Atomic</span><span class="title-word">Memory</span>
-      </h1>
-      <p class="intro-tagline">Learn the periodic table through an interactive, gamified experience</p>
 
       <button id="startBtn" class="start-button">
-        <span>Start</span>
-        <i class="ri-arrow-right-line"></i>
+        <i class="ri-play-fill"></i>
+        <span>Start Challenge</span>
       </button>
       
+      <div class="intro-toolbar">
+        <button class="intro-toolbar-btn" id="introHistoryBtn" title="History">
+          <i class="ri-history-line"></i>
+        </button>
+        <button class="intro-toolbar-btn" id="introLeaderboardBtn" title="Leaderboard">
+          <i class="ri-trophy-line"></i>
+        </button>
+        <button class="intro-toolbar-btn" id="introAchievementsBtn" title="Achievements">
+          <i class="ri-medal-line"></i>
+        </button>
+        <button class="intro-toolbar-btn" id="introThemeBtn" title="Toggle theme">
+          <i class="ri-moon-line"></i>
+        </button>
+        <button class="intro-toolbar-btn" id="introInfoBtn" title="Info">
+          <i class="ri-information-line"></i>
+        </button>
+      </div>
+
       <p class="intro-hint">
         <i class="ri-keyboard-line"></i>
         Press Enter to start
@@ -143,66 +184,9 @@
       </div>
     </div>
 
-    <!-- Mobile Intro Screen (replaces desktop intro on mobile) -->
-    <div id="mobileSetupScreen" class="mobile-setup-screen hidden">
-      <div class="mobile-setup-header">
-        <div class="mobile-setup-logo-row">
-          <div class="logo-grid mobile-setup-logo" aria-label="AtomicMemory">
-            <span class="lg-cell" style="background:#ef4444"></span>
-            <span class="lg-empty"></span>
-            <span class="lg-empty"></span>
-            <span class="lg-empty"></span>
-            <span class="lg-cell" style="background:#ec4899"></span>
-            <span class="lg-cell" style="background:#f97316"></span>
-            <span class="lg-empty"></span>
-            <span class="lg-cell" style="background:#10b981"></span>
-            <span class="lg-cell" style="background:#3b82f6"></span>
-            <span class="lg-cell" style="background:#8b5cf6"></span>
-            <span class="lg-cell" style="background:#06b6d4"></span>
-            <span class="lg-cell" style="background:#eab308"></span>
-            <span class="lg-cell" style="background:#ec4899"></span>
-            <span class="lg-cell" style="background:#f59e0b"></span>
-            <span class="lg-cell" style="background:#84cc16"></span>
-            <span class="lg-empty"></span>
-            <span class="lg-cell" style="background:#3b82f6"></span>
-            <span class="lg-cell" style="background:#ef4444"></span>
-            <span class="lg-cell" style="background:#f97316"></span>
-            <span class="lg-empty"></span>
-          </div>
-          <div class="mobile-setup-title">AtomicMemory</div>
-        </div>
-        <div class="mobile-setup-subtitle">Master the periodic table</div>
-      </div>
+    <!-- Mobile Setup Screen is now unified with intro overlay above -->
 
-      <div id="mobileSetupPreviewContainer" class="mobile-setup-preview">
-        <div id="mobileSetupPreviewTable" class="mini-periodic-table"></div>
-      </div>
-
-      <button class="mobile-start-btn" id="mobileStartBtn">
-        <i class="ri-play-fill"></i>
-        Start Challenge
-      </button>
-
-      <div class="mobile-setup-toolbar">
-        <button class="mobile-setup-toolbar-btn" id="setupHistoryBtn" title="History">
-          <i class="ri-history-line"></i>
-        </button>
-        <button class="mobile-setup-toolbar-btn" id="setupLeaderboardBtn" title="Leaderboard">
-          <i class="ri-trophy-line"></i>
-        </button>
-        <button class="mobile-setup-toolbar-btn" id="setupAchievementsBtn" title="Achievements">
-          <i class="ri-medal-line"></i>
-        </button>
-        <button class="mobile-setup-toolbar-btn" id="setupThemeBtn" title="Toggle theme">
-          <i class="ri-moon-line"></i>
-        </button>
-        <button class="mobile-setup-toolbar-btn" id="setupInfoBtn" title="Info">
-          <i class="ri-information-line"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- Desktop Bottom Nav Bar -->
+    <!-- Desktop Bottom HUD -->
     <div id="desktopBottomBar" class="desktop-bottom-bar">
       <div class="bottom-bar-stats">
         <div class="bottom-stat" title="Score">
@@ -227,22 +211,29 @@
         </div>
       </div>
       <div class="bottom-bar-actions">
-        <button id="viewTableBtn" class="bottom-action-btn view-btn" title="View periodic table">
-          <i class="ri-eye-line"></i>
-          <span>View</span>
-        </button>
-        <button id="hintBtn" class="bottom-action-btn hint-btn" title="Get a hint (-50 points)">
-          <i class="ri-lightbulb-line"></i>
-          <span>Hint</span>
-        </button>
         <button id="finishBtn" class="bottom-action-btn finish-btn" title="Finish challenge">
           <i class="ri-flag-line"></i>
           <span>Finish</span>
         </button>
+        <div class="hud-secondary-row">
+          <button id="hintBtn" class="bottom-action-btn hint-btn" title="Get a hint (-50 points)">
+            <i class="ri-lightbulb-line"></i>
+            <span>Hint</span>
+          </button>
+          <button id="viewTableBtn" class="bottom-action-btn view-btn" title="View periodic table">
+            <i class="ri-eye-line"></i>
+            <span>View</span>
+          </button>
+        </div>
         <button id="resetBtn" class="bottom-action-btn reset-btn" title="Reset challenge">
           <i class="ri-restart-line"></i>
           <span>Reset</span>
         </button>
+      </div>
+      <div class="hud-nav-toggle">
+        <span class="hud-nav-label">Enter →</span>
+        <button class="hud-nav-option active" data-nav="horizontal">Horizontal</button>
+        <button class="hud-nav-option" data-nav="vertical">Vertical</button>
       </div>
     </div>
 
@@ -305,12 +296,15 @@
             <span class="mobile-strip-stat"><span id="mobileAccuracyDisplay" class="strip-value">100%</span></span>
           </div>
 
-          <!-- Mini Table Preview -->
+          <!-- Mini Table Preview (top area) -->
           <div id="miniTableContainer" class="mini-table-container">
             <div id="miniPeriodicTable" class="mini-periodic-table"></div>
           </div>
 
-          <!-- Cell-like Input Display -->
+          <!-- Flexible spacer pushes everything below towards the keyboard -->
+          <div class="mobile-flex-spacer"></div>
+
+          <!-- Cell-like Input Display (centered above arrows/keyboard) -->
           <div class="mobile-cell-input-area">
             <div class="mobile-cell-prompt">
               <span class="mobile-input-number"></span>
@@ -327,7 +321,7 @@
           <!-- Hidden real input for state tracking -->
           <input type="text" id="mobileInput" class="mobile-input-field-hidden" maxlength="3" autocomplete="off" inputmode="none" tabindex="-1" aria-hidden="true">
 
-          <!-- Arrow Navigation Row -->
+          <!-- Arrow Navigation Row (just above keyboard) -->
           <div class="mobile-nav-row">
             <button id="mobileArrowLeft" class="mobile-nav-btn" title="Move left" aria-label="Move left">
               <i class="ri-arrow-left-line"></i>
@@ -385,10 +379,10 @@
               <button class="qwerty-key" data-key="B">B</button>
               <button class="qwerty-key" data-key="N">N</button>
               <button class="qwerty-key" data-key="M">M</button>
+              <button class="qwerty-key qwerty-backspace" data-key="BACKSPACE"><i class="ri-delete-back-2-line"></i></button>
             </div>
             <div class="qwerty-row qwerty-action-row">
-              <button class="qwerty-key qwerty-backspace" data-key="BACKSPACE"><i class="ri-delete-back-2-line"></i></button>
-              <button class="qwerty-key qwerty-submit" data-key="SUBMIT"><i class="ri-check-line"></i> Submit</button>
+              <button class="qwerty-key qwerty-submit" data-key="SUBMIT"><i class="ri-check-line"></i> Enter</button>
             </div>
           </div>
 

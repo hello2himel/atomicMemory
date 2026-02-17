@@ -24,7 +24,8 @@ const state = {
   correctAttempts: 0,
   hintsUsed: 0,
   isMobile: false,
-  totalChallengesCompleted: 0
+  totalChallengesCompleted: 0,
+  navDirection: localStorage.getItem('navDirection') || 'horizontal'
 };
 
 // DOM Elements
@@ -60,7 +61,6 @@ const mobileInputModal = document.getElementById('mobileInputModal');
 const mobileInput = document.getElementById('mobileInput');
 const mobileHintBtn = document.getElementById('mobileHintBtn');
 const mobileSkipBtn = document.getElementById('mobileSkipBtn');
-const mobileSetupScreen = document.getElementById('mobileSetupScreen');
 const completeModal = document.getElementById('completeModal');
 const closeCompleteBtn = document.getElementById('closeCompleteBtn');
 const playAgainBtn = document.getElementById('playAgainBtn');
@@ -87,40 +87,52 @@ function detectMobile() {
   });
 }
 
-// Intro Screen
+// Intro Screen — unified for both desktop and mobile
 function setupIntro() {
-  if (state.isMobile) {
-    // On mobile, auto-start immediately (skip animated intro)
-    startApp();
-    return;
-  }
-  
   startBtn.addEventListener('click', startApp);
   
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !introOverlay.classList.contains('fade-out')) {
+    if (e.key === 'Enter' && !introOverlay.classList.contains('fade-out') && !introOverlay.classList.contains('hidden')) {
       startApp();
     }
   });
+  
+  // Intro toolbar buttons
+  const introHistoryBtn = document.getElementById('introHistoryBtn');
+  const introLeaderboardBtn = document.getElementById('introLeaderboardBtn');
+  const introAchievementsBtn = document.getElementById('introAchievementsBtn');
+  const introThemeBtn = document.getElementById('introThemeBtn');
+  const introInfoBtn = document.getElementById('introInfoBtn');
+  
+  if (introHistoryBtn) introHistoryBtn.addEventListener('click', openHistoryModal);
+  if (introLeaderboardBtn) introLeaderboardBtn.addEventListener('click', openLeaderboardModal);
+  if (introAchievementsBtn) introAchievementsBtn.addEventListener('click', openAchievementsModal);
+  if (introThemeBtn) {
+    introThemeBtn.addEventListener('click', () => {
+      darkModeBtn.click();
+      const icon = introThemeBtn.querySelector('i');
+      icon.className = document.body.dataset.theme === 'dark' ? 'ri-sun-line' : 'ri-moon-line';
+    });
+  }
+  if (introInfoBtn) introInfoBtn.addEventListener('click', openInfoModal);
 }
 
 function startApp() {
-  if (state.isMobile) {
-    // On mobile, skip the animated intro and show the setup screen
+  introOverlay.classList.add('fade-out');
+  setTimeout(() => {
     introOverlay.classList.add('hidden');
     mainApp.classList.remove('hidden');
     renderPeriodicTable();
     initializeFullTable();
-    showMobileSetupScreen();
-  } else {
-    introOverlay.classList.add('fade-out');
-    setTimeout(() => {
-      introOverlay.classList.add('hidden');
-      mainApp.classList.remove('hidden');
-      renderPeriodicTable();
-      initializeFullTable();
-    }, 600);
-  }
+    
+    if (state.isMobile) {
+      // On mobile, go straight into the game modal
+      const firstElement = findFirstActiveElement();
+      if (firstElement) {
+        openMobileInput(firstElement);
+      }
+    }
+  }, 600);
 }
 
 // Dark Mode
@@ -211,33 +223,20 @@ function setupEventListeners() {
     });
   });
   
-  // Mobile setup screen buttons
-  const mobileStartBtn = document.getElementById('mobileStartBtn');
-  if (mobileStartBtn) {
-    mobileStartBtn.addEventListener('click', () => {
-      mobileSetupScreen.classList.add('hidden');
-      const firstElement = findFirstActiveElement();
-      if (firstElement) {
-        openMobileInput(firstElement);
-      }
+  // Navigation direction toggle (HUD)
+  document.querySelectorAll('.hud-nav-option').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.hud-nav-option').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.navDirection = btn.dataset.nav;
+      localStorage.setItem('navDirection', state.navDirection);
     });
-  }
-  const setupHistoryBtn = document.getElementById('setupHistoryBtn');
-  if (setupHistoryBtn) setupHistoryBtn.addEventListener('click', openHistoryModal);
-  const setupLeaderboardBtn = document.getElementById('setupLeaderboardBtn');
-  if (setupLeaderboardBtn) setupLeaderboardBtn.addEventListener('click', openLeaderboardModal);
-  const setupAchievementsBtn = document.getElementById('setupAchievementsBtn');
-  if (setupAchievementsBtn) setupAchievementsBtn.addEventListener('click', openAchievementsModal);
-  const setupThemeBtn = document.getElementById('setupThemeBtn');
-  if (setupThemeBtn) {
-    setupThemeBtn.addEventListener('click', () => {
-      darkModeBtn.click();
-      const icon = setupThemeBtn.querySelector('i');
-      icon.className = document.body.dataset.theme === 'dark' ? 'ri-sun-line' : 'ri-moon-line';
-    });
-  }
-  const setupInfoBtn = document.getElementById('setupInfoBtn');
-  if (setupInfoBtn) setupInfoBtn.addEventListener('click', openInfoModal);
+  });
+  
+  // Set initial nav direction from state
+  document.querySelectorAll('.hud-nav-option').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.nav === state.navDirection);
+  });
   
   // Mobile toolbar buttons
   document.getElementById('mobileToolbarTheme').addEventListener('click', () => {
@@ -251,7 +250,7 @@ function setupEventListeners() {
       resetChallenge();
       if (state.isMobile) {
         closeMobileInput();
-        showMobileSetupScreen();
+        showIntroScreen();
       }
     }
   });
@@ -263,9 +262,7 @@ function setupEventListeners() {
   playAgainBtn.addEventListener('click', () => {
     closeModal(completeModal);
     resetChallenge();
-    if (state.isMobile) {
-      showMobileSetupScreen();
-    }
+    showIntroScreen();
   });
   shareScoreBtn.addEventListener('click', shareScore);
   
@@ -758,7 +755,10 @@ function showHintToast(message) {
 }
 
 function moveToNextElement(currentElement) {
-  const nextElement = findNextElementByPeriod(currentElement);
+  // Use the configured navigation direction
+  const nextElement = state.navDirection === 'vertical' 
+    ? findNextElementByGroup(currentElement) 
+    : findNextElementByPeriod(currentElement);
   
   if (nextElement && !nextElement.classList.contains('correct') && !nextElement.classList.contains('disabled')) {
     if (state.isMobile) {
@@ -867,6 +867,44 @@ function findFirstInCategory(category) {
     .sort((a, b) => parseInt(a.dataset.atomic) - parseInt(b.dataset.atomic));
   
   return elements[0] || null;
+}
+
+// Find the next element using group-based (vertical) navigation
+function findNextElementByGroup(currentElement) {
+  const atomic = parseInt(currentElement.dataset.atomic);
+  const currentPeriod = parseInt(currentElement.dataset.period);
+  const currentGroup = parseInt(currentElement.dataset.group) || null;
+  const currentCategory = currentElement.dataset.category;
+  
+  let nextElement = null;
+  
+  if (currentCategory === 'lanthanide') {
+    nextElement = findNextInCategory('lanthanide', atomic);
+    if (!nextElement) {
+      nextElement = findFirstInPeriod(6, 71);
+    }
+  } else if (currentCategory === 'actinide') {
+    nextElement = findNextInCategory('actinide', atomic);
+    if (!nextElement) {
+      nextElement = findFirstInPeriod(7, 103);
+    }
+  } else if (currentGroup) {
+    nextElement = findNextInGroup(currentGroup, currentPeriod);
+    if (!nextElement) {
+      // Move to next group
+      const nextGroup = currentGroup + 1;
+      if (nextGroup <= 18) {
+        nextElement = findFirstInGroup(nextGroup);
+      }
+      if (!nextElement) {
+        nextElement = findFirstActiveElement();
+      }
+    }
+  } else {
+    nextElement = findFirstActiveElement();
+  }
+  
+  return nextElement;
 }
 
 // Timer
@@ -1312,44 +1350,18 @@ function handleQwertyKey(key) {
   }
 }
 
-// ===== MOBILE SETUP SCREEN =====
+// ===== SHOW INTRO SCREEN =====
 
-function showMobileSetupScreen() {
-  // Render preview table
-  renderSetupPreviewTable();
+function showIntroScreen() {
+  // Show intro overlay again
+  introOverlay.classList.remove('hidden', 'fade-out');
+  mainApp.classList.add('hidden');
   
   // Sync theme icon
-  const themeIcon = document.querySelector('#setupThemeBtn i');
+  const themeIcon = document.querySelector('#introThemeBtn i');
   if (themeIcon) {
     themeIcon.className = document.body.dataset.theme === 'dark' ? 'ri-sun-line' : 'ri-moon-line';
   }
-  
-  mobileSetupScreen.classList.remove('hidden');
-}
-
-function renderSetupPreviewTable() {
-  const previewTable = document.getElementById('mobileSetupPreviewTable');
-  if (!previewTable) return;
-  previewTable.innerHTML = '';
-  
-  const layout = getMiniTableLayout();
-  
-  layout.forEach(item => {
-    if (item === 'spacer' || item === 'label' || item === 'placeholder') {
-      const spacer = document.createElement('div');
-      spacer.className = 'mini-spacer';
-      previewTable.appendChild(spacer);
-    } else {
-      const cell = document.createElement('div');
-      cell.className = 'mini-cell';
-      const elData = ELEMENTS_MAP[item];
-      if (elData) {
-        cell.style.background = getCategoryColor(elData.category);
-        cell.style.borderColor = getCategoryColor(elData.category);
-      }
-      previewTable.appendChild(cell);
-    }
-  });
 }
 
 // ===== DESKTOP BOTTOM BAR STATS =====
@@ -1552,7 +1564,9 @@ function updateMobileStats() {
 }
 
 function findNextElementAuto(currentElement) {
-  let nextElement = findNextElementByPeriod(currentElement);
+  let nextElement = state.navDirection === 'vertical'
+    ? findNextElementByGroup(currentElement)
+    : findNextElementByPeriod(currentElement);
   
   // If no next element found or it's already correct/disabled, find any unanswered element
   if (!nextElement || nextElement.classList.contains('correct') || nextElement.classList.contains('disabled')) {
