@@ -1206,6 +1206,8 @@ function toggleViewTable() {
     return;
   }
 
+  const legend = document.querySelector('.category-legend');
+
   // If currently viewing, just hide
   if (viewTableBtn.classList.contains('viewing')) {
     viewTableBtn.classList.remove('viewing');
@@ -1224,6 +1226,7 @@ function toggleViewTable() {
 
     icon.className = 'ri-eye-line';
     viewTableBtn.querySelector('span').textContent = 'Reveal Table';
+    if (legend) legend.classList.add('hidden');
     return;
   }
 
@@ -1246,6 +1249,7 @@ function toggleViewTable() {
 
   icon.className = 'ri-eye-off-line';
   viewTableBtn.querySelector('span').textContent = 'Hide Table';
+  if (legend) legend.classList.remove('hidden');
 }
 
 function openHistoryModal() {
