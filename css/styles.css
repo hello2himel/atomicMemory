@@ -69,6 +69,9 @@
   --radius-xl: 20px;
   --radius-full: 9999px;
   
+  /* Bottom bar height variable */
+  --bottom-bar-height: 110px;
+  
   /* Typography */
   --font-display: 'Outfit', sans-serif;
   --font-body: 'Outfit', sans-serif;
@@ -845,7 +848,7 @@ body {
 .table-container {
   flex: 1;
   padding: var(--space-xl);
-  padding-bottom: 110px;
+  padding-bottom: var(--bottom-bar-height);
   overflow: auto;
   position: relative;
 }

@@ -152,8 +152,9 @@
     }, 3000);
   }
 
-  // Start animation only on desktop (window > 768px)
-  if (window.innerWidth > 768) {
+  // Start animation only on desktop (mobile has its own intro)
+  var MOBILE_BREAKPOINT = 768;
+  if (window.innerWidth > MOBILE_BREAKPOINT) {
     runCycle();
   }
 

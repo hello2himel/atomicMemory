@@ -58,7 +58,6 @@ const mobileMenu = document.getElementById('mobileMenu');
 const closeMobileMenu = document.getElementById('closeMobileMenu');
 const mobileInputModal = document.getElementById('mobileInputModal');
 const mobileInput = document.getElementById('mobileInput');
-const mobileSubmitBtn = document.getElementById('mobileSubmitBtn');
 const mobileHintBtn = document.getElementById('mobileHintBtn');
 const mobileSkipBtn = document.getElementById('mobileSkipBtn');
 const mobileSetupScreen = document.getElementById('mobileSetupScreen');
