@@ -228,6 +228,7 @@ body {
   color: var(--text-secondary);
   font-weight: 500;
   animation: fade-in 800ms ease-out 300ms backwards;
+  margin-top: -4px;
 }
 
 @keyframes fade-in {
