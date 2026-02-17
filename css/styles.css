@@ -206,7 +206,7 @@ body {
 .intro-title-text {
   font-size: 32px;
   font-weight: 900;
-  color: #ffffff;
+  color: var(--text-primary);
   font-family: var(--font-display);
 }
 
