@@ -12,17 +12,20 @@ Live demo: [atomicmemory.netlify.app](https://atomicmemory.netlify.app)
 
 ## Features
 
-- **Multi-Mode Practice** — Full Table, Block (s/p/d/f), Group, and Period modes
-- **Keyboard-First Interaction** — Type element symbols, navigate with arrow keys, submit with Enter
+- **Full Table Challenge** — Practice all 118 elements; answer as many as you can, then press Finish
+- **Keyboard-First Interaction** — Type element symbols, navigate between cells with arrow keys, submit with Enter
+- **Arrow Key Navigation** — Move between element cells using arrow keys while inputting (desktop) or arrow buttons (mobile)
+- **Finish Anytime** — Press the Finish button to end the challenge at any point and see your score
 - **Immediate Feedback** — Correct answers highlight green, wrong answers flash red
 - **Scoring & Ranks** — 7 rank tiers from Novice to Legendary with bonuses and penalties
 - **Achievements** — 15 unlockable achievements (First Element, Speed Demon, Perfectionist, etc.)
-- **Leaderboard** — Top 10 personal best scores with mode, date, accuracy, and time
+- **Leaderboard** — Top 10 personal best scores with date, accuracy, and time
 - **Practice History** — Track your last 50 sessions
 - **View Mode** — Toggle to reveal all element symbols and names on the table for reference
 - **Timed Challenges** — Track speed and accuracy per session
 - **Dark / Light Theme** — Auto-detects system preference or toggle manually
 - **Responsive Design** — Full desktop and mobile support with dedicated mobile input UI
+- **Mobile Arrow Keys** — On-screen directional buttons for navigating between elements on mobile
 - **Animated Intro** — Periodic table animation with random color flashes and category-color settling
 - **Fully Client-Side** — No server needed; all data stored in localStorage
 
@@ -30,17 +33,12 @@ Live demo: [atomicmemory.netlify.app](https://atomicmemory.netlify.app)
 
 ## How It Works
 
-1. **Choose a mode** — Full (all 118), Block, Group, or Period
+1. **Start the challenge** — All 118 elements are active; answer as many as you can
 2. **Click an element** — An input field appears; type the element's chemical symbol
-3. **Get feedback** — Correct answers are marked green; mistakes flash red with point penalties
-4. **Complete the challenge** — Fill in all active elements to finish and see your score breakdown
-5. **Track progress** — View your history, achievements, and leaderboard from the header
-
-### Navigation
-
-- **Horizontal mode** — Elements advance left-to-right across periods
-- **Vertical mode** — Elements advance top-to-bottom within groups
-- **Arrow keys** — Navigate between elements manually
+3. **Navigate with arrow keys** — Use arrow keys (desktop) or arrow buttons (mobile) to move between cells
+4. **Get feedback** — Correct answers are marked green; mistakes flash red with point penalties
+5. **Finish anytime** — Press the Finish button when you're done to see your score breakdown
+6. **Track progress** — View your history, achievements, and leaderboard from the header
 
 ### Scoring
 
