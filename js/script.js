@@ -1613,7 +1613,7 @@ function drawConnectorLine(atomicNumber) {
   const x2 = cardRect.left + cardRect.width / 2 - containerRect.left;
   const y2 = cardRect.top - containerRect.top;
   
-  // Curved path with a single control point for a gentle S-curve
+  // Cubic Bézier curve with two control points for a gentle S-curve
   const midY = (y1 + y2) / 2;
   const d = `M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`;
   
