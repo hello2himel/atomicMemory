@@ -335,11 +335,14 @@ function setupEventListeners() {
   
   // Complete modal
   closeCompleteBtn.addEventListener('click', () => {
-    closeModal(completeModal);
+    dismissCompleteModal();
   });
   playAgainBtn.addEventListener('click', () => {
     closeModal(completeModal);
     resetChallenge();
+    if (state.isMobile) {
+      showIntroScreen();
+    }
   });
   shareScoreBtn.addEventListener('click', shareScore);
   
@@ -355,18 +358,22 @@ function setupEventListeners() {
   }
   
   // Close modals on overlay click
-  [historyModal, leaderboardModal, achievementsModal, completeModal, infoModal, donateModal].forEach(modal => {
+  [historyModal, leaderboardModal, achievementsModal, infoModal, donateModal].forEach(modal => {
     modal.querySelector('.modal-overlay')?.addEventListener('click', () => closeModal(modal));
   });
+  completeModal.querySelector('.modal-overlay')?.addEventListener('click', () => dismissCompleteModal());
   
   // Close modals on Escape key
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      [historyModal, leaderboardModal, achievementsModal, completeModal, infoModal, donateModal].forEach(modal => {
+      [historyModal, leaderboardModal, achievementsModal, infoModal, donateModal].forEach(modal => {
         if (!modal.classList.contains('hidden')) {
           closeModal(modal);
         }
       });
+      if (!completeModal.classList.contains('hidden')) {
+        dismissCompleteModal();
+      }
       if (!mobileMenu.classList.contains('hidden')) {
         mobileMenu.classList.add('hidden');
       }
@@ -1236,6 +1243,14 @@ function loadTotalChallenges() {
 // Modals
 function closeModal(modal) {
   modal.classList.add('hidden');
+}
+
+function dismissCompleteModal() {
+  closeModal(completeModal);
+  if (state.isMobile) {
+    resetChallenge();
+    showIntroScreen();
+  }
 }
 
 function openInfoModal() {

@@ -3,6 +3,7 @@
 ![Live Demo](https://img.shields.io/badge/Live-atomicmemory.netlify.app-brightgreen)
 ![License](https://img.shields.io/badge/License-AGPL--3.0-blue)
 ![GitHub Repo](https://img.shields.io/badge/GitHub-hello2himel/atomicmemory-181717?logo=github)
+[![Donate](https://img.shields.io/badge/Donate-Support%20this%20project-ff69b4)](https://hello2himel.netlify.app/donate?source=AtomicMemory)
 
 AtomicMemory is an interactive, gamified web application for mastering all **118 chemical elements** of the periodic table. It uses active recall, immediate feedback, and a competitive scoring system to create an engaging study experience for chemistry students, enthusiasts, and educators.
 
