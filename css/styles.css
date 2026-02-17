@@ -395,20 +395,36 @@ body {
   display: none;
 }
 
-/* Desktop top-left branding */
-.desktop-brand {
-  position: fixed;
-  top: var(--space-md);
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 26px;
+/* In-table branding (between s-block and p-block) */
+.table-brand-title {
+  grid-column: span 16;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  font-size: clamp(28px, 3vw, 42px);
   font-weight: 900;
   color: var(--text-primary);
   font-family: var(--font-display);
   letter-spacing: -0.03em;
-  z-index: var(--z-sticky);
-  pointer-events: none;
-  opacity: 0.7;
+  opacity: 0.85;
+  padding-bottom: 2px;
+  user-select: none;
+}
+
+.table-brand-tagline {
+  grid-column: span 10;
+  grid-row: span 2;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  text-align: center;
+  font-size: clamp(10px, 1.1vw, 14px);
+  font-weight: 500;
+  color: var(--text-tertiary);
+  font-family: var(--font-display);
+  line-height: 1.4;
+  padding: 4px 8px 0;
+  user-select: none;
 }
 
 .header-title-row {
@@ -727,13 +743,13 @@ body {
   bottom: var(--space-md);
   left: 50%;
   transform: translateX(-50%);
-  width: 94%;
-  max-width: 1100px;
+  width: fit-content;
+  max-width: 94%;
   background: var(--bg-secondary);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-radius: var(--radius-lg);
-  padding: var(--space-sm) var(--space-md);
+  padding: var(--space-sm) var(--space-lg);
   z-index: var(--z-sticky);
   box-shadow: var(--shadow-xl);
   border: 1px solid var(--border-color);
@@ -2729,7 +2745,6 @@ body {
   .header,
   .progress-bar-container,
   .desktop-bottom-bar,
-  .desktop-brand,
   .mode-selection-panel {
     display: none !important;
   }

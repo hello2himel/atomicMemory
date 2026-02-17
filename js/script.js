@@ -416,19 +416,27 @@ function renderPeriodicTable() {
   
   // Period 1
   renderElement(ELEMENTS[0]); // H
-  for (let i = 0; i < 16; i++) periodicTable.appendChild(createSpacer());
+  // Brand title spans the 16 empty columns in row 1
+  const brandTitle = document.createElement('div');
+  brandTitle.className = 'table-brand-title';
+  brandTitle.textContent = 'AtomicMemory';
+  periodicTable.appendChild(brandTitle);
   renderElement(ELEMENTS[1]); // He
   
   // Period 2
   renderElement(ELEMENTS[2]); // Li
   renderElement(ELEMENTS[3]); // Be
-  for (let i = 0; i < 10; i++) periodicTable.appendChild(createSpacer());
+  // Brand tagline spans the 10 empty columns in rows 2-3
+  const brandTagline = document.createElement('div');
+  brandTagline.className = 'table-brand-tagline';
+  brandTagline.textContent = 'Learn the periodic table through an interactive, gamified experience.';
+  periodicTable.appendChild(brandTagline);
   for (let i = 4; i <= 9; i++) renderElement(ELEMENTS[i]);
   
   // Period 3
   renderElement(ELEMENTS[10]); // Na
   renderElement(ELEMENTS[11]); // Mg
-  for (let i = 0; i < 10; i++) periodicTable.appendChild(createSpacer());
+  // Row 3 cols 3-12 are covered by the tagline's grid-row: span 2
   for (let i = 12; i <= 17; i++) renderElement(ELEMENTS[i]);
   
   // Periods 4-5
