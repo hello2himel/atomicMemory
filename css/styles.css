@@ -280,32 +280,80 @@ body {
   animation: fade-in 800ms ease-out 600ms backwards;
 }
 
-/* Intro toolbar (same on both desktop and mobile) */
-.intro-toolbar {
-  display: flex;
-  justify-content: center;
-  gap: var(--space-sm);
-  margin-top: var(--space-sm);
-  animation: fade-in 800ms ease-out 600ms backwards;
-}
-
-.intro-toolbar-btn {
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: var(--space-sm) var(--space-md);
-  color: var(--text-secondary);
-  font-size: 16px;
-  cursor: pointer;
+/* ===== CUSTOM CONFIRM DIALOG ===== */
+.confirm-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
-  transition: all 150ms ease;
+  justify-content: center;
+  z-index: 10000;
+  animation: fade-in 150ms ease-out;
 }
 
-.intro-toolbar-btn:hover {
+.confirm-dialog {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: var(--space-xl) var(--space-2xl);
+  max-width: 380px;
+  width: 90%;
+  text-align: center;
+  box-shadow: var(--shadow-xl), 0 0 60px rgba(0, 0, 0, 0.3);
+}
+
+.confirm-dialog-icon {
+  font-size: 36px;
+  color: var(--warning);
+  margin-bottom: var(--space-sm);
+}
+
+.confirm-dialog-message {
+  font-size: 15px;
+  color: var(--text-primary);
+  line-height: 1.5;
+  margin-bottom: var(--space-lg);
+  font-weight: 500;
+}
+
+.confirm-dialog-actions {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: center;
+}
+
+.confirm-dialog-btn {
+  padding: var(--space-sm) var(--space-xl);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 150ms ease;
+  border: 1px solid var(--border-color);
+  font-family: var(--font-display);
+  min-width: 100px;
+}
+
+.confirm-cancel {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+.confirm-cancel:hover {
   background: var(--bg-hover);
   color: var(--text-primary);
+}
+
+.confirm-ok {
+  background: var(--accent-gradient);
+  color: white;
+  border-color: transparent;
+}
+
+.confirm-ok:hover {
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
 }
 
 /* ===== MAIN APP ===== */

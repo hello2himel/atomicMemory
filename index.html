@@ -55,24 +55,6 @@
         <i class="ri-play-fill"></i>
         <span>Start Challenge</span>
       </button>
-      
-      <div class="intro-toolbar">
-        <button class="intro-toolbar-btn" id="introHistoryBtn" title="History">
-          <i class="ri-history-line"></i>
-        </button>
-        <button class="intro-toolbar-btn" id="introLeaderboardBtn" title="Leaderboard">
-          <i class="ri-trophy-line"></i>
-        </button>
-        <button class="intro-toolbar-btn" id="introAchievementsBtn" title="Achievements">
-          <i class="ri-medal-line"></i>
-        </button>
-        <button class="intro-toolbar-btn" id="introThemeBtn" title="Toggle theme">
-          <i class="ri-moon-line"></i>
-        </button>
-        <button class="intro-toolbar-btn" id="introInfoBtn" title="Info">
-          <i class="ri-information-line"></i>
-        </button>
-      </div>
 
       <p class="intro-hint">
         <i class="ri-keyboard-line"></i>
@@ -274,6 +256,15 @@
               <span class="mobile-game-title">AtomicMemory</span>
             </div>
             <div class="mobile-game-header-right">
+              <button class="mobile-toolbar-btn" id="mobileToolbarHistory" title="History">
+                <i class="ri-history-line"></i>
+              </button>
+              <button class="mobile-toolbar-btn" id="mobileToolbarLeaderboard" title="Leaderboard">
+                <i class="ri-trophy-line"></i>
+              </button>
+              <button class="mobile-toolbar-btn" id="mobileToolbarAchievements" title="Achievements">
+                <i class="ri-medal-line"></i>
+              </button>
               <button class="mobile-toolbar-btn" id="mobileToolbarTheme" title="Toggle theme">
                 <i class="ri-moon-line"></i>
               </button>
@@ -579,6 +570,20 @@
         This is an open source software. <a href="https://github.com/hello2himel/atomicmemory" target="_blank" rel="noopener noreferrer">View Source Code</a>
       </p>
     </footer>
+  </div>
+
+  <!-- Custom Confirm Dialog -->
+  <div id="confirmDialog" class="confirm-dialog-overlay hidden" role="dialog" aria-modal="true">
+    <div class="confirm-dialog">
+      <div class="confirm-dialog-icon">
+        <i class="ri-question-line"></i>
+      </div>
+      <p class="confirm-dialog-message" id="confirmMessage"></p>
+      <div class="confirm-dialog-actions">
+        <button class="confirm-dialog-btn confirm-cancel" id="confirmCancel">Cancel</button>
+        <button class="confirm-dialog-btn confirm-ok" id="confirmOk">Confirm</button>
+      </div>
+    </div>
   </div>
 
   <script src="js/elements.js"></script>

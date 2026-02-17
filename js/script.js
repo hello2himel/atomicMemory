@@ -28,6 +28,34 @@ const state = {
   navDirection: localStorage.getItem('navDirection') || 'horizontal'
 };
 
+// Custom Confirm Dialog (replaces browser native confirm)
+function showConfirmDialog(message) {
+  return new Promise((resolve) => {
+    const overlay = document.getElementById('confirmDialog');
+    const msgEl = document.getElementById('confirmMessage');
+    const okBtn = document.getElementById('confirmOk');
+    const cancelBtn = document.getElementById('confirmCancel');
+    
+    msgEl.textContent = message;
+    overlay.classList.remove('hidden');
+    okBtn.focus();
+    
+    function cleanup() {
+      overlay.classList.add('hidden');
+      okBtn.removeEventListener('click', onOk);
+      cancelBtn.removeEventListener('click', onCancel);
+      overlay.removeEventListener('click', onOverlay);
+    }
+    function onOk() { cleanup(); resolve(true); }
+    function onCancel() { cleanup(); resolve(false); }
+    function onOverlay(e) { if (e.target === overlay) { cleanup(); resolve(false); } }
+    
+    okBtn.addEventListener('click', onOk);
+    cancelBtn.addEventListener('click', onCancel);
+    overlay.addEventListener('click', onOverlay);
+  });
+}
+
 // DOM Elements
 const introOverlay = document.getElementById('introOverlay');
 const startBtn = document.getElementById('startBtn');
@@ -96,25 +124,6 @@ function setupIntro() {
       startApp();
     }
   });
-  
-  // Intro toolbar buttons
-  const introHistoryBtn = document.getElementById('introHistoryBtn');
-  const introLeaderboardBtn = document.getElementById('introLeaderboardBtn');
-  const introAchievementsBtn = document.getElementById('introAchievementsBtn');
-  const introThemeBtn = document.getElementById('introThemeBtn');
-  const introInfoBtn = document.getElementById('introInfoBtn');
-  
-  if (introHistoryBtn) introHistoryBtn.addEventListener('click', openHistoryModal);
-  if (introLeaderboardBtn) introLeaderboardBtn.addEventListener('click', openLeaderboardModal);
-  if (introAchievementsBtn) introAchievementsBtn.addEventListener('click', openAchievementsModal);
-  if (introThemeBtn) {
-    introThemeBtn.addEventListener('click', () => {
-      darkModeBtn.click();
-      const icon = introThemeBtn.querySelector('i');
-      icon.className = document.body.dataset.theme === 'dark' ? 'ri-sun-line' : 'ri-moon-line';
-    });
-  }
-  if (introInfoBtn) introInfoBtn.addEventListener('click', openInfoModal);
 }
 
 function startApp() {
@@ -157,8 +166,8 @@ function setupEventListeners() {
   });
   
   // Reset button
-  resetBtn.addEventListener('click', () => {
-    if (confirm('Are you sure you want to reset? Your current progress will be lost.')) {
+  resetBtn.addEventListener('click', async () => {
+    if (await showConfirmDialog('Are you sure you want to reset? Your current progress will be lost.')) {
       resetChallenge();
     }
   });
@@ -245,8 +254,8 @@ function setupEventListeners() {
     const icon = document.querySelector('#mobileToolbarTheme i');
     icon.className = document.body.dataset.theme === 'dark' ? 'ri-sun-line' : 'ri-moon-line';
   });
-  document.getElementById('mobileToolbarReset').addEventListener('click', () => {
-    if (confirm('Reset current challenge?')) {
+  document.getElementById('mobileToolbarReset').addEventListener('click', async () => {
+    if (await showConfirmDialog('Reset current challenge?')) {
       resetChallenge();
       if (state.isMobile) {
         closeMobileInput();
@@ -254,6 +263,11 @@ function setupEventListeners() {
       }
     }
   });
+  
+  // Mobile nav buttons (history, leaderboard, achievements)
+  document.getElementById('mobileToolbarHistory').addEventListener('click', openHistoryModal);
+  document.getElementById('mobileToolbarLeaderboard').addEventListener('click', openLeaderboardModal);
+  document.getElementById('mobileToolbarAchievements').addEventListener('click', openAchievementsModal);
   
   // Complete modal
   closeCompleteBtn.addEventListener('click', () => {
@@ -1356,12 +1370,6 @@ function showIntroScreen() {
   // Show intro overlay again
   introOverlay.classList.remove('hidden', 'fade-out');
   mainApp.classList.add('hidden');
-  
-  // Sync theme icon
-  const themeIcon = document.querySelector('#introThemeBtn i');
-  if (themeIcon) {
-    themeIcon.className = document.body.dataset.theme === 'dark' ? 'ri-sun-line' : 'ri-moon-line';
-  }
 }
 
 // ===== DESKTOP BOTTOM BAR STATS =====
@@ -1661,13 +1669,13 @@ function navigateToAdjacentElement(direction) {
 }
 
 // Finish challenge early (with partial completion)
-function finishChallenge() {
+async function finishChallenge() {
   if (state.correctElements.size === 0) {
     showHintToast('Please answer at least one element before finishing.');
     return;
   }
   
-  if (!confirm(`Finish with ${state.correctElements.size}/${state.activeElements.size} elements? Your score will be calculated based on what you've completed.`)) {
+  if (!await showConfirmDialog(`Finish with ${state.correctElements.size}/${state.activeElements.size} elements? Your score will be calculated based on what you've completed.`)) {
     return;
   }
   
