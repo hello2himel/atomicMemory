@@ -338,11 +338,7 @@ function setupEventListeners() {
     dismissCompleteModal();
   });
   playAgainBtn.addEventListener('click', () => {
-    closeModal(completeModal);
-    resetChallenge();
-    if (state.isMobile) {
-      showIntroScreen();
-    }
+    dismissCompleteModal();
   });
   shareScoreBtn.addEventListener('click', shareScore);
   
@@ -1247,9 +1243,12 @@ function closeModal(modal) {
 
 function dismissCompleteModal() {
   closeModal(completeModal);
+  resetChallenge();
   if (state.isMobile) {
-    resetChallenge();
-    showIntroScreen();
+    const firstElement = findFirstActiveElement();
+    if (firstElement) {
+      openMobileInput(firstElement);
+    }
   }
 }
 
