@@ -230,9 +230,11 @@
       </div>
       <div class="bottom-bar-control-row">
         <div class="hud-nav-toggle">
-          <span class="hud-nav-label">Enter →</span>
-          <button class="hud-nav-option active" data-nav="horizontal">Horizontal</button>
-          <button class="hud-nav-option" data-nav="vertical">Vertical</button>
+          <span class="hud-nav-label">After Enter, jump to…</span>
+          <div class="hud-pill-toggle">
+            <button class="hud-nav-option active" data-nav="horizontal">→ Next in Period</button>
+            <button class="hud-nav-option" data-nav="vertical">↓ Next in Group</button>
+          </div>
         </div>
         <button id="resetBtn" class="bottom-action-btn reset-btn" title="Reset challenge">
           <i class="ri-restart-line"></i>
@@ -295,25 +297,30 @@
             <div id="miniPeriodicTable" class="mini-periodic-table"></div>
           </div>
 
+          <!-- SVG connector line from mini-table cell to input card -->
+          <svg class="gc-connector-svg" id="gcConnectorSvg" aria-hidden="true">
+            <path class="gc-connector-path" id="gcConnectorPath" fill="none"/>
+          </svg>
+
           <!-- Flexible spacer above control zone -->
           <div class="mobile-flex-spacer"></div>
 
-          <!-- Combined Element Info + Answer Input Card -->
+          <!-- Combined Element Info + Answer Input Card (cell-like design) -->
           <div class="gc-info-card">
-            <div class="gc-info-top">
-              <div class="gc-info-label">
-                <span class="mobile-input-number"></span>
+            <div class="gc-cell-box" id="gcInputBox">
+              <div class="gc-cell-atomic" id="cellAtomicNumber"></div>
+              <div class="gc-cell-category">
                 <span class="mobile-input-category"></span>
               </div>
-              <div class="gc-atomic-badge" id="cellAtomicNumber"></div>
-            </div>
-            <div class="gc-input-box" id="gcInputBox">
               <span class="cell-symbol-display" id="cellSymbolDisplay">—</span>
               <button class="gc-backspace-btn hidden" id="gcBackspaceBtn" aria-label="Backspace">
                 <i class="ri-delete-back-2-line"></i>
               </button>
+              <div class="gc-cell-name" id="cellNameDisplay"></div>
+              <div class="gc-cell-info">
+                <span class="mobile-input-number"></span>
+              </div>
             </div>
-            <div class="gc-name-display" id="cellNameDisplay"></div>
             <div class="mobile-input-hint hidden"></div>
           </div>
 
@@ -357,7 +364,7 @@
                 </div>
               </div>
               <button id="mobileFinishBtn" class="gc-finish-btn" title="Finish Game" aria-label="Finish Game">
-                🏁 Finish Game
+                <i class="ri-flag-line"></i> Finish Game
               </button>
             </div>
           </div>

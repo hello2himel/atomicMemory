@@ -892,15 +892,20 @@ body {
   font-size: 11px;
   font-weight: 600;
   color: var(--text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-family: var(--font-mono);
+  letter-spacing: 0.03em;
+  font-family: var(--font-body);
+  white-space: nowrap;
+}
+
+.hud-pill-toggle {
+  display: flex;
+  gap: 4px;
 }
 
 .hud-nav-option {
   background: transparent;
   border: 1px solid var(--border-color);
-  padding: 3px 10px;
+  padding: 4px 12px;
   border-radius: var(--radius-sm);
   font-size: 11px;
   font-weight: 600;
@@ -911,9 +916,10 @@ body {
 }
 
 .hud-nav-option.active {
-  background: rgba(16, 185, 129, 0.15);
+  background: var(--accent-primary);
   border-color: var(--accent-primary);
-  color: var(--accent-primary);
+  color: #fff;
+  font-weight: 700;
 }
 
 .hud-nav-option:hover:not(.active) {
@@ -1294,6 +1300,7 @@ body {
   flex-direction: column;
   overflow: hidden;
   padding: 0;
+  position: relative;
 }
 
 /* Mobile Game Title Row */
@@ -1374,107 +1381,132 @@ body {
 }
 
 /* Cell-like Input Display */
-/* ===== GAME CONTROL ZONE ===== */
-
-/* Combined Info + Input Card */
+/* ===== CELL-LIKE INPUT CARD ===== */
 .gc-info-card {
-  margin: 0 var(--space-md);
-  padding: 12px 14px;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
+  margin: 0 auto;
+  padding: 0;
+  background: transparent;
+  border: none;
   flex-shrink: 0;
-}
-
-[data-theme="dark"] .gc-info-card {
-  background: rgba(255,255,255,0.04);
-  border-color: rgba(255,255,255,0.08);
-}
-
-.gc-info-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-
-.gc-info-label {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-}
-
-.gc-atomic-badge {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  border: 2px solid #10b981;
-  background: rgba(16,185,129,0.1);
-  display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 700;
-  color: #10b981;
-  font-family: var(--font-mono);
-  flex-shrink: 0;
 }
 
-.gc-input-box {
+.gc-cell-box {
+  width: 120px;
+  height: 140px;
+  border: 3px solid var(--accent-primary);
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   position: relative;
+  box-shadow: var(--shadow-lg), 0 0 20px rgba(16,185,129,0.15);
+  transition: border-color 200ms ease, background 200ms ease, box-shadow 200ms ease;
+}
+
+[data-theme="dark"] .gc-cell-box {
   background: var(--bg-secondary);
-  border: 2px solid var(--border-color);
-  border-radius: 12px;
-  padding: 10px 14px;
-  min-height: 48px;
-  transition: border-color 200ms ease;
+  box-shadow: var(--shadow-lg), 0 0 24px rgba(16,185,129,0.2);
 }
 
-[data-theme="dark"] .gc-input-box {
-  background: rgba(0,0,0,0.25);
-  border-color: rgba(255,255,255,0.08);
-}
-
-.gc-input-box.has-input {
+.gc-cell-box.has-input {
   border-color: #10b981;
+  box-shadow: var(--shadow-lg), 0 0 28px rgba(16,185,129,0.25);
 }
 
-.gc-input-box.cell-correct {
+.gc-cell-box.cell-correct {
   border-color: var(--correct) !important;
   background: var(--correct-light);
 }
 
-.gc-input-box.cell-incorrect {
+.gc-cell-box.cell-incorrect {
   border-color: var(--incorrect) !important;
   background: var(--incorrect-light);
   animation: shake 300ms ease;
 }
 
-.gc-input-box .cell-symbol-display {
-  font-size: 26px;
+/* Atomic number — top left */
+.gc-cell-atomic {
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-primary);
+  font-family: var(--font-mono);
+}
+
+/* Category — top right */
+.gc-cell-category {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+}
+
+.gc-cell-category .mobile-input-category {
+  font-size: 8px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+/* Symbol input display — center */
+.gc-cell-box .cell-symbol-display {
+  font-size: 36px;
   font-weight: 800;
   color: var(--text-primary);
-  font-family: var(--font-mono);
-  letter-spacing: 2px;
+  font-family: var(--font-display);
+  letter-spacing: 1px;
   line-height: 1;
   text-align: center;
-  flex: 1;
+  margin-top: 8px;
 }
 
-.gc-input-box .cell-symbol-display.empty {
+.gc-cell-box .cell-symbol-display.empty {
   color: var(--text-tertiary);
+  font-size: 28px;
 }
 
+/* Element name — below symbol */
+.gc-cell-name {
+  font-size: 9px;
+  color: var(--text-tertiary);
+  text-align: center;
+  margin-top: 4px;
+  min-height: 12px;
+  text-transform: capitalize;
+  font-weight: 500;
+}
+
+/* Element info — bottom */
+.gc-cell-info {
+  position: absolute;
+  bottom: 5px;
+  left: 0;
+  right: 0;
+  text-align: center;
+}
+
+.gc-cell-info .mobile-input-number {
+  font-size: 8px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+}
+
+/* Backspace button */
 .gc-backspace-btn {
   position: absolute;
-  right: 10px;
+  right: -40px;
   top: 50%;
   transform: translateY(-50%);
   background: var(--bg-tertiary);
-  border: none;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   width: 32px;
   height: 32px;
@@ -1492,13 +1524,24 @@ body {
   transform: translateY(-50%) scale(0.92);
 }
 
-.gc-name-display {
-  font-size: 11px;
-  color: var(--text-tertiary);
-  text-align: center;
-  margin-top: 4px;
-  min-height: 14px;
-  text-transform: capitalize;
+/* SVG connector line */
+.gc-connector-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: visible;
+}
+
+.gc-connector-path {
+  stroke: var(--accent-primary);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 3;
+  opacity: 0.4;
+  transition: opacity 300ms ease;
 }
 
 /* Micro labels */

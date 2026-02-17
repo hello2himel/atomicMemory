@@ -1585,7 +1585,39 @@ function updateMiniTable(atomicNumber, status) {
     }, 600);
   } else if (status === 'current') {
     cell.classList.add('mini-current');
+    // Draw connector line from mini-table cell to input card
+    drawConnectorLine(atomicNumber);
   }
+}
+
+// Draw a dashed curved line from the current mini-table cell to the input card
+function drawConnectorLine(atomicNumber) {
+  const svg = document.getElementById('gcConnectorSvg');
+  const path = document.getElementById('gcConnectorPath');
+  if (!svg || !path) return;
+  
+  const miniCell = document.querySelector(`#miniPeriodicTable .mini-cell[data-atomic="${atomicNumber}"]`);
+  const inputCard = document.querySelector('.gc-info-card');
+  const container = document.querySelector('.mobile-input-content');
+  if (!miniCell || !inputCard || !container) return;
+  
+  const containerRect = container.getBoundingClientRect();
+  const cellRect = miniCell.getBoundingClientRect();
+  const cardRect = inputCard.getBoundingClientRect();
+  
+  // Start point: bottom center of the mini cell
+  const x1 = cellRect.left + cellRect.width / 2 - containerRect.left;
+  const y1 = cellRect.bottom - containerRect.top;
+  
+  // End point: top center of the input card
+  const x2 = cardRect.left + cardRect.width / 2 - containerRect.left;
+  const y2 = cardRect.top - containerRect.top;
+  
+  // Curved path with a single control point for a gentle S-curve
+  const midY = (y1 + y2) / 2;
+  const d = `M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`;
+  
+  path.setAttribute('d', d);
 }
 
 function updateMobileInputForElement(element) {
