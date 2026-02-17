@@ -206,12 +206,8 @@ body {
 .intro-title-text {
   font-size: 32px;
   font-weight: 900;
-  color: var(--text-primary);
+  color: #ffffff;
   font-family: var(--font-display);
-  background: var(--accent-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 @keyframes intro-slide-up {
