@@ -116,6 +116,7 @@ const viewTableBtn = document.getElementById('viewTableBtn');
 const donateBtn = document.getElementById('donateBtn');
 const donateModal = document.getElementById('donateModal');
 const closeDonateBtn = document.getElementById('closeDonateBtn');
+const donateDismissBtn = document.getElementById('donateDismissBtn');
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -233,6 +234,7 @@ function setupEventListeners() {
   // Donate modal
   donateBtn.addEventListener('click', openDonateModal);
   closeDonateBtn.addEventListener('click', () => closeModal(donateModal));
+  donateDismissBtn.addEventListener('click', () => closeModal(donateModal));
   
   // View table button (toggle element visibility on existing table)
   viewTableBtn.addEventListener('click', toggleViewTable);
@@ -345,14 +347,14 @@ function setupEventListeners() {
   }
   
   // Close modals on overlay click
-  [historyModal, leaderboardModal, achievementsModal, completeModal, infoModal].forEach(modal => {
+  [historyModal, leaderboardModal, achievementsModal, completeModal, infoModal, donateModal].forEach(modal => {
     modal.querySelector('.modal-overlay')?.addEventListener('click', () => closeModal(modal));
   });
   
   // Close modals on Escape key
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      [historyModal, leaderboardModal, achievementsModal, completeModal, infoModal].forEach(modal => {
+      [historyModal, leaderboardModal, achievementsModal, completeModal, infoModal, donateModal].forEach(modal => {
         if (!modal.classList.contains('hidden')) {
           closeModal(modal);
         }
