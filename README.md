@@ -14,35 +14,42 @@ Live demo: [atomicmemory.netlify.app](https://atomicmemory.netlify.app)
 
 - **Full Table Challenge** — Practice all 118 elements; answer as many as you can, then press Finish
 - **Keyboard-First Interaction** — Type element symbols, navigate between cells with arrow keys, submit with Enter
-- **Arrow Key Navigation** — Move between element cells using arrow keys while inputting (desktop) or arrow buttons (mobile)
+- **Arrow Key Navigation** — Move between element cells using arrow keys while inputting (desktop) or D-pad buttons (mobile)
+- **Navigation Direction Toggle** — Choose whether Enter advances to the next element in the same period (→) or group (↓)
 - **Finish Anytime** — Press the Finish button to end the challenge at any point and see your score
 - **Immediate Feedback** — Correct answers highlight green, wrong answers flash red
 - **Scoring & Ranks** — 7 rank tiers from Novice to Legendary with bonuses and penalties
-- **Achievements** — 15 unlockable achievements (First Element, Speed Demon, Perfectionist, etc.)
+- **Achievements** — 16 unlockable achievements (First Step, Speed Demon, Perfectionist, Comeback Kid, etc.)
 - **Leaderboard** — Top 10 personal best scores with date, accuracy, and time
 - **Practice History** — Track your last 50 sessions
-- **View Mode** — Toggle to reveal all element symbols and names on the table for reference
+- **View Mode** — Toggle to reveal all element symbols and names on the table for reference (blocked during active challenge)
+- **Score Sharing** — Share your final score via the Web Share API or copy to clipboard
 - **Timed Challenges** — Track speed and accuracy per session
 - **Dark / Light Theme** — Auto-detects system preference or toggle manually
 - **Responsive Design** — Full desktop and mobile support with dedicated mobile input UI
-- **Mobile QWERTY Keyboard** — Wordle-style on-screen keyboard; no native keyboard needed
-- **Cell-like Mobile Input** — Input display looks like a periodic table cell with atomic number and symbol
-- **Mobile Arrow Keys** — On-screen directional buttons for navigating between elements on mobile
-- **Desktop Bottom Nav** — Game stats and action buttons in a fixed bottom navigation bar
-- **Animated Intro** — Periodic table animation with random color flashes and category-color settling (desktop); simplified setup screen (mobile)
+- **Mobile QWERTY Keyboard** — Wordle-style on-screen keyboard with shift and backspace; no native keyboard needed
+- **Mini Periodic Table** — Mobile view includes a miniature periodic table with an SVG connector line highlighting the current element
+- **Cell-like Mobile Input** — Input display styled as a periodic table cell with atomic number, symbol, and position info
+- **Mobile D-pad Navigation** — On-screen directional buttons for navigating between elements on mobile
+- **Mobile Toolbar** — Quick access to history, leaderboard, achievements, about, donate, theme, and reset
+- **Desktop Bottom Nav** — Game stats, action buttons, and navigation toggle in a fixed bottom bar
+- **Animated Intro** — Periodic table animation with random color flashes and category-color settling on a unified intro screen
+- **Score Breakdown** — Collapsible breakdown of base score, bonuses, and penalties after each challenge
+- **Donate** — Support the developer through an optional donate link
 - **Fully Client-Side** — No server needed; all data stored in localStorage
 
 ---
 
 ## How It Works
 
-1. **Start the challenge** — On desktop, all 118 elements are shown in the periodic table; on mobile, a simplified setup screen appears
+1. **Start the challenge** — A unified intro screen shows the animated periodic table; press Start or Enter to begin
 2. **Click an element (desktop)** — An input field appears; type the element's chemical symbol
 3. **Type on QWERTY keyboard (mobile)** — Use the on-screen keyboard to type; input looks like a periodic table cell
-4. **Navigate with arrow keys** — Use arrow keys (desktop) or arrow buttons (mobile) to move between cells
+4. **Navigate with arrow keys** — Use arrow keys (desktop) or D-pad buttons (mobile) to move between cells
 5. **Get feedback** — Correct answers are marked green; mistakes flash red with point penalties
 6. **Finish anytime** — Press the Finish button when you're done to see your score breakdown
 7. **Track progress** — View your history, achievements, and leaderboard
+8. **Share your score** — Share results via the Share button in the challenge complete modal
 
 ### Scoring
 
@@ -79,14 +86,14 @@ Novice → Apprentice → Chemist → Expert → Master → Grand Master → Leg
 
 ```
 /atomicmemory
-├── index.html              # Main app (intro, header, table, modals)
+├── index.html              # Main app (intro, header, table, modals, QWERTY keyboard)
 ├── css/
 │   └── styles.css          # Complete styling with CSS variables and responsive design
 ├── js/
 │   ├── elements.js         # 118-element data array (number, symbol, name, category, etc.)
 │   ├── script.js           # Core app logic (rendering, interaction, state, modals, mobile)
 │   ├── scoring.js          # Scoring system, rank tiers, leaderboard, localStorage
-│   ├── achievements.js     # 15 achievement definitions and unlock manager
+│   ├── achievements.js     # 16 achievement definitions and unlock manager
 │   └── cubes.js            # Intro animation and logo grid animation
 └── README.md               # Documentation
 ```
