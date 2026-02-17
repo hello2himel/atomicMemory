@@ -411,6 +411,7 @@ body {
   height: 0;
   overflow: visible;
   line-height: 1;
+  transform: translateY(12px);
 }
 
 .table-brand-tagline {
@@ -429,6 +430,7 @@ body {
   user-select: none;
   height: 0;
   overflow: visible;
+  transform: translateY(40px);
 }
 
 .header-title-row {
