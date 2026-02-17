@@ -1510,6 +1510,7 @@ function handleQwertyKey(key) {
   if (mobileInput.value.length < 3) {
     const letter = state.shiftActive ? key.toUpperCase() : key.toLowerCase();
     mobileInput.value += letter;
+    formatSymbolInput(mobileInput);
     if (cellSymbolDisplay) {
       cellSymbolDisplay.textContent = mobileInput.value;
       cellSymbolDisplay.classList.remove('empty');
