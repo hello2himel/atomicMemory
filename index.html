@@ -17,22 +17,45 @@
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <!-- Intro Overlay -->
+  <!-- Unified Intro/Setup Screen (used on both desktop and mobile) -->
   <div id="introOverlay" class="intro-overlay">
     <div class="intro-content">
+      <div class="intro-setup-logo-row">
+        <div class="logo-grid intro-setup-logo" aria-label="AtomicMemory">
+          <span class="lg-cell" style="background:#ef4444"></span>
+          <span class="lg-empty"></span>
+          <span class="lg-empty"></span>
+          <span class="lg-empty"></span>
+          <span class="lg-cell" style="background:#ec4899"></span>
+          <span class="lg-cell" style="background:#f97316"></span>
+          <span class="lg-empty"></span>
+          <span class="lg-cell" style="background:#10b981"></span>
+          <span class="lg-cell" style="background:#3b82f6"></span>
+          <span class="lg-cell" style="background:#8b5cf6"></span>
+          <span class="lg-cell" style="background:#06b6d4"></span>
+          <span class="lg-cell" style="background:#eab308"></span>
+          <span class="lg-cell" style="background:#ec4899"></span>
+          <span class="lg-cell" style="background:#f59e0b"></span>
+          <span class="lg-cell" style="background:#84cc16"></span>
+          <span class="lg-empty"></span>
+          <span class="lg-cell" style="background:#3b82f6"></span>
+          <span class="lg-cell" style="background:#ef4444"></span>
+          <span class="lg-cell" style="background:#f97316"></span>
+          <span class="lg-empty"></span>
+        </div>
+        <h1 class="intro-title-text">AtomicMemory</h1>
+      </div>
+      <p class="intro-tagline">Learn the periodic table through an interactive, gamified experience.</p>
+
       <div class="intro-table-wrapper">
         <div id="introPeriodicTable" class="intro-periodic-table"></div>
       </div>
-      <h1 class="intro-title">
-        <span class="title-word">Atomic</span><span class="title-word">Memory</span>
-      </h1>
-      <p class="intro-tagline">Learn the periodic table through an interactive, gamified experience</p>
 
       <button id="startBtn" class="start-button">
-        <span>Start</span>
-        <i class="ri-arrow-right-line"></i>
+        <i class="ri-play-fill"></i>
+        <span>Start Challenge</span>
       </button>
-      
+
       <p class="intro-hint">
         <i class="ri-keyboard-line"></i>
         Press Enter to start
@@ -114,6 +137,9 @@
         <button id="leaderboardBtn" class="header-icon-btn" title="Leaderboard" aria-label="Leaderboard">
           <i class="ri-trophy-line" aria-hidden="true"></i>
         </button>
+        <button id="aboutBtn" class="header-icon-btn" title="About" aria-label="About">
+          <i class="ri-information-line" aria-hidden="true"></i>
+        </button>
         <button id="darkModeBtn" class="header-icon-btn" title="Toggle theme" aria-label="Toggle theme">
           <i class="ri-moon-line" aria-hidden="true"></i>
         </button>
@@ -143,63 +169,58 @@
       </div>
     </div>
 
-    <!-- Mobile Setup Screen -->
-    <div id="mobileSetupScreen" class="mobile-setup-screen hidden">
-      <!-- content will be populated by JS -->
-    </div>
+    <!-- Mobile Setup Screen is now unified with intro overlay above -->
 
-    <!-- Slim Control Bar -->
-    <div class="quick-settings">
-      <div class="settings-left">
-        <div class="mode-tabs">
-          <button class="mode-tab active" data-mode="full" title="All 118 elements">
-            <i class="ri-table-2"></i>
-            <span>Full</span>
-          </button>
-          <button class="mode-tab" data-mode="block" title="Practice by blocks">
-            <i class="ri-shapes-line"></i>
-            <span>Blocks</span>
-          </button>
-          <button class="mode-tab" data-mode="group" title="Practice by groups">
-            <i class="ri-layout-column-line"></i>
-            <span>Groups</span>
-          </button>
-          <button class="mode-tab" data-mode="period" title="Practice by periods">
-            <i class="ri-layout-row-line"></i>
-            <span>Periods</span>
-          </button>
+    <!-- Desktop Bottom HUD -->
+    <div id="desktopBottomBar" class="desktop-bottom-bar">
+      <div class="bottom-bar-stats">
+        <div class="bottom-stat" title="Score">
+          <i class="ri-star-line"></i>
+          <span id="bottomScore">0</span>
         </div>
-
-        <div class="nav-toggle">
-          <button class="nav-option active" data-nav="period" title="Move horizontally">
-            <i class="ri-arrow-right-line"></i>
-            <span>Horizontal</span>
-          </button>
-          <button class="nav-option" data-nav="group" title="Move vertically">
-            <i class="ri-arrow-down-line"></i>
-            <span>Vertical</span>
-          </button>
+        <div class="bottom-stat" title="Time">
+          <i class="ri-timer-line"></i>
+          <span id="bottomTimer">00:00</span>
+        </div>
+        <div class="bottom-stat" title="Progress">
+          <i class="ri-check-double-line"></i>
+          <span id="bottomProgress">0/118</span>
+        </div>
+        <div class="bottom-stat" title="Streak">
+          <i class="ri-fire-line"></i>
+          <span id="bottomStreak">0</span>
+        </div>
+        <div class="bottom-stat" title="Accuracy">
+          <i class="ri-percent-line"></i>
+          <span id="bottomAccuracy">100%</span>
         </div>
       </div>
-
-      <div class="settings-right">
-        <button id="viewTableBtn" class="action-btn view-btn" title="View periodic table">
-          <i class="ri-eye-line"></i>
-          <span>View</span>
-        </button>
-        <button id="hintBtn" class="action-btn hint-btn" title="Get a hint (-50 points)">
+      <div class="bottom-bar-action-row">
+        <button id="hintBtn" class="bottom-action-btn hint-btn" title="Get a hint (-50 points)">
           <i class="ri-lightbulb-line"></i>
           <span>Hint</span>
         </button>
-        <button id="resetBtn" class="action-btn reset-btn" title="Reset challenge">
+        <button id="finishBtn" class="bottom-action-btn finish-btn" title="Finish challenge">
+          <i class="ri-flag-line"></i>
+          <span>Finish</span>
+        </button>
+        <button id="viewTableBtn" class="bottom-action-btn view-btn" title="View periodic table">
+          <i class="ri-eye-line"></i>
+          <span>View</span>
+        </button>
+      </div>
+      <div class="bottom-bar-control-row">
+        <div class="hud-nav-toggle">
+          <span class="hud-nav-label">Enter →</span>
+          <button class="hud-nav-option active" data-nav="horizontal">Horizontal</button>
+          <button class="hud-nav-option" data-nav="vertical">Vertical</button>
+        </div>
+        <button id="resetBtn" class="bottom-action-btn reset-btn" title="Reset challenge">
           <i class="ri-restart-line"></i>
           <span>Reset</span>
         </button>
       </div>
     </div>
-
-    <!-- Mode Selection Panel -->
-    <div id="modeSelectionPanel" class="mode-selection-panel hidden"></div>
 
     <!-- Periodic Table Container -->
     <main class="table-container">
@@ -210,73 +231,166 @@
       <!-- Mobile Input Modal -->
       <div id="mobileInputModal" class="mobile-input-modal hidden">
         <div class="mobile-input-content">
-          <!-- Score Row -->
-          <div class="mobile-modal-score-row">
-            <div class="mobile-modal-score-value" id="mobileScoreDisplay">0</div>
-            <span class="mobile-modal-rank" id="mobileRankDisplay">Novice</span>
+          <!-- Compact Header -->
+          <div class="mobile-game-header">
+            <div class="mobile-game-logo-row">
+              <div class="logo-grid mobile-game-logo" aria-label="AtomicMemory">
+                <span class="lg-cell" style="background:#ef4444"></span>
+                <span class="lg-empty"></span>
+                <span class="lg-empty"></span>
+                <span class="lg-empty"></span>
+                <span class="lg-cell" style="background:#ec4899"></span>
+                <span class="lg-cell" style="background:#f97316"></span>
+                <span class="lg-empty"></span>
+                <span class="lg-cell" style="background:#10b981"></span>
+                <span class="lg-cell" style="background:#3b82f6"></span>
+                <span class="lg-cell" style="background:#8b5cf6"></span>
+                <span class="lg-cell" style="background:#06b6d4"></span>
+                <span class="lg-cell" style="background:#eab308"></span>
+                <span class="lg-cell" style="background:#ec4899"></span>
+                <span class="lg-cell" style="background:#f59e0b"></span>
+                <span class="lg-cell" style="background:#84cc16"></span>
+                <span class="lg-empty"></span>
+                <span class="lg-cell" style="background:#3b82f6"></span>
+                <span class="lg-cell" style="background:#ef4444"></span>
+                <span class="lg-cell" style="background:#f97316"></span>
+                <span class="lg-empty"></span>
+              </div>
+              <span class="mobile-game-title">AtomicMemory</span>
+            </div>
+            <div class="mobile-game-header-right">
+              <button class="mobile-toolbar-btn" id="mobileToolbarHistory" title="History">
+                <i class="ri-history-line"></i>
+              </button>
+              <button class="mobile-toolbar-btn" id="mobileToolbarLeaderboard" title="Leaderboard">
+                <i class="ri-trophy-line"></i>
+              </button>
+              <button class="mobile-toolbar-btn" id="mobileToolbarAchievements" title="Achievements">
+                <i class="ri-medal-line"></i>
+              </button>
+              <button class="mobile-toolbar-btn" id="mobileToolbarAbout" title="About">
+                <i class="ri-information-line"></i>
+              </button>
+              <button class="mobile-toolbar-btn" id="mobileToolbarTheme" title="Toggle theme">
+                <i class="ri-moon-line"></i>
+              </button>
+              <button class="mobile-toolbar-btn" id="mobileToolbarReset" title="Reset">
+                <i class="ri-restart-line"></i>
+              </button>
+            </div>
           </div>
 
-          <!-- Mini Table Preview -->
+          <!-- Compact Stats Strip -->
+          <div class="mobile-stats-strip">
+            <span class="mobile-strip-stat"><span class="strip-label">Score</span> <span id="mobileScoreDisplay" class="strip-value">0</span></span>
+            <span class="strip-divider">|</span>
+            <span class="mobile-strip-stat"><span class="strip-label">Time</span> <span id="mobileTimerDisplay" class="strip-value">00:00</span></span>
+            <span class="strip-divider">|</span>
+            <span class="mobile-strip-stat"><span id="mobileProgressDisplay" class="strip-value">0/118</span></span>
+            <span class="strip-divider">|</span>
+            <span class="mobile-strip-stat"><i class="ri-fire-line"></i> <span id="mobileStreakDisplay" class="strip-value">0</span></span>
+            <span class="strip-divider">|</span>
+            <span class="mobile-strip-stat"><span id="mobileAccuracyDisplay" class="strip-value">100%</span></span>
+          </div>
+
+          <!-- Mini Table Preview (top area) -->
           <div id="miniTableContainer" class="mini-table-container">
             <div id="miniPeriodicTable" class="mini-periodic-table"></div>
           </div>
 
-          <!-- Stats Bar -->
-          <div class="mobile-modal-stats">
-            <div class="mobile-modal-stat">
-              <div class="mobile-modal-stat-value" id="mobileProgressDisplay">0/118</div>
-              <div class="mobile-modal-stat-label">Progress</div>
-            </div>
-            <div class="mobile-modal-stat">
-              <div class="mobile-modal-stat-value" id="mobileStreakDisplay">0</div>
-              <div class="mobile-modal-stat-label">Streak</div>
-            </div>
-            <div class="mobile-modal-stat">
-              <div class="mobile-modal-stat-value" id="mobileAccuracyDisplay">100%</div>
-              <div class="mobile-modal-stat-label">Accuracy</div>
-            </div>
-            <div class="mobile-modal-stat">
-              <div class="mobile-modal-stat-value" id="mobileTimerDisplay">00:00</div>
-              <div class="mobile-modal-stat-label">Time</div>
-            </div>
-          </div>
+          <!-- Flexible spacer above cell for vertical centering -->
+          <div class="mobile-flex-spacer"></div>
 
-          <!-- Toolbar -->
-          <div class="mobile-modal-toolbar">
-            <button class="mobile-toolbar-btn" id="mobileToolbarTheme" title="Toggle theme">
-              <i class="ri-moon-line"></i>
-            </button>
-            <button class="mobile-toolbar-btn" id="mobileToolbarReset" title="Reset">
-              <i class="ri-restart-line"></i>
-            </button>
-          </div>
-
-          <!-- Element Info & Input -->
-          <div class="mobile-input-header">
-            <div class="mobile-input-element-info">
+          <!-- Cell-like Input Display (vertically centered) -->
+          <div class="mobile-cell-input-area">
+            <div class="mobile-cell-prompt">
               <span class="mobile-input-number"></span>
               <span class="mobile-input-category"></span>
             </div>
-            <button class="mobile-input-close" aria-label="Close input">
-              <i class="ri-close-line" aria-hidden="true"></i>
-            </button>
+            <div class="mobile-cell-display">
+              <div class="cell-atomic-number" id="cellAtomicNumber"></div>
+              <div class="cell-symbol-display" id="cellSymbolDisplay">?</div>
+              <div class="cell-name-display" id="cellNameDisplay"></div>
+            </div>
+            <div class="mobile-input-hint hidden"></div>
           </div>
-          <input type="text" id="mobileInput" class="mobile-input-field" maxlength="3" autocomplete="off" placeholder="Enter symbol">
-          <div class="mobile-input-actions">
-            <button id="mobileHintBtn" class="mobile-hint-btn">
+
+          <!-- Flexible spacer below cell for vertical centering -->
+          <div class="mobile-flex-spacer"></div>
+
+          <!-- Hidden real input for state tracking -->
+          <input type="text" id="mobileInput" class="mobile-input-field-hidden" maxlength="3" autocomplete="off" inputmode="none" tabindex="-1" aria-hidden="true">
+
+          <!-- Arrow Navigation Row (just above keyboard) -->
+          <div class="mobile-nav-row">
+            <button id="mobileArrowLeft" class="mobile-nav-btn" title="Move left" aria-label="Move left">
+              <i class="ri-arrow-left-line"></i>
+            </button>
+            <button id="mobileArrowUp" class="mobile-nav-btn" title="Move up" aria-label="Move up">
+              <i class="ri-arrow-up-line"></i>
+            </button>
+            <button id="mobileArrowDown" class="mobile-nav-btn" title="Move down" aria-label="Move down">
+              <i class="ri-arrow-down-line"></i>
+            </button>
+            <button id="mobileArrowRight" class="mobile-nav-btn" title="Move right" aria-label="Move right">
+              <i class="ri-arrow-right-line"></i>
+            </button>
+            <button id="mobileHintBtn" class="mobile-nav-btn mobile-nav-hint" title="Hint" aria-label="Hint">
               <i class="ri-lightbulb-line"></i>
-              Hint
             </button>
-            <button id="mobileSkipBtn" class="mobile-skip-btn">
+            <button id="mobileSkipBtn" class="mobile-nav-btn mobile-nav-skip" title="Skip" aria-label="Skip">
               <i class="ri-skip-forward-line"></i>
-              Skip
             </button>
-            <button id="mobileSubmitBtn" class="mobile-submit-btn">
-              <i class="ri-check-line"></i>
-              Submit
+            <button id="mobileFinishBtn" class="mobile-nav-btn mobile-nav-finish" title="Finish" aria-label="Finish">
+              <i class="ri-flag-line"></i>
+              <span>Finish</span>
             </button>
           </div>
-          <div class="mobile-input-hint hidden"></div>
+
+          <!-- QWERTY Keyboard -->
+          <div class="qwerty-keyboard" id="qwertyKeyboard">
+            <div class="qwerty-row">
+              <button class="qwerty-key" data-key="Q">Q</button>
+              <button class="qwerty-key" data-key="W">W</button>
+              <button class="qwerty-key" data-key="E">E</button>
+              <button class="qwerty-key" data-key="R">R</button>
+              <button class="qwerty-key" data-key="T">T</button>
+              <button class="qwerty-key" data-key="Y">Y</button>
+              <button class="qwerty-key" data-key="U">U</button>
+              <button class="qwerty-key" data-key="I">I</button>
+              <button class="qwerty-key" data-key="O">O</button>
+              <button class="qwerty-key" data-key="P">P</button>
+            </div>
+            <div class="qwerty-row">
+              <button class="qwerty-key" data-key="A">A</button>
+              <button class="qwerty-key" data-key="S">S</button>
+              <button class="qwerty-key" data-key="D">D</button>
+              <button class="qwerty-key" data-key="F">F</button>
+              <button class="qwerty-key" data-key="G">G</button>
+              <button class="qwerty-key" data-key="H">H</button>
+              <button class="qwerty-key" data-key="J">J</button>
+              <button class="qwerty-key" data-key="K">K</button>
+              <button class="qwerty-key" data-key="L">L</button>
+            </div>
+            <div class="qwerty-row">
+              <button class="qwerty-key" data-key="Z">Z</button>
+              <button class="qwerty-key" data-key="X">X</button>
+              <button class="qwerty-key" data-key="C">C</button>
+              <button class="qwerty-key" data-key="V">V</button>
+              <button class="qwerty-key" data-key="B">B</button>
+              <button class="qwerty-key" data-key="N">N</button>
+              <button class="qwerty-key" data-key="M">M</button>
+              <button class="qwerty-key qwerty-backspace" data-key="BACKSPACE"><i class="ri-delete-back-2-line"></i></button>
+            </div>
+            <div class="qwerty-row qwerty-action-row">
+              <button class="qwerty-key qwerty-submit" data-key="SUBMIT"><i class="ri-check-line"></i> Enter</button>
+            </div>
+          </div>
+
+          <span class="mobile-modal-rank" id="mobileRankDisplay">Novice</span>
+          <button class="mobile-input-close" aria-label="Close input">
+            <i class="ri-close-line" aria-hidden="true"></i>
+          </button>
         </div>
       </div>
     </main>
@@ -371,8 +485,16 @@
           </button>
         </div>
         <div class="modal-body info-modal-body">
-          <p>Made with <span aria-label="love">❤️</span> by <a href="https://hello2himel.netlify.app" target="_blank" rel="noopener noreferrer">@hello2himel</a> from <span aria-label="Bangladesh">🇧🇩</span></p>
-          <p>This is an open source software. <a href="https://github.com/hello2himel/atomicmemory" target="_blank" rel="noopener noreferrer">View Source Code</a></p>
+          <h4 class="info-story-title">The Story Behind AtomicMemory</h4>
+          <p>I'm a high school student in Bangladesh, and I used to hate memorizing the periodic table. It felt pointless. I wanted to understand chemistry, not just recite it. But exams here mostly reward whoever remembers faster, and I was struggling.</p>
+          <p>My chemistry coach put it simply. Memorizing without strategy is just pain. But with the right approach, it changes completely. Learning group by group means you're not just remembering symbols, you're understanding why elements sit next to each other, what they share, how they behave. Slowly, the table stops feeling like a wall of random letters and starts feeling like a map. You begin seeing patterns instead of trying to force facts into your head.</p>
+          <p>That clicked for me in a way nothing had before. I wanted to practice, so I started thinking about printing blank tables and filling them in by hand, over and over. Then it hit me, I know how to code. Why not just build something? So I did. And somewhere in the middle of building a simple practice tool, I had a moment where I realized this could actually feel rewarding. Streaks, ranks, achievements, a sense of progress. The whole thing came together.</p>
+          <p>That's AtomicMemory. Born from a student who didn't want to memorize anything, and a coach who showed him there's a better way.</p>
+          <p>If you're struggling with the same thing, this was made for you.</p>
+          <div class="info-links">
+            <p>Made with <span aria-label="love">❤️</span> by <a href="https://hello2himel.netlify.app" target="_blank" rel="noopener noreferrer">@hello2himel</a> from <span aria-label="Bangladesh">🇧🇩</span></p>
+            <p>This is an open source software. <a href="https://github.com/hello2himel/atomicmemory" target="_blank" rel="noopener noreferrer">View Source Code</a></p>
+          </div>
         </div>
       </div>
     </div>
@@ -454,15 +576,20 @@
       </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="footer">
-      <p>
-        Made with <span aria-label="love">❤️</span> by <a href="https://hello2himel.netlify.app" target="_blank" rel="noopener noreferrer">@hello2himel</a> from <span aria-label="Bangladesh">🇧🇩</span>
-      </p>
-      <p>
-        This is an open source software. <a href="https://github.com/hello2himel/atomicmemory" target="_blank" rel="noopener noreferrer">View Source Code</a>
-      </p>
-    </footer>
+  </div>
+
+  <!-- Custom Confirm Dialog -->
+  <div id="confirmDialog" class="confirm-dialog-overlay hidden" role="dialog" aria-modal="true">
+    <div class="confirm-dialog">
+      <div class="confirm-dialog-icon">
+        <i class="ri-question-line"></i>
+      </div>
+      <p class="confirm-dialog-message" id="confirmMessage"></p>
+      <div class="confirm-dialog-actions">
+        <button class="confirm-dialog-btn confirm-cancel" id="confirmCancel">Cancel</button>
+        <button class="confirm-dialog-btn confirm-ok" id="confirmOk">Confirm</button>
+      </div>
+    </div>
   </div>
 
   <script src="js/elements.js"></script>

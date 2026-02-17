@@ -152,7 +152,7 @@
     }, 3000);
   }
 
-  // Start animation
+  // Start animation on all screen sizes (unified intro)
   runCycle();
 
   // Cleanup on start
