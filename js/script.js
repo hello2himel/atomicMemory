@@ -113,6 +113,7 @@ const playAgainBtn = document.getElementById('playAgainBtn');
 const shareScoreBtn = document.getElementById('shareScoreBtn');
 const infoModal = document.getElementById('infoModal');
 const closeInfoBtn = document.getElementById('closeInfoBtn');
+const aboutBtn = document.getElementById('aboutBtn');
 const viewTableBtn = document.getElementById('viewTableBtn');
 
 // Initialize
@@ -209,6 +210,7 @@ function setupEventListeners() {
   closeAchievementsBtn.addEventListener('click', () => closeModal(achievementsModal));
   
   // Info modal
+  aboutBtn.addEventListener('click', openInfoModal);
   closeInfoBtn.addEventListener('click', () => closeModal(infoModal));
   
   // View table button (toggle element visibility on existing table)
@@ -282,10 +284,11 @@ function setupEventListeners() {
     }
   });
   
-  // Mobile nav buttons (history, leaderboard, achievements)
+  // Mobile nav buttons (history, leaderboard, achievements, about)
   document.getElementById('mobileToolbarHistory').addEventListener('click', openHistoryModal);
   document.getElementById('mobileToolbarLeaderboard').addEventListener('click', openLeaderboardModal);
   document.getElementById('mobileToolbarAchievements').addEventListener('click', openAchievementsModal);
+  document.getElementById('mobileToolbarAbout').addEventListener('click', openInfoModal);
   
   // Complete modal
   closeCompleteBtn.addEventListener('click', () => {
@@ -356,6 +359,10 @@ function openMobileMenu() {
       <button class="mobile-menu-btn" onclick="darkModeBtn.click(); mobileMenu.classList.add('hidden')">
         <i class="${document.body.dataset.theme === 'dark' ? 'ri-sun-line' : 'ri-moon-line'}"></i>
         <span>Toggle Theme</span>
+      </button>
+      <button class="mobile-menu-btn" onclick="openInfoModal(); mobileMenu.classList.add('hidden')">
+        <i class="ri-information-line"></i>
+        <span>About</span>
       </button>
     </div>
   `;
