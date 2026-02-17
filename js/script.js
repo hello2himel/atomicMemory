@@ -256,17 +256,17 @@ function setupEventListeners() {
       btn.classList.add('active');
       state.navDirection = btn.dataset.nav;
       localStorage.setItem('navDirection', state.navDirection);
-      // Sync mobile toggle
-      document.querySelectorAll('.mobile-nav-dir-btn').forEach(b => {
+      // Sync mobile pill toggle
+      document.querySelectorAll('.gc-pill').forEach(b => {
         b.classList.toggle('active', b.dataset.nav === state.navDirection);
       });
     });
   });
   
-  // Navigation direction toggle (mobile)
-  document.querySelectorAll('.mobile-nav-dir-btn').forEach(btn => {
+  // Navigation direction toggle (mobile pill toggle)
+  document.querySelectorAll('.gc-pill').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.mobile-nav-dir-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.gc-pill').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       state.navDirection = btn.dataset.nav;
       localStorage.setItem('navDirection', state.navDirection);
@@ -281,9 +281,15 @@ function setupEventListeners() {
   document.querySelectorAll('.hud-nav-option').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.nav === state.navDirection);
   });
-  document.querySelectorAll('.mobile-nav-dir-btn').forEach(btn => {
+  document.querySelectorAll('.gc-pill').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.nav === state.navDirection);
   });
+  
+  // Backspace button in game control zone
+  const gcBackspaceBtn = document.getElementById('gcBackspaceBtn');
+  if (gcBackspaceBtn) {
+    gcBackspaceBtn.addEventListener('click', () => handleQwertyKey('BACKSPACE'));
+  }
   
   // Mobile toolbar buttons
   document.getElementById('mobileToolbarTheme').addEventListener('click', () => {
@@ -559,10 +565,14 @@ function openMobileInput(element) {
   const cellSymbolDisplay = document.getElementById('cellSymbolDisplay');
   const cellNameDisplay = document.getElementById('cellNameDisplay');
   if (cellAtomicNum) cellAtomicNum.textContent = element.dataset.atomic;
-  if (cellSymbolDisplay) cellSymbolDisplay.textContent = '?';
+  if (cellSymbolDisplay) {
+    cellSymbolDisplay.textContent = '—';
+    cellSymbolDisplay.classList.add('empty');
+  }
   if (cellNameDisplay) cellNameDisplay.textContent = '';
   
   mobileInput.value = '';
+  updateGcInputState();
   
   mobileInputModal.querySelector('.mobile-input-hint').classList.add('hidden');
   mobileInputModal.classList.remove('hidden');
@@ -591,6 +601,7 @@ function handleMobileSubmit() {
   
   validateInput(state.currentElement, value);
   
+  const gcInputBox = document.getElementById('gcInputBox');
   const cellDisplay = document.getElementById('cellSymbolDisplay');
   const cellName = document.getElementById('cellNameDisplay');
   
@@ -598,10 +609,10 @@ function handleMobileSubmit() {
     // Update mini table
     updateMiniTable(parseInt(state.currentElement.dataset.atomic), 'correct');
     
-    // Flash green feedback on cell display
-    if (cellDisplay) {
-      cellDisplay.parentElement.classList.add('cell-correct');
-      setTimeout(() => cellDisplay.parentElement.classList.remove('cell-correct'), 400);
+    // Flash green feedback on input box
+    if (gcInputBox) {
+      gcInputBox.classList.add('cell-correct');
+      setTimeout(() => gcInputBox.classList.remove('cell-correct'), 400);
     }
     
     updateMobileStats();
@@ -622,14 +633,27 @@ function handleMobileSubmit() {
   } else {
     // Flash red feedback
     updateMiniTable(parseInt(state.currentElement.dataset.atomic), 'incorrect');
-    if (cellDisplay) {
-      cellDisplay.parentElement.classList.add('cell-incorrect');
-      setTimeout(() => cellDisplay.parentElement.classList.remove('cell-incorrect'), 400);
+    if (gcInputBox) {
+      gcInputBox.classList.add('cell-incorrect');
+      setTimeout(() => gcInputBox.classList.remove('cell-incorrect'), 400);
     }
     mobileInput.value = '';
-    if (cellDisplay) cellDisplay.textContent = '?';
+    if (cellDisplay) {
+      cellDisplay.textContent = '—';
+      cellDisplay.classList.add('empty');
+    }
+    updateGcInputState();
     updateMobileStats();
   }
+}
+
+// Update game control zone input box visual state
+function updateGcInputState() {
+  const gcInputBox = document.getElementById('gcInputBox');
+  const gcBackspaceBtn = document.getElementById('gcBackspaceBtn');
+  const hasInput = mobileInput.value.length > 0;
+  if (gcInputBox) gcInputBox.classList.toggle('has-input', hasInput);
+  if (gcBackspaceBtn) gcBackspaceBtn.classList.toggle('hidden', !hasInput);
 }
 
 function formatSymbolInput(input) {
@@ -1386,8 +1410,10 @@ function handleQwertyKey(key) {
     if (mobileInput.value.length > 0) {
       mobileInput.value = mobileInput.value.slice(0, -1);
       if (cellSymbolDisplay) {
-        cellSymbolDisplay.textContent = mobileInput.value || '?';
+        cellSymbolDisplay.textContent = mobileInput.value || '—';
+        cellSymbolDisplay.classList.toggle('empty', !mobileInput.value);
       }
+      updateGcInputState();
     }
     return;
   }
@@ -1403,7 +1429,9 @@ function handleQwertyKey(key) {
     formatSymbolInput(mobileInput);
     if (cellSymbolDisplay) {
       cellSymbolDisplay.textContent = mobileInput.value;
+      cellSymbolDisplay.classList.remove('empty');
     }
+    updateGcInputState();
   }
 }
 
@@ -1574,10 +1602,14 @@ function updateMobileInputForElement(element) {
   const cellSymbolDisplay = document.getElementById('cellSymbolDisplay');
   const cellNameDisplay = document.getElementById('cellNameDisplay');
   if (cellAtomicNum) cellAtomicNum.textContent = element.dataset.atomic;
-  if (cellSymbolDisplay) cellSymbolDisplay.textContent = '?';
+  if (cellSymbolDisplay) {
+    cellSymbolDisplay.textContent = '—';
+    cellSymbolDisplay.classList.add('empty');
+  }
   if (cellNameDisplay) cellNameDisplay.textContent = '';
   
   mobileInput.value = '';
+  updateGcInputState();
   mobileInputModal.querySelector('.mobile-input-hint').classList.add('hidden');
   
   // Update mini table to highlight new current element

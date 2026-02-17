@@ -295,65 +295,71 @@
             <div id="miniPeriodicTable" class="mini-periodic-table"></div>
           </div>
 
-          <!-- Flexible spacer above cell for vertical centering -->
+          <!-- Flexible spacer above control zone -->
           <div class="mobile-flex-spacer"></div>
 
-          <!-- Cell-like Input Display (vertically centered) -->
-          <div class="mobile-cell-input-area">
-            <div class="mobile-cell-prompt">
-              <span class="mobile-input-number"></span>
-              <span class="mobile-input-category"></span>
+          <!-- Combined Element Info + Answer Input Card -->
+          <div class="gc-info-card">
+            <div class="gc-info-top">
+              <div class="gc-info-label">
+                <span class="mobile-input-number"></span>
+                <span class="mobile-input-category"></span>
+              </div>
+              <div class="gc-atomic-badge" id="cellAtomicNumber"></div>
             </div>
-            <div class="mobile-cell-display">
-              <div class="cell-atomic-number" id="cellAtomicNumber"></div>
-              <div class="cell-symbol-display" id="cellSymbolDisplay">?</div>
-              <div class="cell-name-display" id="cellNameDisplay"></div>
+            <div class="gc-input-box" id="gcInputBox">
+              <span class="cell-symbol-display" id="cellSymbolDisplay">—</span>
+              <button class="gc-backspace-btn hidden" id="gcBackspaceBtn" aria-label="Backspace">
+                <i class="ri-delete-back-2-line"></i>
+              </button>
             </div>
+            <div class="gc-name-display" id="cellNameDisplay"></div>
             <div class="mobile-input-hint hidden"></div>
           </div>
 
-          <!-- Flexible spacer below cell for vertical centering -->
+          <!-- Flexible spacer below info card -->
           <div class="mobile-flex-spacer"></div>
 
           <!-- Hidden real input for state tracking -->
           <input type="text" id="mobileInput" class="mobile-input-field-hidden" maxlength="3" autocomplete="off" inputmode="none" tabindex="-1" aria-hidden="true">
 
-          <!-- Navigation Controls (just above keyboard) -->
-          <div class="mobile-nav-row">
-            <!-- Left: D-pad arrow keys -->
-            <div class="mobile-dpad">
-              <div class="dpad-spacer"></div>
-              <button id="mobileArrowUp" class="mobile-nav-btn" title="Move up" aria-label="Move up">
-                <i class="ri-arrow-up-line"></i>
-              </button>
-              <div class="dpad-spacer"></div>
-              <button id="mobileArrowLeft" class="mobile-nav-btn" title="Move left" aria-label="Move left">
-                <i class="ri-arrow-left-line"></i>
-              </button>
-              <button id="mobileArrowDown" class="mobile-nav-btn" title="Move down" aria-label="Move down">
-                <i class="ri-arrow-down-line"></i>
-              </button>
-              <button id="mobileArrowRight" class="mobile-nav-btn" title="Move right" aria-label="Move right">
-                <i class="ri-arrow-right-line"></i>
+          <!-- Two-column Controls Row -->
+          <div class="gc-controls-row">
+            <!-- Left: D-pad card -->
+            <div class="gc-dpad-card">
+              <span class="gc-micro-label">NAVIGATE</span>
+              <div class="gc-dpad">
+                <div class="gc-dpad-top">
+                  <button id="mobileArrowUp" class="gc-dpad-btn" title="Move up" aria-label="Move up">
+                    <i class="ri-arrow-up-line"></i>
+                  </button>
+                </div>
+                <div class="gc-dpad-bottom">
+                  <button id="mobileArrowLeft" class="gc-dpad-btn" title="Move left" aria-label="Move left">
+                    <i class="ri-arrow-left-line"></i>
+                  </button>
+                  <button id="mobileArrowDown" class="gc-dpad-btn" title="Move down" aria-label="Move down">
+                    <i class="ri-arrow-down-line"></i>
+                  </button>
+                  <button id="mobileArrowRight" class="gc-dpad-btn" title="Move right" aria-label="Move right">
+                    <i class="ri-arrow-right-line"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!-- Right: Enter toggle + Finish -->
+            <div class="gc-right-col">
+              <div class="gc-enter-card">
+                <span class="gc-micro-label">AFTER ENTER, JUMP TO…</span>
+                <div class="gc-pill-toggle">
+                  <button class="gc-pill active" data-nav="horizontal">→ Next in Period</button>
+                  <button class="gc-pill" data-nav="vertical">↓ Next in Group</button>
+                </div>
+              </div>
+              <button id="mobileFinishBtn" class="gc-finish-btn" title="Finish Game" aria-label="Finish Game">
+                🏁 Finish Game
               </button>
             </div>
-            <!-- Right: Direction toggle -->
-            <div class="mobile-nav-direction">
-              <button class="mobile-nav-dir-btn active" data-nav="horizontal" title="Horizontal entry">
-                <i class="ri-arrow-right-line"></i>
-              </button>
-              <button class="mobile-nav-dir-btn" data-nav="vertical" title="Vertical entry">
-                <i class="ri-arrow-down-line"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- Finish Row -->
-          <div class="mobile-finish-row">
-            <button id="mobileFinishBtn" class="mobile-finish-btn" title="Finish" aria-label="Finish">
-              <i class="ri-flag-line"></i>
-              <span>Finish</span>
-            </button>
           </div>
 
           <!-- QWERTY Keyboard -->
