@@ -396,17 +396,39 @@ body {
 
 /* ===== UNIFIED HEADER ===== */
 .header {
-  height: 56px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 var(--space-lg);
+  flex-direction: column;
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border-color);
   position: sticky;
   top: 0;
   z-index: var(--z-sticky);
   backdrop-filter: blur(10px);
+}
+
+.header-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.header-buttons-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-md);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.header-stats-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px var(--space-md);
 }
 
 .header-left {
@@ -475,15 +497,14 @@ body {
   font-family: var(--font-display);
 }
 
-.header-center {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-}
-
-/* Stats are in the bottom HUD now — header-center is hidden */
+/* Stats strip in header */
 .inline-stats {
-  display: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 12px;
+  font-family: var(--font-mono);
 }
 
 .inline-stat {
@@ -520,9 +541,8 @@ body {
 }
 
 .stat-divider {
-  width: 1px;
-  height: 16px;
-  background: var(--border-color);
+  color: var(--border-color);
+  font-size: 10px;
 }
 
 .score-change {
@@ -561,10 +581,7 @@ body {
 }
 
 .header-right {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-  flex-shrink: 0;
+  display: none;
 }
 
 .header-icon-btn {
@@ -2059,7 +2076,6 @@ body {
 
 .close-modal-btn:hover {
   background: var(--bg-hover);
-  transform: rotate(90deg);
 }
 
 .modal-body {
@@ -2637,10 +2653,6 @@ body {
   :root {
     --space-xl: 24px;
     --space-2xl: 32px;
-  }
-  
-  .header {
-    padding: 0 var(--space-md);
   }
   
   .quick-settings {
