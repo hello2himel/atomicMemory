@@ -8,11 +8,6 @@ const APP_URL = 'https://atomicmemory.netlify.app';
 
 // State
 const state = {
-  navigationMode: 'period',
-  practiceMode: 'full',
-  selectedBlocks: [],
-  selectedGroups: [],
-  selectedPeriods: [],
   activeElements: new Set(),
   correctElements: new Set(),
   wrongAttempts: {},
@@ -46,7 +41,7 @@ const totalCountDisplay = document.getElementById('totalCount');
 const streakDisplay = document.getElementById('streakDisplay');
 const accuracyDisplay = document.getElementById('accuracyDisplay');
 const progressFill = document.getElementById('progressFill');
-const modeSelectionPanel = document.getElementById('modeSelectionPanel');
+const finishBtn = document.getElementById('finishBtn');
 const historyBtn = document.getElementById('historyBtn');
 const historyModal = document.getElementById('historyModal');
 const closeHistoryBtn = document.getElementById('closeHistoryBtn');
@@ -112,7 +107,11 @@ function startApp() {
     renderPeriodicTable();
     initializeFullTable();
     if (state.isMobile) {
-      showMobileSetupScreen();
+      // On mobile, directly start the challenge
+      const firstElement = findFirstActiveElement();
+      if (firstElement) {
+        openMobileInput(firstElement);
+      }
     }
   }, 600);
 }
@@ -138,33 +137,15 @@ function setupEventListeners() {
     localStorage.setItem('darkMode', !isDark);
   });
   
-  // Mode tabs
-  document.querySelectorAll('.mode-tab').forEach(tab => {
-    tab.addEventListener('click', (e) => {
-      document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
-      e.currentTarget.classList.add('active');
-      const mode = e.currentTarget.dataset.mode;
-      state.practiceMode = mode;
-      handleModeChange(mode);
-    });
-  });
-  
-  // Navigation toggle
-  document.querySelectorAll('.nav-option').forEach(option => {
-    option.addEventListener('click', (e) => {
-      document.querySelectorAll('.nav-option').forEach(o => o.classList.remove('active'));
-      e.currentTarget.classList.add('active');
-      state.navigationMode = e.currentTarget.dataset.nav;
-      localStorage.setItem('navigationMode', state.navigationMode);
-    });
-  });
-  
   // Reset button
   resetBtn.addEventListener('click', () => {
     if (confirm('Are you sure you want to reset? Your current progress will be lost.')) {
       resetChallenge();
     }
   });
+  
+  // Finish button
+  finishBtn.addEventListener('click', finishChallenge);
   
   // Hint button
   hintBtn.addEventListener('click', showHint);
@@ -215,6 +196,15 @@ function setupEventListeners() {
   });
   document.querySelector('.mobile-input-close').addEventListener('click', closeMobileInput);
   
+  // Mobile arrow key buttons
+  document.getElementById('mobileArrowUp').addEventListener('click', () => navigateToAdjacentElement('up'));
+  document.getElementById('mobileArrowDown').addEventListener('click', () => navigateToAdjacentElement('down'));
+  document.getElementById('mobileArrowLeft').addEventListener('click', () => navigateToAdjacentElement('left'));
+  document.getElementById('mobileArrowRight').addEventListener('click', () => navigateToAdjacentElement('right'));
+  
+  // Mobile finish button
+  document.getElementById('mobileFinishBtn').addEventListener('click', finishChallenge);
+  
   // Mobile toolbar buttons
   document.getElementById('mobileToolbarTheme').addEventListener('click', () => {
     darkModeBtn.click();
@@ -226,7 +216,10 @@ function setupEventListeners() {
     if (confirm('Reset current challenge?')) {
       resetChallenge();
       if (state.isMobile) {
-        showMobileSetupScreen();
+        const firstElement = findFirstActiveElement();
+        if (firstElement) {
+          openMobileInput(firstElement);
+        }
       }
     }
   });
@@ -234,15 +227,15 @@ function setupEventListeners() {
   // Complete modal
   closeCompleteBtn.addEventListener('click', () => {
     closeModal(completeModal);
-    if (state.isMobile) {
-      showMobileSetupScreen();
-    }
   });
   playAgainBtn.addEventListener('click', () => {
     closeModal(completeModal);
     resetChallenge();
     if (state.isMobile) {
-      showMobileSetupScreen();
+      const firstElement = findFirstActiveElement();
+      if (firstElement) {
+        openMobileInput(firstElement);
+      }
     }
   });
   shareScoreBtn.addEventListener('click', shareScore);
@@ -282,18 +275,6 @@ function setupEventListeners() {
   
   // Table interaction
   periodicTable.addEventListener('click', handleElementClick);
-  
-  // Load saved navigation preference
-  const savedNav = localStorage.getItem('navigationMode');
-  if (savedNav) {
-    state.navigationMode = savedNav;
-    document.querySelectorAll('.nav-option').forEach(option => {
-      if (option.dataset.nav === savedNav) {
-        document.querySelectorAll('.nav-option').forEach(o => o.classList.remove('active'));
-        option.classList.add('active');
-      }
-    });
-  }
 }
 
 // Mobile Menu
@@ -322,151 +303,6 @@ function openMobileMenu() {
   `;
   
   mobileMenu.classList.remove('hidden');
-}
-
-// Mode Change Handler
-function handleModeChange(mode) {
-  modeSelectionPanel.innerHTML = '';
-  
-  // Auto-select best navigation for the mode
-  setNavigationForMode(mode);
-  
-  switch (mode) {
-    case 'full':
-      modeSelectionPanel.classList.add('hidden');
-      initializeFullTable();
-      break;
-    case 'block':
-      modeSelectionPanel.classList.remove('hidden');
-      createBlockSelector();
-      break;
-    case 'group':
-      modeSelectionPanel.classList.remove('hidden');
-      createGroupSelector();
-      break;
-    case 'period':
-      modeSelectionPanel.classList.remove('hidden');
-      createPeriodSelector();
-      break;
-  }
-}
-
-// Auto-select navigation direction based on practice mode
-function setNavigationForMode(mode) {
-  const nav = (mode === 'group') ? 'group' : 'period';
-  state.navigationMode = nav;
-  localStorage.setItem('navigationMode', nav);
-  
-  // Sync desktop nav toggle UI
-  document.querySelectorAll('.nav-option').forEach(o => o.classList.remove('active'));
-  const mainOpt = document.querySelector(`.nav-option[data-nav="${nav}"]`);
-  if (mainOpt) mainOpt.classList.add('active');
-  
-  // Sync mobile setup nav toggle UI
-  document.querySelectorAll('.mobile-setup-nav-option').forEach(o => o.classList.remove('active'));
-  const mobileOpt = document.querySelector(`.mobile-setup-nav-option[data-nav="${nav}"]`);
-  if (mobileOpt) mobileOpt.classList.add('active');
-}
-
-// Selectors
-function createBlockSelector() {
-  modeSelectionPanel.innerHTML = `
-    <div class="selector-title">Select Blocks</div>
-    <div class="selector-options">
-      ${['s', 'p', 'd', 'f'].map(block => `
-        <label class="checkbox-option">
-          <input type="checkbox" value="${block}" class="block-checkbox">
-          <span>${block.toUpperCase()}-Block</span>
-        </label>
-      `).join('')}
-    </div>
-    <button class="apply-selection-btn">Apply Selection</button>
-  `;
-  
-  document.querySelector('.apply-selection-btn').addEventListener('click', () => {
-    state.selectedBlocks = Array.from(document.querySelectorAll('.block-checkbox:checked')).map(cb => cb.value);
-    if (state.selectedBlocks.length === 0) {
-      showHintToast('Please select at least one block');
-      return;
-    }
-    applySelection();
-    modeSelectionPanel.classList.add('hidden');
-  });
-}
-
-function createGroupSelector() {
-  const groups = Array.from({length: 18}, (_, i) => i + 1);
-  modeSelectionPanel.innerHTML = `
-    <div class="selector-title">Select Groups</div>
-    <div class="selector-options group-grid">
-      ${groups.map(g => `
-        <label class="checkbox-option">
-          <input type="checkbox" value="${g}" class="group-checkbox">
-          <span>${g}</span>
-        </label>
-      `).join('')}
-    </div>
-    <button class="apply-selection-btn">Apply Selection</button>
-  `;
-  
-  document.querySelector('.apply-selection-btn').addEventListener('click', () => {
-    state.selectedGroups = Array.from(document.querySelectorAll('.group-checkbox:checked')).map(cb => parseInt(cb.value));
-    if (state.selectedGroups.length === 0) {
-      showHintToast('Please select at least one group');
-      return;
-    }
-    applySelection();
-    modeSelectionPanel.classList.add('hidden');
-  });
-}
-
-function createPeriodSelector() {
-  const periods = Array.from({length: 7}, (_, i) => i + 1);
-  modeSelectionPanel.innerHTML = `
-    <div class="selector-title">Select Periods</div>
-    <div class="selector-options">
-      ${periods.map(p => `
-        <label class="checkbox-option">
-          <input type="checkbox" value="${p}" class="period-checkbox">
-          <span>${p}</span>
-        </label>
-      `).join('')}
-    </div>
-    <button class="apply-selection-btn">Apply Selection</button>
-  `;
-  
-  document.querySelector('.apply-selection-btn').addEventListener('click', () => {
-    state.selectedPeriods = Array.from(document.querySelectorAll('.period-checkbox:checked')).map(cb => parseInt(cb.value));
-    if (state.selectedPeriods.length === 0) {
-      showHintToast('Please select at least one period');
-      return;
-    }
-    applySelection();
-    modeSelectionPanel.classList.add('hidden');
-  });
-}
-
-// Apply Selection
-function applySelection() {
-  state.activeElements.clear();
-  
-  ELEMENTS.forEach(element => {
-    let isActive = false;
-    
-    if (state.practiceMode === 'block') {
-      isActive = state.selectedBlocks.includes(element.block);
-    } else if (state.practiceMode === 'group') {
-      isActive = element.group !== null && state.selectedGroups.includes(element.group);
-    } else if (state.practiceMode === 'period') {
-      isActive = state.selectedPeriods.includes(element.period);
-    }
-    
-    if (isActive) {
-      state.activeElements.add(element.atomicNumber);
-    }
-  });
-  
-  resetChallenge();
 }
 
 function initializeFullTable() {
@@ -601,8 +437,6 @@ function handleElementClick(e) {
   if (!state.activeElements.has(parseInt(element.dataset.atomic))) return;
   
   if (state.isMobile) {
-    // Don't process clicks when setup screen is visible
-    if (!mobileSetupScreen.classList.contains('hidden')) return;
     // When modal is already open, just update it
     if (!mobileInputModal.classList.contains('hidden')) {
       updateMobileInputForElement(element);
@@ -658,10 +492,6 @@ function openMobileInput(element) {
 function closeMobileInput() {
   mobileInputModal.classList.add('hidden');
   state.currentElement = null;
-  // On mobile, go back to setup screen since there's no desktop UI
-  if (state.isMobile) {
-    showMobileSetupScreen();
-  }
 }
 
 function handleMobileSubmit() {
@@ -754,6 +584,10 @@ function activateElement(element) {
       input.remove();
       element.classList.remove('active');
       state.currentElement = null;
+    } else if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+      e.preventDefault();
+      const direction = e.key.replace('Arrow', '').toLowerCase();
+      navigateToAdjacentElement(direction);
     }
   });
   
@@ -889,42 +723,28 @@ function moveToNextElement(currentElement) {
   
   let nextElement = null;
   
-  if (state.navigationMode === 'period') {
-    if (currentCategory === 'lanthanide') {
-      nextElement = findNextInCategory('lanthanide', atomic);
-      if (!nextElement) {
-        nextElement = findFirstInPeriod(6, 71);
-      }
-    } else if (currentCategory === 'actinide') {
-      nextElement = findNextInCategory('actinide', atomic);
-      if (!nextElement) {
-        nextElement = findFirstInPeriod(7, 103);
-      }
-    } else if (currentGroup === 18) {
-      nextElement = findFirstInPeriod(currentPeriod + 1);
-    } else {
-      nextElement = findNextInPeriod(currentPeriod, atomic);
-      if (!nextElement) {
-        nextElement = findFirstInPeriod(currentPeriod + 1);
-      }
+  // Always use horizontal (period) navigation for auto-advance
+  if (currentCategory === 'lanthanide') {
+    nextElement = findNextInCategory('lanthanide', atomic);
+    if (!nextElement) {
+      nextElement = findFirstInPeriod(6, 71);
     }
+  } else if (currentCategory === 'actinide') {
+    nextElement = findNextInCategory('actinide', atomic);
+    if (!nextElement) {
+      nextElement = findFirstInPeriod(7, 103);
+    }
+  } else if (currentGroup === 18) {
+    nextElement = findFirstInPeriod(currentPeriod + 1);
   } else {
-    if (currentCategory === 'lanthanide' || currentCategory === 'actinide') {
-      nextElement = findNextInCategory(currentCategory, atomic);
-      if (!nextElement && currentCategory === 'lanthanide') {
-        nextElement = findFirstInCategory('actinide');
-      }
-    } else if (currentGroup) {
-      nextElement = findNextInGroup(currentGroup, currentPeriod);
-      if (!nextElement) {
-        nextElement = findFirstInGroup(currentGroup + 1);
-      }
+    nextElement = findNextInPeriod(currentPeriod, atomic);
+    if (!nextElement) {
+      nextElement = findFirstInPeriod(currentPeriod + 1);
     }
   }
   
   if (nextElement && !nextElement.classList.contains('correct') && !nextElement.classList.contains('disabled')) {
     if (state.isMobile) {
-      // On mobile, if modal is open update in-place; otherwise open it
       if (!mobileInputModal.classList.contains('hidden')) {
         updateMobileInputForElement(nextElement);
       } else {
@@ -1141,29 +961,11 @@ function checkAchievements(challengeComplete = false) {
 
 // Config
 function getConfigKey() {
-  if (state.practiceMode === 'full') {
-    return 'full';
-  } else if (state.practiceMode === 'block') {
-    return `block-${state.selectedBlocks.sort().join(',')}`;
-  } else if (state.practiceMode === 'group') {
-    return `group-${state.selectedGroups.sort().join(',')}`;
-  } else if (state.practiceMode === 'period') {
-    return `period-${state.selectedPeriods.sort().join(',')}`;
-  }
-  return 'default';
+  return 'full';
 }
 
 function getModeLabel() {
-  if (state.practiceMode === 'full') {
-    return 'Full Table (118 elements)';
-  } else if (state.practiceMode === 'block') {
-    return `Blocks: ${state.selectedBlocks.join(', ').toUpperCase()}`;
-  } else if (state.practiceMode === 'group') {
-    return `Groups: ${state.selectedGroups.join(', ')}`;
-  } else if (state.practiceMode === 'period') {
-    return `Periods: ${state.selectedPeriods.join(', ')}`;
-  }
-  return 'Custom';
+  return 'Full Table (118 elements)';
 }
 
 // Stats
@@ -1368,19 +1170,11 @@ function showCompleteModal() {
 }
 
 function getShareFocusLabel() {
-  if (state.practiceMode === 'full') return 'All 118 Elements';
-  if (state.practiceMode === 'block') return `${state.selectedBlocks.map(b => `${b}-block`).join(', ')}`;
-  if (state.practiceMode === 'group') return `Group ${state.selectedGroups.join(', ')}`;
-  if (state.practiceMode === 'period') return `Period ${state.selectedPeriods.join(', ')}`;
-  return 'Custom';
+  return 'All 118 Elements';
 }
 
 function getShareModeLabel() {
-  if (state.practiceMode === 'full') return 'Full Table';
-  if (state.practiceMode === 'block') return 'Block Practice';
-  if (state.practiceMode === 'group') return 'Group Practice';
-  if (state.practiceMode === 'period') return 'Period Practice';
-  return 'Custom';
+  return 'Full Table';
 }
 
 function shareScore() {
@@ -1432,311 +1226,7 @@ function saveToHistory() {
   localStorage.setItem('history', JSON.stringify(history));
 }
 
-// ===== MOBILE SETUP & PERSISTENT MODAL =====
-
-function showMobileSetupScreen() {
-  const screen = mobileSetupScreen;
-  
-  screen.innerHTML = `
-    <div class="mobile-setup-header">
-      <div class="mobile-setup-logo-row">
-        <div class="logo-grid mobile-setup-logo" aria-label="AtomicMemory">
-          <span class="lg-cell" style="background:#ef4444"></span>
-          <span class="lg-empty"></span>
-          <span class="lg-empty"></span>
-          <span class="lg-empty"></span>
-          <span class="lg-cell" style="background:#ec4899"></span>
-          <span class="lg-cell" style="background:#f97316"></span>
-          <span class="lg-empty"></span>
-          <span class="lg-cell" style="background:#10b981"></span>
-          <span class="lg-cell" style="background:#3b82f6"></span>
-          <span class="lg-cell" style="background:#8b5cf6"></span>
-          <span class="lg-cell" style="background:#06b6d4"></span>
-          <span class="lg-cell" style="background:#eab308"></span>
-          <span class="lg-cell" style="background:#ec4899"></span>
-          <span class="lg-cell" style="background:#f59e0b"></span>
-          <span class="lg-cell" style="background:#84cc16"></span>
-          <span class="lg-empty"></span>
-          <span class="lg-cell" style="background:#3b82f6"></span>
-          <span class="lg-cell" style="background:#ef4444"></span>
-          <span class="lg-cell" style="background:#f97316"></span>
-          <span class="lg-empty"></span>
-        </div>
-        <div class="mobile-setup-title">AtomicMemory</div>
-      </div>
-      <div class="mobile-setup-subtitle">Configure your challenge</div>
-    </div>
-
-    <div id="mobileSetupPreviewContainer" class="mobile-setup-preview">
-      <div id="mobileSetupPreviewTable" class="mini-periodic-table"></div>
-    </div>
-    
-    <div class="mobile-setup-section">
-      <div class="mobile-setup-section-title">
-        <i class="ri-gamepad-line"></i> Mode
-      </div>
-      <div class="mobile-setup-mode-tabs">
-        <button class="mobile-setup-mode-tab ${state.practiceMode === 'full' ? 'active' : ''}" data-mode="full">
-          <i class="ri-table-2"></i>
-          Full
-        </button>
-        <button class="mobile-setup-mode-tab ${state.practiceMode === 'block' ? 'active' : ''}" data-mode="block">
-          <i class="ri-shapes-line"></i>
-          Blocks
-        </button>
-        <button class="mobile-setup-mode-tab ${state.practiceMode === 'group' ? 'active' : ''}" data-mode="group">
-          <i class="ri-layout-column-line"></i>
-          Groups
-        </button>
-        <button class="mobile-setup-mode-tab ${state.practiceMode === 'period' ? 'active' : ''}" data-mode="period">
-          <i class="ri-layout-row-line"></i>
-          Periods
-        </button>
-      </div>
-      <div id="mobileSetupSelectors" class="mobile-setup-selectors"></div>
-    </div>
-    
-    <div class="mobile-setup-section">
-      <div class="mobile-setup-section-title">
-        <i class="ri-compass-3-line"></i> Navigation
-      </div>
-      <div class="mobile-setup-nav-toggle">
-        <button class="mobile-setup-nav-option ${state.navigationMode === 'period' ? 'active' : ''}" data-nav="period">
-          <i class="ri-arrow-right-line"></i> Horizontal
-        </button>
-        <button class="mobile-setup-nav-option ${state.navigationMode === 'group' ? 'active' : ''}" data-nav="group">
-          <i class="ri-arrow-down-line"></i> Vertical
-        </button>
-      </div>
-    </div>
-    
-    <button class="mobile-start-btn" id="mobileStartBtn">
-      <i class="ri-play-fill"></i>
-      Start Challenge
-    </button>
-    
-    <div class="mobile-setup-toolbar">
-      <button class="mobile-setup-toolbar-btn" id="setupHistoryBtn" title="History">
-        <i class="ri-history-line"></i>
-      </button>
-      <button class="mobile-setup-toolbar-btn" id="setupLeaderboardBtn" title="Leaderboard">
-        <i class="ri-trophy-line"></i>
-      </button>
-      <button class="mobile-setup-toolbar-btn" id="setupAchievementsBtn" title="Achievements">
-        <i class="ri-medal-line"></i>
-      </button>
-      <button class="mobile-setup-toolbar-btn" id="setupThemeBtn" title="Toggle theme">
-        <i class="${document.body.dataset.theme === 'dark' ? 'ri-sun-line' : 'ri-moon-line'}"></i>
-      </button>
-      <button class="mobile-setup-toolbar-btn" id="setupInfoBtn" title="Info">
-        <i class="ri-information-line"></i>
-      </button>
-    </div>
-  `;
-  
-  // Mode tab listeners
-  screen.querySelectorAll('.mobile-setup-mode-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      screen.querySelectorAll('.mobile-setup-mode-tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      state.practiceMode = tab.dataset.mode;
-      
-      // Also sync the main mode tabs
-      document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
-      const mainTab = document.querySelector(`.mode-tab[data-mode="${tab.dataset.mode}"]`);
-      if (mainTab) mainTab.classList.add('active');
-      
-      // Auto-select best navigation for the mode
-      setNavigationForMode(tab.dataset.mode);
-      
-      updateMobileSetupSelectors();
-      renderSetupPreviewTable();
-    });
-  });
-  
-  // Nav toggle listeners
-  screen.querySelectorAll('.mobile-setup-nav-option').forEach(option => {
-    option.addEventListener('click', () => {
-      screen.querySelectorAll('.mobile-setup-nav-option').forEach(o => o.classList.remove('active'));
-      option.classList.add('active');
-      state.navigationMode = option.dataset.nav;
-      localStorage.setItem('navigationMode', state.navigationMode);
-      
-      // Sync main nav toggles
-      document.querySelectorAll('.nav-option').forEach(o => o.classList.remove('active'));
-      const mainOpt = document.querySelector(`.nav-option[data-nav="${option.dataset.nav}"]`);
-      if (mainOpt) mainOpt.classList.add('active');
-    });
-  });
-  
-  // Start button
-  screen.querySelector('#mobileStartBtn').addEventListener('click', startMobileChallenge);
-  
-  // Setup toolbar listeners
-  screen.querySelector('#setupHistoryBtn').addEventListener('click', openHistoryModal);
-  screen.querySelector('#setupLeaderboardBtn').addEventListener('click', openLeaderboardModal);
-  screen.querySelector('#setupAchievementsBtn').addEventListener('click', openAchievementsModal);
-  screen.querySelector('#setupThemeBtn').addEventListener('click', () => {
-    darkModeBtn.click();
-    const icon = screen.querySelector('#setupThemeBtn i');
-    icon.className = document.body.dataset.theme === 'dark' ? 'ri-sun-line' : 'ri-moon-line';
-  });
-  screen.querySelector('#setupInfoBtn').addEventListener('click', openInfoModal);
-  
-  updateMobileSetupSelectors();
-  renderSetupPreviewTable();
-  screen.classList.remove('hidden');
-}
-
-function updateMobileSetupSelectors() {
-  const container = document.getElementById('mobileSetupSelectors');
-  if (!container) return;
-  
-  container.innerHTML = '';
-  
-  if (state.practiceMode === 'block') {
-    container.innerHTML = `
-      <div class="mobile-setup-selector-grid">
-        ${['s', 'p', 'd', 'f'].map(block => `
-          <label class="mobile-setup-checkbox-option">
-            <input type="checkbox" value="${block}" class="mobile-block-checkbox">
-            <span>${block.toUpperCase()}-Block</span>
-          </label>
-        `).join('')}
-      </div>
-    `;
-  } else if (state.practiceMode === 'group') {
-    const groups = Array.from({length: 18}, (_, i) => i + 1);
-    container.innerHTML = `
-      <div class="mobile-setup-selector-grid">
-        ${groups.map(g => `
-          <label class="mobile-setup-checkbox-option">
-            <input type="checkbox" value="${g}" class="mobile-group-checkbox">
-            <span>${g}</span>
-          </label>
-        `).join('')}
-      </div>
-    `;
-  } else if (state.practiceMode === 'period') {
-    const periods = Array.from({length: 7}, (_, i) => i + 1);
-    container.innerHTML = `
-      <div class="mobile-setup-selector-grid">
-        ${periods.map(p => `
-          <label class="mobile-setup-checkbox-option">
-            <input type="checkbox" value="${p}" class="mobile-period-checkbox">
-            <span>${p}</span>
-          </label>
-        `).join('')}
-      </div>
-    `;
-  }
-  
-  // Listen to checkbox changes to update preview table
-  container.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-    cb.addEventListener('change', () => renderSetupPreviewTable());
-  });
-}
-
-function renderSetupPreviewTable() {
-  const previewTable = document.getElementById('mobileSetupPreviewTable');
-  if (!previewTable) return;
-  previewTable.innerHTML = '';
-  
-  // Determine which elements are active based on current mode/selections
-  const activeSet = new Set();
-  const mode = state.practiceMode;
-  
-  if (mode === 'full') {
-    ELEMENTS.forEach(el => activeSet.add(el.atomicNumber));
-  } else if (mode === 'block') {
-    const checked = Array.from(document.querySelectorAll('.mobile-block-checkbox:checked')).map(cb => cb.value);
-    if (checked.length > 0) {
-      ELEMENTS.forEach(el => { if (checked.includes(el.block)) activeSet.add(el.atomicNumber); });
-    } else {
-      ELEMENTS.forEach(el => activeSet.add(el.atomicNumber));
-    }
-  } else if (mode === 'group') {
-    const checked = Array.from(document.querySelectorAll('.mobile-group-checkbox:checked')).map(cb => parseInt(cb.value));
-    if (checked.length > 0) {
-      ELEMENTS.forEach(el => { if (el.group && checked.includes(el.group)) activeSet.add(el.atomicNumber); });
-    } else {
-      ELEMENTS.forEach(el => activeSet.add(el.atomicNumber));
-    }
-  } else if (mode === 'period') {
-    const checked = Array.from(document.querySelectorAll('.mobile-period-checkbox:checked')).map(cb => parseInt(cb.value));
-    if (checked.length > 0) {
-      ELEMENTS.forEach(el => { if (checked.includes(el.period)) activeSet.add(el.atomicNumber); });
-    } else {
-      ELEMENTS.forEach(el => activeSet.add(el.atomicNumber));
-    }
-  }
-  
-  const layout = getMiniTableLayout();
-  
-  layout.forEach(item => {
-    if (item === 'spacer' || item === 'label' || item === 'placeholder') {
-      const spacer = document.createElement('div');
-      spacer.className = 'mini-spacer';
-      previewTable.appendChild(spacer);
-    } else {
-      const cell = document.createElement('div');
-      cell.className = 'mini-cell';
-      const elData = ELEMENTS_MAP[item];
-      if (elData) {
-        cell.style.background = getCategoryColor(elData.category);
-        cell.style.borderColor = getCategoryColor(elData.category);
-      }
-      if (!activeSet.has(item)) {
-        cell.classList.add('mini-disabled');
-      }
-      previewTable.appendChild(cell);
-    }
-  });
-}
-
-function hideMobileSetupScreen() {
-  mobileSetupScreen.classList.add('hidden');
-}
-
-function startMobileChallenge() {
-  const mode = state.practiceMode;
-  
-  if (mode === 'block') {
-    state.selectedBlocks = Array.from(document.querySelectorAll('.mobile-block-checkbox:checked')).map(cb => cb.value);
-    if (state.selectedBlocks.length === 0) {
-      showHintToast('Please select at least one block');
-      return;
-    }
-  } else if (mode === 'group') {
-    state.selectedGroups = Array.from(document.querySelectorAll('.mobile-group-checkbox:checked')).map(cb => parseInt(cb.value));
-    if (state.selectedGroups.length === 0) {
-      showHintToast('Please select at least one group');
-      return;
-    }
-  } else if (mode === 'period') {
-    state.selectedPeriods = Array.from(document.querySelectorAll('.mobile-period-checkbox:checked')).map(cb => parseInt(cb.value));
-    if (state.selectedPeriods.length === 0) {
-      showHintToast('Please select at least one period');
-      return;
-    }
-  }
-  
-  hideMobileSetupScreen();
-  
-  // Apply mode
-  if (mode === 'full') {
-    handleModeChange('full');
-  } else {
-    handleModeChange(mode);
-    applySelection();
-  }
-  
-  // Find first active element and open persistent modal
-  const firstElement = findFirstActiveElement();
-  if (firstElement) {
-    openMobileInput(firstElement);
-  }
-}
+// ===== MOBILE PERSISTENT MODAL =====
 
 function findFirstActiveElement() {
   const elements = Array.from(document.querySelectorAll('.element'))
@@ -1790,12 +1280,8 @@ function renderMiniTable() {
       cell.className = 'mini-cell';
       cell.dataset.atomic = item;
       
-      // Color by category
-      const elData = ELEMENTS_MAP[item];
-      if (elData) {
-        cell.style.background = getCategoryColor(elData.category);
-        cell.style.borderColor = getCategoryColor(elData.category);
-      }
+      // No category colors — cells are blank/neutral
+      // Only correctly answered elements get colored (green)
       
       // Mark disabled if not active
       if (!state.activeElements.has(item)) {
@@ -1843,20 +1329,11 @@ function updateMiniTable(atomicNumber, status) {
   if (status === 'correct') {
     cell.classList.remove('mini-incorrect');
     cell.classList.add('mini-correct');
-    cell.style.background = '';
-    cell.style.borderColor = '';
   } else if (status === 'incorrect') {
     cell.classList.add('mini-incorrect');
-    cell.style.background = '';
-    cell.style.borderColor = '';
-    // Flash red then revert
+    // Flash red then revert to neutral
     setTimeout(() => {
       cell.classList.remove('mini-incorrect');
-      const elData = ELEMENTS_MAP[atomicNumber];
-      if (elData && !state.correctElements.has(atomicNumber)) {
-        cell.style.background = getCategoryColor(elData.category);
-        cell.style.borderColor = getCategoryColor(elData.category);
-      }
     }, 600);
   } else if (status === 'current') {
     cell.classList.add('mini-current');
@@ -1924,36 +1401,23 @@ function findNextElementAuto(currentElement) {
   
   let nextElement = null;
   
-  if (state.navigationMode === 'period') {
-    if (currentCategory === 'lanthanide') {
-      nextElement = findNextInCategory('lanthanide', atomic);
-      if (!nextElement) {
-        nextElement = findFirstInPeriod(6, 71);
-      }
-    } else if (currentCategory === 'actinide') {
-      nextElement = findNextInCategory('actinide', atomic);
-      if (!nextElement) {
-        nextElement = findFirstInPeriod(7, 103);
-      }
-    } else if (currentGroup === 18) {
-      nextElement = findFirstInPeriod(currentPeriod + 1);
-    } else {
-      nextElement = findNextInPeriod(currentPeriod, atomic);
-      if (!nextElement) {
-        nextElement = findFirstInPeriod(currentPeriod + 1);
-      }
+  // Always use horizontal (period) navigation for auto-advance
+  if (currentCategory === 'lanthanide') {
+    nextElement = findNextInCategory('lanthanide', atomic);
+    if (!nextElement) {
+      nextElement = findFirstInPeriod(6, 71);
     }
+  } else if (currentCategory === 'actinide') {
+    nextElement = findNextInCategory('actinide', atomic);
+    if (!nextElement) {
+      nextElement = findFirstInPeriod(7, 103);
+    }
+  } else if (currentGroup === 18) {
+    nextElement = findFirstInPeriod(currentPeriod + 1);
   } else {
-    if (currentCategory === 'lanthanide' || currentCategory === 'actinide') {
-      nextElement = findNextInCategory(currentCategory, atomic);
-      if (!nextElement && currentCategory === 'lanthanide') {
-        nextElement = findFirstInCategory('actinide');
-      }
-    } else if (currentGroup) {
-      nextElement = findNextInGroup(currentGroup, currentPeriod);
-      if (!nextElement) {
-        nextElement = findFirstInGroup(currentGroup + 1);
-      }
+    nextElement = findNextInPeriod(currentPeriod, atomic);
+    if (!nextElement) {
+      nextElement = findFirstInPeriod(currentPeriod + 1);
     }
   }
   
@@ -1967,4 +1431,98 @@ function findNextElementAuto(currentElement) {
   }
   
   return nextElement;
+}
+
+// Arrow key navigation between element cells
+function navigateToAdjacentElement(direction) {
+  if (!state.currentElement) return;
+  
+  const currentAtomic = parseInt(state.currentElement.dataset.atomic);
+  const currentPeriod = parseInt(state.currentElement.dataset.period);
+  const currentGroup = parseInt(state.currentElement.dataset.group) || null;
+  const currentCategory = state.currentElement.dataset.category;
+  
+  let targetElement = null;
+  
+  // Build a grid-based lookup of elements by position
+  const allElements = Array.from(document.querySelectorAll('.element'))
+    .filter(el => !el.classList.contains('placeholder') && !el.classList.contains('disabled'));
+  
+  if (direction === 'left' || direction === 'right') {
+    // Navigate within the same period (or category for lanthanides/actinides)
+    const sameRow = allElements
+      .filter(el => {
+        if (currentCategory === 'lanthanide' || currentCategory === 'actinide') {
+          return el.dataset.category === currentCategory;
+        }
+        return parseInt(el.dataset.period) === currentPeriod && 
+               el.dataset.category !== 'lanthanide' && el.dataset.category !== 'actinide';
+      })
+      .sort((a, b) => parseInt(a.dataset.atomic) - parseInt(b.dataset.atomic));
+    
+    const currentIndex = sameRow.findIndex(el => parseInt(el.dataset.atomic) === currentAtomic);
+    if (currentIndex !== -1) {
+      if (direction === 'left' && currentIndex > 0) {
+        targetElement = sameRow[currentIndex - 1];
+      } else if (direction === 'right' && currentIndex < sameRow.length - 1) {
+        targetElement = sameRow[currentIndex + 1];
+      }
+    }
+  } else if (direction === 'up' || direction === 'down') {
+    // Navigate within the same group (column)
+    if (currentGroup) {
+      const sameCol = allElements
+        .filter(el => parseInt(el.dataset.group) === currentGroup &&
+                      el.dataset.category !== 'lanthanide' && el.dataset.category !== 'actinide')
+        .sort((a, b) => parseInt(a.dataset.period) - parseInt(b.dataset.period));
+      
+      const currentIndex = sameCol.findIndex(el => parseInt(el.dataset.atomic) === currentAtomic);
+      if (currentIndex !== -1) {
+        if (direction === 'up' && currentIndex > 0) {
+          targetElement = sameCol[currentIndex - 1];
+        } else if (direction === 'down' && currentIndex < sameCol.length - 1) {
+          targetElement = sameCol[currentIndex + 1];
+        }
+      }
+    } else if (currentCategory === 'lanthanide' || currentCategory === 'actinide') {
+      // For lanthanides/actinides, up/down moves between the two series
+      const elData = ELEMENTS_MAP[currentAtomic];
+      if (elData) {
+        // Lanthanides are 57-71, Actinides are 89-103
+        // Map position within series
+        const offset = currentCategory === 'lanthanide' ? currentAtomic - 57 : currentAtomic - 89;
+        let targetAtomic;
+        if (direction === 'down' && currentCategory === 'lanthanide') {
+          targetAtomic = 89 + offset;
+        } else if (direction === 'up' && currentCategory === 'actinide') {
+          targetAtomic = 57 + offset;
+        }
+        if (targetAtomic) {
+          targetElement = allElements.find(el => parseInt(el.dataset.atomic) === targetAtomic) || null;
+        }
+      }
+    }
+  }
+  
+  if (targetElement && !targetElement.classList.contains('correct')) {
+    if (state.isMobile) {
+      updateMobileInputForElement(targetElement);
+    } else {
+      activateElement(targetElement);
+    }
+  }
+}
+
+// Finish challenge early (with partial completion)
+function finishChallenge() {
+  if (state.correctElements.size === 0) {
+    showHintToast('Answer at least one element before finishing!');
+    return;
+  }
+  
+  if (!confirm(`Finish with ${state.correctElements.size}/${state.activeElements.size} elements? Your score will be calculated based on what you've completed.`)) {
+    return;
+  }
+  
+  completeChallenge();
 }

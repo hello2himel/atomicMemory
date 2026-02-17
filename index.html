@@ -150,38 +150,6 @@
 
     <!-- Slim Control Bar -->
     <div class="quick-settings">
-      <div class="settings-left">
-        <div class="mode-tabs">
-          <button class="mode-tab active" data-mode="full" title="All 118 elements">
-            <i class="ri-table-2"></i>
-            <span>Full</span>
-          </button>
-          <button class="mode-tab" data-mode="block" title="Practice by blocks">
-            <i class="ri-shapes-line"></i>
-            <span>Blocks</span>
-          </button>
-          <button class="mode-tab" data-mode="group" title="Practice by groups">
-            <i class="ri-layout-column-line"></i>
-            <span>Groups</span>
-          </button>
-          <button class="mode-tab" data-mode="period" title="Practice by periods">
-            <i class="ri-layout-row-line"></i>
-            <span>Periods</span>
-          </button>
-        </div>
-
-        <div class="nav-toggle">
-          <button class="nav-option active" data-nav="period" title="Move horizontally">
-            <i class="ri-arrow-right-line"></i>
-            <span>Horizontal</span>
-          </button>
-          <button class="nav-option" data-nav="group" title="Move vertically">
-            <i class="ri-arrow-down-line"></i>
-            <span>Vertical</span>
-          </button>
-        </div>
-      </div>
-
       <div class="settings-right">
         <button id="viewTableBtn" class="action-btn view-btn" title="View periodic table">
           <i class="ri-eye-line"></i>
@@ -191,15 +159,16 @@
           <i class="ri-lightbulb-line"></i>
           <span>Hint</span>
         </button>
+        <button id="finishBtn" class="action-btn finish-btn" title="Finish challenge">
+          <i class="ri-flag-line"></i>
+          <span>Finish</span>
+        </button>
         <button id="resetBtn" class="action-btn reset-btn" title="Reset challenge">
           <i class="ri-restart-line"></i>
           <span>Reset</span>
         </button>
       </div>
     </div>
-
-    <!-- Mode Selection Panel -->
-    <div id="modeSelectionPanel" class="mode-selection-panel hidden"></div>
 
     <!-- Periodic Table Container -->
     <main class="table-container">
@@ -276,6 +245,26 @@
               Submit
             </button>
           </div>
+          <div class="mobile-arrow-keys">
+            <button id="mobileArrowUp" class="mobile-arrow-btn" title="Move up" aria-label="Move up">
+              <i class="ri-arrow-up-line"></i>
+            </button>
+            <div class="mobile-arrow-row">
+              <button id="mobileArrowLeft" class="mobile-arrow-btn" title="Move left" aria-label="Move left">
+                <i class="ri-arrow-left-line"></i>
+              </button>
+              <button id="mobileArrowDown" class="mobile-arrow-btn" title="Move down" aria-label="Move down">
+                <i class="ri-arrow-down-line"></i>
+              </button>
+              <button id="mobileArrowRight" class="mobile-arrow-btn" title="Move right" aria-label="Move right">
+                <i class="ri-arrow-right-line"></i>
+              </button>
+            </div>
+          </div>
+          <button id="mobileFinishBtn" class="mobile-finish-btn">
+            <i class="ri-flag-line"></i>
+            Finish
+          </button>
           <div class="mobile-input-hint hidden"></div>
         </div>
       </div>
