@@ -318,20 +318,26 @@
           <!-- Hidden real input for state tracking -->
           <input type="text" id="mobileInput" class="mobile-input-field-hidden" maxlength="3" autocomplete="off" inputmode="none" tabindex="-1" aria-hidden="true">
 
-          <!-- Arrow Navigation Row (just above keyboard) -->
+          <!-- Navigation Controls (just above keyboard) -->
           <div class="mobile-nav-row">
-            <button id="mobileArrowLeft" class="mobile-nav-btn" title="Move left" aria-label="Move left">
-              <i class="ri-arrow-left-line"></i>
-            </button>
-            <button id="mobileArrowUp" class="mobile-nav-btn" title="Move up" aria-label="Move up">
-              <i class="ri-arrow-up-line"></i>
-            </button>
-            <button id="mobileArrowDown" class="mobile-nav-btn" title="Move down" aria-label="Move down">
-              <i class="ri-arrow-down-line"></i>
-            </button>
-            <button id="mobileArrowRight" class="mobile-nav-btn" title="Move right" aria-label="Move right">
-              <i class="ri-arrow-right-line"></i>
-            </button>
+            <!-- Left: D-pad arrow keys -->
+            <div class="mobile-dpad">
+              <div class="dpad-spacer"></div>
+              <button id="mobileArrowUp" class="mobile-nav-btn" title="Move up" aria-label="Move up">
+                <i class="ri-arrow-up-line"></i>
+              </button>
+              <div class="dpad-spacer"></div>
+              <button id="mobileArrowLeft" class="mobile-nav-btn" title="Move left" aria-label="Move left">
+                <i class="ri-arrow-left-line"></i>
+              </button>
+              <button id="mobileArrowDown" class="mobile-nav-btn" title="Move down" aria-label="Move down">
+                <i class="ri-arrow-down-line"></i>
+              </button>
+              <button id="mobileArrowRight" class="mobile-nav-btn" title="Move right" aria-label="Move right">
+                <i class="ri-arrow-right-line"></i>
+              </button>
+            </div>
+            <!-- Right: Direction toggle -->
             <div class="mobile-nav-direction">
               <button class="mobile-nav-dir-btn active" data-nav="horizontal" title="Horizontal entry">
                 <i class="ri-arrow-right-line"></i>
@@ -340,7 +346,11 @@
                 <i class="ri-arrow-down-line"></i>
               </button>
             </div>
-            <button id="mobileFinishBtn" class="mobile-nav-btn mobile-nav-finish" title="Finish" aria-label="Finish">
+          </div>
+
+          <!-- Finish Row -->
+          <div class="mobile-finish-row">
+            <button id="mobileFinishBtn" class="mobile-finish-btn" title="Finish" aria-label="Finish">
               <i class="ri-flag-line"></i>
               <span>Finish</span>
             </button>

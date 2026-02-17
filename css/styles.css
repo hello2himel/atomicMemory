@@ -1504,25 +1504,38 @@ body {
 /* Mobile Navigation Row */
 .mobile-nav-row {
   display: flex;
-  justify-content: center;
-  gap: var(--space-xs);
+  align-items: center;
+  gap: var(--space-sm);
   padding: var(--space-xs) var(--space-md);
   flex-shrink: 0;
 }
 
+/* D-pad arrow layout */
+.mobile-dpad {
+  display: grid;
+  grid-template-columns: repeat(3, 36px);
+  grid-template-rows: repeat(2, 36px);
+  gap: 3px;
+}
+
+.dpad-spacer {
+  /* empty cell in the grid */
+}
+
 .mobile-nav-btn {
-  width: 42px;
-  height: 42px;
+  width: 36px;
+  height: 36px;
   border: 2px solid var(--border-color);
   border-radius: var(--radius-md);
   background: var(--bg-secondary);
   color: var(--text-primary);
-  font-size: 18px;
+  font-size: 16px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 100ms ease;
+  padding: 0;
 }
 
 .mobile-nav-btn:active {
@@ -1543,28 +1556,29 @@ body {
 /* Mobile nav direction toggle */
 .mobile-nav-direction {
   display: flex;
-  gap: 2px;
-  border: 2px solid var(--border-color);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  height: 42px;
+  flex-direction: column;
+  gap: 3px;
 }
 
 .mobile-nav-dir-btn {
   background: var(--bg-secondary);
-  border: none;
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
   color: var(--text-tertiary);
   font-size: 16px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 12px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
   transition: all 100ms ease;
 }
 
 .mobile-nav-dir-btn.active {
   background: rgba(16, 185, 129, 0.15);
+  border-color: var(--accent-primary);
   color: var(--accent-primary);
 }
 
@@ -1572,13 +1586,34 @@ body {
   transform: scale(0.93);
 }
 
-.mobile-nav-finish {
-  color: #ef4444;
-  border-color: #ef4444;
-  flex: 1;
+/* Finish row */
+.mobile-finish-row {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-xs) var(--space-md);
+  flex-shrink: 0;
+}
+
+.mobile-finish-btn {
+  display: inline-flex;
+  align-items: center;
   gap: 4px;
+  padding: 6px 24px;
+  border: 2px solid #ef4444;
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+  color: #ef4444;
   font-size: 13px;
   font-weight: 600;
+  cursor: pointer;
+  transition: all 100ms ease;
+  font-family: var(--font-body);
+}
+
+.mobile-finish-btn:active {
+  background: #ef4444;
+  color: white;
+  transform: scale(0.95);
 }
 
 /* QWERTY Keyboard */
