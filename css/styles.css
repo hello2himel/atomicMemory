@@ -407,8 +407,11 @@ body {
   font-family: var(--font-display);
   letter-spacing: -0.03em;
   opacity: 0.85;
-  padding-bottom: 2px;
   user-select: none;
+  height: 0;
+  overflow: visible;
+  align-self: end;
+  line-height: 1;
 }
 
 .table-brand-tagline {
@@ -425,6 +428,9 @@ body {
   line-height: 1.4;
   padding: 4px 8px 0;
   user-select: none;
+  height: 0;
+  overflow: visible;
+  align-self: start;
 }
 
 .header-title-row {

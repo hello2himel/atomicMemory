@@ -1195,6 +1195,12 @@ function openInfoModal() {
 }
 
 function toggleViewTable() {
+  // Block reveal while a challenge is in progress (active elements not yet completed)
+  if (state.activeElements.size > 0 && state.correctElements.size < state.activeElements.size && !viewTableBtn.classList.contains('viewing')) {
+    showHintToast('Can\'t reveal the table during a challenge. Finish or reset first!');
+    return;
+  }
+
   // If currently viewing, just hide
   if (viewTableBtn.classList.contains('viewing')) {
     viewTableBtn.classList.remove('viewing');
