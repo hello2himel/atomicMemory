@@ -167,6 +167,12 @@ function startApp() {
       if (firstElement) {
         openMobileInput(firstElement);
       }
+    } else {
+      // On desktop, auto-focus the first element so users see the input field
+      const firstElement = findFirstActiveElement();
+      if (firstElement) {
+        activateElement(firstElement);
+      }
     }
   }, 600);
 }
@@ -414,63 +420,56 @@ function updateElementStates() {
 function renderPeriodicTable() {
   periodicTable.innerHTML = '';
   
-  // Period 1
-  renderElement(ELEMENTS[0]); // H
-  // 1 spacer for col 2, then brand title spans cols 3-12, then 5 spacers for cols 13-17
-  periodicTable.appendChild(createSpacer());
+  // Brand block: occupies the d-block gap in rows 1-2 (grid-column 3/13, grid-row 1/3)
+  const brand = document.createElement('div');
+  brand.className = 'table-brand';
   const brandTitle = document.createElement('div');
   brandTitle.className = 'table-brand-title';
   brandTitle.textContent = 'AtomicMemory';
-  periodicTable.appendChild(brandTitle);
-  for (let i = 0; i < 5; i++) periodicTable.appendChild(createSpacer());
-  renderElement(ELEMENTS[1]); // He
-  
-  // Period 2
-  renderElement(ELEMENTS[2]); // Li
-  renderElement(ELEMENTS[3]); // Be
-  // Brand tagline spans the 10 empty columns in rows 2-3
   const brandTagline = document.createElement('div');
   brandTagline.className = 'table-brand-tagline';
   brandTagline.textContent = 'Learn the periodic table through an interactive, gamified experience.';
-  periodicTable.appendChild(brandTagline);
-  for (let i = 4; i <= 9; i++) renderElement(ELEMENTS[i]);
+  brand.appendChild(brandTitle);
+  brand.appendChild(brandTagline);
+  periodicTable.appendChild(brand);
+
+  // Period 1
+  renderElement(ELEMENTS[0], 1, 1); // H
+  renderElement(ELEMENTS[1], 1, 18); // He
+  
+  // Period 2
+  renderElement(ELEMENTS[2], 2, 1); // Li
+  renderElement(ELEMENTS[3], 2, 2); // Be
+  for (let i = 4; i <= 9; i++) renderElement(ELEMENTS[i], 2, ELEMENTS[i].group);
   
   // Period 3
-  renderElement(ELEMENTS[10]); // Na
-  renderElement(ELEMENTS[11]); // Mg
-  // Row 3 cols 3-12 are covered by the tagline's grid-row: span 2
-  for (let i = 12; i <= 17; i++) renderElement(ELEMENTS[i]);
+  for (let i = 10; i <= 17; i++) renderElement(ELEMENTS[i], 3, ELEMENTS[i].group);
   
-  // Periods 4-5
-  for (let i = 18; i <= 53; i++) renderElement(ELEMENTS[i]);
+  // Periods 4-5 (all have group assignments)
+  for (let i = 18; i <= 53; i++) renderElement(ELEMENTS[i], ELEMENTS[i].period, ELEMENTS[i].group);
   
   // Period 6 with lanthanides placeholder
-  renderElement(ELEMENTS[54]); // Cs
-  renderElement(ELEMENTS[55]); // Ba
-  periodicTable.appendChild(createPlaceholder('*'));
-  for (let i = 71; i <= 85; i++) renderElement(ELEMENTS[i]);
+  renderElement(ELEMENTS[54], 6, 1); // Cs
+  renderElement(ELEMENTS[55], 6, 2); // Ba
+  periodicTable.appendChild(createPlaceholder('57–71', 6, 3));
+  for (let i = 71; i <= 85; i++) renderElement(ELEMENTS[i], 6, ELEMENTS[i].group);
   
   // Period 7 with actinides placeholder
-  renderElement(ELEMENTS[86]); // Fr
-  renderElement(ELEMENTS[87]); // Ra
-  periodicTable.appendChild(createPlaceholder('**'));
-  for (let i = 103; i <= 117; i++) renderElement(ELEMENTS[i]);
+  renderElement(ELEMENTS[86], 7, 1); // Fr
+  renderElement(ELEMENTS[87], 7, 2); // Ra
+  periodicTable.appendChild(createPlaceholder('89–103', 7, 3));
+  for (let i = 103; i <= 117; i++) renderElement(ELEMENTS[i], 7, ELEMENTS[i].group);
   
-  // Spacer row
-  for (let i = 0; i < 18; i++) periodicTable.appendChild(createSpacer());
+  // Lanthanides (row 9, with a spacer row 8)
+  periodicTable.appendChild(createLabel('Lanthanides', 9));
+  for (let col = 4, idx = 56; idx <= 70; idx++, col++) renderElement(ELEMENTS[idx], 9, col);
   
-  // Lanthanides
-  for (let i = 0; i < 2; i++) periodicTable.appendChild(createSpacer());
-  periodicTable.appendChild(createLabel('Lanthanides'));
-  for (let i = 56; i <= 70; i++) renderElement(ELEMENTS[i]);
-  
-  // Actinides
-  for (let i = 0; i < 2; i++) periodicTable.appendChild(createSpacer());
-  periodicTable.appendChild(createLabel('Actinides'));
-  for (let i = 88; i <= 102; i++) renderElement(ELEMENTS[i]);
+  // Actinides (row 10)
+  periodicTable.appendChild(createLabel('Actinides', 10));
+  for (let col = 4, idx = 88; idx <= 102; idx++, col++) renderElement(ELEMENTS[idx], 10, col);
 }
 
-function renderElement(element) {
+function renderElement(element, row, col) {
   const div = document.createElement('div');
   div.className = 'element';
   div.dataset.atomic = element.atomicNumber;
@@ -480,6 +479,10 @@ function renderElement(element) {
   div.dataset.period = element.period;
   div.dataset.block = element.block;
   div.dataset.category = element.category;
+  if (row && col) {
+    div.style.gridRow = row;
+    div.style.gridColumn = col;
+  }
   
   const numberSpan = document.createElement('span');
   numberSpan.className = 'element-number';
@@ -500,23 +503,25 @@ function renderElement(element) {
   periodicTable.appendChild(div);
 }
 
-function createSpacer() {
-  const spacer = document.createElement('div');
-  spacer.className = 'spacer';
-  return spacer;
-}
-
-function createPlaceholder(text) {
+function createPlaceholder(text, row, col) {
   const div = document.createElement('div');
   div.className = 'element placeholder';
   div.textContent = text;
+  if (row && col) {
+    div.style.gridRow = row;
+    div.style.gridColumn = col;
+  }
   return div;
 }
 
-function createLabel(text) {
+function createLabel(text, row) {
   const label = document.createElement('div');
   label.className = text === 'Lanthanides' ? 'lanthanide-label' : 'actinide-label';
   label.textContent = text;
+  if (row) {
+    label.style.gridRow = row;
+    label.style.gridColumn = '1 / 4';
+  }
   return label;
 }
 
@@ -1159,7 +1164,7 @@ function updateStats() {
   correctCountDisplay.textContent = correct;
   totalCountDisplay.textContent = total;
   streakDisplay.textContent = state.streak;
-  accuracyDisplay.textContent = `${state.accuracy}%`;
+  accuracyDisplay.textContent = state.totalAttempts > 0 ? `${state.accuracy}%` : '—';
   progressFill.style.width = `${percent}%`;
   
   scoringSystem.updateScoreDisplay();
@@ -1487,7 +1492,7 @@ function updateBottomBarStats() {
   }
   if (bottomProgress) bottomProgress.textContent = `${correct}/${total}`;
   if (bottomStreak) bottomStreak.textContent = state.streak;
-  if (bottomAccuracy) bottomAccuracy.textContent = `${accuracy}%`;
+  if (bottomAccuracy) bottomAccuracy.textContent = state.totalAttempts > 0 ? `${accuracy}%` : '—';
 }
 
 // ===== MOBILE PERSISTENT MODAL =====
@@ -1677,7 +1682,7 @@ function updateMobileStats() {
   
   if (progressEl) progressEl.textContent = `${correct}/${total}`;
   if (streakEl) streakEl.textContent = state.streak;
-  if (accuracyEl) accuracyEl.textContent = `${accuracy}%`;
+  if (accuracyEl) accuracyEl.textContent = state.totalAttempts > 0 ? `${accuracy}%` : '—';
   if (timerEl) {
     const minutes = Math.floor(state.elapsedTime / 60);
     const seconds = state.elapsedTime % 60;

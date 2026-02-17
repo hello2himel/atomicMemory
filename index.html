@@ -65,7 +65,7 @@
       <span id="correctCount">0</span>
       <span id="totalCount">118</span>
       <span id="streakDisplay">0</span>
-      <span id="accuracyDisplay">100%</span>
+      <span id="accuracyDisplay">—</span>
     </div>
 
     <!-- Progress Bar -->
@@ -112,7 +112,7 @@
           </div>
           <div class="bottom-stat" title="Accuracy">
             <i class="ri-percent-line"></i>
-            <span id="bottomAccuracy">100%</span>
+            <span id="bottomAccuracy">—</span>
           </div>
         </div>
       </div>
@@ -134,16 +134,16 @@
         <div class="hud-nav-toggle">
           <span class="hud-nav-label">After Enter, jump to…</span>
           <div class="hud-pill-toggle">
-            <button class="hud-nav-option active" data-nav="horizontal">→ Next in Period</button>
-            <button class="hud-nav-option" data-nav="vertical">↓ Next in Group</button>
+            <button class="hud-nav-option active" data-nav="horizontal" title="After submitting an answer, move to the next element in the same row (period)">→ Next in Period</button>
+            <button class="hud-nav-option" data-nav="vertical" title="After submitting an answer, move to the next element in the same column (group)">↓ Next in Group</button>
           </div>
         </div>
         <div class="hud-nav-btns">
-          <button id="achievementsBtn" class="header-icon-btn" title="Achievements" aria-label="Achievements">
+          <button id="achievementsBtn" class="header-icon-btn" title="Achievements unlocked" aria-label="Achievements">
             <i class="ri-medal-line" aria-hidden="true"></i>
-            <span id="achievementBadge" class="notification-badge hidden">0</span>
+            <span id="achievementBadge" class="notification-badge hidden" title="Total achievements unlocked">0</span>
           </button>
-          <button id="historyBtn" class="header-icon-btn" title="History" aria-label="Practice history">
+          <button id="historyBtn" class="header-icon-btn" title="Practice history — view your past challenges" aria-label="Practice history">
             <i class="ri-history-line" aria-hidden="true"></i>
           </button>
           <button id="aboutBtn" class="header-icon-btn" title="About" aria-label="About">
@@ -163,6 +163,18 @@
     <main class="table-container">
       <div class="table-wrapper">
         <div id="periodicTable" class="periodic-table"></div>
+        <div class="category-legend">
+          <span class="legend-item"><span class="legend-swatch" style="background: var(--cat-alkali)"></span>Alkali Metal</span>
+          <span class="legend-item"><span class="legend-swatch" style="background: var(--cat-alkaline)"></span>Alkaline Earth</span>
+          <span class="legend-item"><span class="legend-swatch" style="background: var(--cat-transition)"></span>Transition Metal</span>
+          <span class="legend-item"><span class="legend-swatch" style="background: var(--cat-post-transition)"></span>Post-Transition</span>
+          <span class="legend-item"><span class="legend-swatch" style="background: var(--cat-metalloid)"></span>Metalloid</span>
+          <span class="legend-item"><span class="legend-swatch" style="background: var(--cat-nonmetal)"></span>Nonmetal</span>
+          <span class="legend-item"><span class="legend-swatch" style="background: var(--cat-halogen)"></span>Halogen</span>
+          <span class="legend-item"><span class="legend-swatch" style="background: var(--cat-noble)"></span>Noble Gas</span>
+          <span class="legend-item"><span class="legend-swatch" style="background: var(--cat-lanthanide)"></span>Lanthanide</span>
+          <span class="legend-item"><span class="legend-swatch" style="background: var(--cat-actinide)"></span>Actinide</span>
+        </div>
       </div>
       
       <!-- Mobile Input Modal -->
@@ -205,7 +217,7 @@
             <span class="strip-divider">|</span>
             <span class="mobile-strip-stat"><i class="ri-fire-line"></i> <span id="mobileStreakDisplay" class="strip-value">0</span></span>
             <span class="strip-divider">|</span>
-            <span class="mobile-strip-stat"><span id="mobileAccuracyDisplay" class="strip-value">100%</span></span>
+            <span class="mobile-strip-stat"><span id="mobileAccuracyDisplay" class="strip-value">—</span></span>
           </div>
 
           <!-- Mini Table Preview (top area) -->
