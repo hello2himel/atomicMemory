@@ -2629,38 +2629,6 @@ body {
   text-decoration: underline;
 }
 
-/* ===== PERSISTENT FOOTER ===== */
-.persistent-footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  text-align: center;
-  padding: 6px var(--space-md);
-  font-size: 12px;
-  color: var(--text-tertiary);
-  background: var(--bg-secondary);
-  border-top: 1px solid var(--border-color);
-  z-index: 1;
-  font-family: var(--font-mono);
-}
-
-.persistent-footer a {
-  color: var(--accent-primary);
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.persistent-footer a:hover {
-  text-decoration: underline;
-}
-
-.footer-divider {
-  margin: 0 6px;
-  color: var(--border-color);
-}
-
-
 
 /* ===== RESPONSIVE DESIGN ===== */
 
@@ -2722,8 +2690,7 @@ body {
   .header,
   .progress-bar-container,
   .desktop-bottom-bar,
-  .mode-selection-panel,
-  .persistent-footer {
+  .mode-selection-panel {
     display: none !important;
   }
   
