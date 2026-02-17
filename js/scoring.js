@@ -239,7 +239,8 @@ class ScoringSystem {
   }
 
   saveScore(config, elementsCount, time, mistakes) {
-    const leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]');
+    let leaderboard;
+    try { leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]'); } catch (e) { leaderboard = []; }
     
     const entry = {
       score: this.score,
@@ -262,18 +263,20 @@ class ScoringSystem {
     // Sort by score
     leaderboard.sort((a, b) => b.score - a.score);
     
-    localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+    try { localStorage.setItem('leaderboard', JSON.stringify(leaderboard)); } catch (e) { /* quota exceeded or disabled */ }
     
     return entry;
   }
 
   getTopScores(limit = 10) {
-    const leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]');
+    let leaderboard;
+    try { leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]'); } catch (e) { leaderboard = []; }
     return leaderboard.slice(0, limit);
   }
 
   getPersonalBest() {
-    const leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]');
+    let leaderboard;
+    try { leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]'); } catch (e) { leaderboard = []; }
     
     if (leaderboard.length === 0) return null;
     

@@ -6,6 +6,15 @@ if (typeof ELEMENTS !== 'undefined') {
 
 const APP_URL = 'https://atomicmemory.netlify.app';
 
+// Safe localStorage helpers
+function safeGetItem(key) {
+  try { return localStorage.getItem(key); } catch (e) { return null; }
+}
+
+function safeSetItem(key, value) {
+  try { localStorage.setItem(key, value); } catch (e) { /* quota exceeded or disabled */ }
+}
+
 // State
 const state = {
   activeElements: new Set(),
@@ -24,8 +33,9 @@ const state = {
   correctAttempts: 0,
   hintsUsed: 0,
   isMobile: false,
+  shiftActive: false,
   totalChallengesCompleted: 0,
-  navDirection: localStorage.getItem('navDirection') || 'horizontal'
+  navDirection: safeGetItem('navDirection') || 'horizontal'
 };
 
 // Custom Confirm Dialog (replaces browser native confirm)
@@ -183,7 +193,7 @@ function startApp() {
 // Dark Mode
 function detectDarkMode() {
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  const savedDarkMode = localStorage.getItem('darkMode');
+  const savedDarkMode = safeGetItem('darkMode');
   
   if (savedDarkMode === 'true' || (savedDarkMode === null && prefersDark)) {
     document.body.dataset.theme = 'dark';
@@ -198,7 +208,7 @@ function setupEventListeners() {
     const isDark = document.body.dataset.theme === 'dark';
     document.body.dataset.theme = isDark ? '' : 'dark';
     darkModeBtn.innerHTML = isDark ? '<i class="ri-moon-line"></i>' : '<i class="ri-sun-line"></i>';
-    localStorage.setItem('darkMode', !isDark);
+    safeSetItem('darkMode', !isDark);
   });
   
   // Reset button
@@ -268,7 +278,7 @@ function setupEventListeners() {
       document.querySelectorAll('.hud-nav-option').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       state.navDirection = btn.dataset.nav;
-      localStorage.setItem('navDirection', state.navDirection);
+      safeSetItem('navDirection', state.navDirection);
       // Sync mobile pill toggle
       document.querySelectorAll('.gc-pill').forEach(b => {
         b.classList.toggle('active', b.dataset.nav === state.navDirection);
@@ -282,7 +292,7 @@ function setupEventListeners() {
       document.querySelectorAll('.gc-pill').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       state.navDirection = btn.dataset.nav;
-      localStorage.setItem('navDirection', state.navDirection);
+      safeSetItem('navDirection', state.navDirection);
       // Sync desktop toggle
       document.querySelectorAll('.hud-nav-option').forEach(b => {
         b.classList.toggle('active', b.dataset.nav === state.navDirection);
@@ -1044,6 +1054,21 @@ function updateTimerDisplay() {
   if (bottomTimer) bottomTimer.textContent = timeStr;
 }
 
+// Pause timer when page is hidden to save resources
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    if (state.timerInterval) {
+      clearInterval(state.timerInterval);
+      state.timerInterval = null;
+    }
+  } else if (state.timerStarted && !state.timerInterval) {
+    state.timerInterval = setInterval(() => {
+      state.elapsedTime = Math.floor((Date.now() - state.startTime) / 1000);
+      updateTimerDisplay();
+    }, 100);
+  }
+});
+
 // Challenge
 function resetChallenge() {
   stopTimer();
@@ -1198,11 +1223,11 @@ function updateStats() {
 
 // Save/Load Total Challenges
 function saveTotalChallenges() {
-  localStorage.setItem('totalChallenges', state.totalChallengesCompleted);
+  safeSetItem('totalChallenges', state.totalChallengesCompleted);
 }
 
 function loadTotalChallenges() {
-  const saved = localStorage.getItem('totalChallenges');
+  const saved = safeGetItem('totalChallenges');
   if (saved) {
     state.totalChallengesCompleted = parseInt(saved);
   }
@@ -1280,7 +1305,7 @@ function openHistoryModal() {
 }
 
 function loadHistory() {
-  const history = JSON.parse(localStorage.getItem('history') || '[]');
+  const history = JSON.parse(safeGetItem('history') || '[]');
   
   if (history.length === 0) {
     historyModalBody.innerHTML = `
@@ -1425,7 +1450,7 @@ function shareScore() {
 }
 
 function saveToHistory() {
-  const history = JSON.parse(localStorage.getItem('history') || '[]');
+  const history = JSON.parse(safeGetItem('history') || '[]');
   
   const wrongAttempts = Object.values(state.wrongAttempts).reduce((a, b) => a + b, 0);
   
@@ -1447,7 +1472,7 @@ function saveToHistory() {
     history.splice(50);
   }
   
-  localStorage.setItem('history', JSON.stringify(history));
+  safeSetItem('history', JSON.stringify(history));
 }
 
 // ===== QWERTY KEYBOARD HANDLER =====
@@ -1456,6 +1481,13 @@ function handleQwertyKey(key) {
   if (!state.currentElement) return;
   
   const cellSymbolDisplay = document.getElementById('cellSymbolDisplay');
+  
+  if (key === 'SHIFT') {
+    state.shiftActive = !state.shiftActive;
+    const shiftBtn = document.querySelector('.qwerty-shift');
+    if (shiftBtn) shiftBtn.classList.toggle('active', state.shiftActive);
+    return;
+  }
   
   if (key === 'BACKSPACE') {
     if (mobileInput.value.length > 0) {
@@ -1476,13 +1508,19 @@ function handleQwertyKey(key) {
   
   // Letter key
   if (mobileInput.value.length < 3) {
-    mobileInput.value += key;
-    formatSymbolInput(mobileInput);
+    const letter = state.shiftActive ? key.toUpperCase() : key.toLowerCase();
+    mobileInput.value += letter;
     if (cellSymbolDisplay) {
       cellSymbolDisplay.textContent = mobileInput.value;
       cellSymbolDisplay.classList.remove('empty');
     }
     updateGcInputState();
+    // Auto-deactivate shift after typing a letter
+    if (state.shiftActive) {
+      state.shiftActive = false;
+      const shiftBtn = document.querySelector('.qwerty-shift');
+      if (shiftBtn) shiftBtn.classList.remove('active');
+    }
   }
 }
 

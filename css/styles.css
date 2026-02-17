@@ -1983,6 +1983,18 @@ body {
   background: var(--bg-hover);
 }
 
+.qwerty-shift {
+  flex: 1.5;
+  max-width: none;
+  background: var(--bg-tertiary);
+  font-size: 18px;
+}
+
+.qwerty-shift.active {
+  background: var(--accent-primary);
+  color: white;
+}
+
 .qwerty-backspace {
   flex: 1.5;
   max-width: none;
@@ -2002,6 +2014,11 @@ body {
 .qwerty-submit:active {
   transform: scale(0.97);
   background: var(--accent-gradient);
+}
+
+.qwerty-key:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
 }
 
 /* Mobile toolbar buttons (in game header) */
