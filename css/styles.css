@@ -734,11 +734,11 @@ body {
 }
 
 .bottom-bar-title {
-  font-size: 16px;
+  text-align: center;
+  font-size: 14px;
   font-weight: 800;
   color: var(--text-primary);
   font-family: var(--font-display);
-  white-space: nowrap;
 }
 
 .bottom-bar-stats {
