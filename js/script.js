@@ -113,6 +113,9 @@ const infoModal = document.getElementById('infoModal');
 const closeInfoBtn = document.getElementById('closeInfoBtn');
 const aboutBtn = document.getElementById('aboutBtn');
 const viewTableBtn = document.getElementById('viewTableBtn');
+const donateBtn = document.getElementById('donateBtn');
+const donateModal = document.getElementById('donateModal');
+const closeDonateBtn = document.getElementById('closeDonateBtn');
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -227,6 +230,10 @@ function setupEventListeners() {
   aboutBtn.addEventListener('click', openInfoModal);
   closeInfoBtn.addEventListener('click', () => closeModal(infoModal));
   
+  // Donate modal
+  donateBtn.addEventListener('click', openDonateModal);
+  closeDonateBtn.addEventListener('click', () => closeModal(donateModal));
+  
   // View table button (toggle element visibility on existing table)
   viewTableBtn.addEventListener('click', toggleViewTable);
   
@@ -314,6 +321,7 @@ function setupEventListeners() {
   document.getElementById('mobileToolbarLeaderboard').addEventListener('click', openLeaderboardModal);
   document.getElementById('mobileToolbarAchievements').addEventListener('click', openAchievementsModal);
   document.getElementById('mobileToolbarAbout').addEventListener('click', openInfoModal);
+  document.getElementById('mobileToolbarDonate').addEventListener('click', openDonateModal);
   
   // Complete modal
   closeCompleteBtn.addEventListener('click', () => {
@@ -387,6 +395,10 @@ function openMobileMenu() {
       <button class="mobile-menu-btn" onclick="openInfoModal(); mobileMenu.classList.add('hidden')">
         <i class="ri-information-line"></i>
         <span>About</span>
+      </button>
+      <button class="mobile-menu-btn" onclick="openDonateModal(); mobileMenu.classList.add('hidden')">
+        <i class="ri-heart-fill donate-heart-icon"></i>
+        <span>Donate</span>
       </button>
     </div>
   `;
@@ -1197,6 +1209,10 @@ function closeModal(modal) {
 
 function openInfoModal() {
   infoModal.classList.remove('hidden');
+}
+
+function openDonateModal() {
+  donateModal.classList.remove('hidden');
 }
 
 function toggleViewTable() {

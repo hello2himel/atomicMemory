@@ -619,6 +619,86 @@ body {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
+/* Donate button - red accent */
+.donate-icon-btn {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #fff;
+}
+
+.donate-icon-btn:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(220, 38, 38, 0.4);
+}
+
+.donate-mobile-btn {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #fff;
+}
+
+.donate-mobile-btn:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
+  color: #fff;
+}
+
+/* Donate Modal */
+.donate-modal-content {
+  max-width: 440px;
+}
+
+.donate-modal-body {
+  padding: var(--space-xl);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.donate-icon-hero {
+  font-size: 48px;
+  color: #dc2626;
+  line-height: 1;
+}
+
+.donate-message {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+}
+
+.donate-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #dc2626;
+  color: #fff;
+  border: none;
+  padding: 12px 28px;
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 200ms ease;
+}
+
+.donate-cta-btn:hover {
+  background: #b91c1c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(220, 38, 38, 0.4);
+}
+
+.donate-heart-icon {
+  color: #dc2626;
+}
+
 .notification-badge {
   position: absolute;
   top: 4px;

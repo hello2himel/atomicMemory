@@ -149,6 +149,9 @@
           <button id="aboutBtn" class="header-icon-btn" title="About" aria-label="About">
             <i class="ri-information-line" aria-hidden="true"></i>
           </button>
+          <button id="donateBtn" class="header-icon-btn donate-icon-btn" title="Donate" aria-label="Donate">
+            <i class="ri-heart-fill" aria-hidden="true"></i>
+          </button>
           <button id="darkModeBtn" class="header-icon-btn" title="Toggle theme" aria-label="Toggle theme">
             <i class="ri-moon-line" aria-hidden="true"></i>
           </button>
@@ -198,6 +201,9 @@
             </button>
             <button class="mobile-toolbar-btn" id="mobileToolbarAbout" title="About">
               <i class="ri-information-line"></i>
+            </button>
+            <button class="mobile-toolbar-btn donate-mobile-btn" id="mobileToolbarDonate" title="Donate">
+              <i class="ri-heart-fill"></i>
             </button>
             <button class="mobile-toolbar-btn" id="mobileToolbarTheme" title="Toggle theme">
               <i class="ri-moon-line"></i>
@@ -447,6 +453,32 @@
             <p>Made with <span aria-label="love">❤️</span> by <a href="https://hello2himel.netlify.app" target="_blank" rel="noopener noreferrer">@hello2himel</a> from <span aria-label="Bangladesh">🇧🇩</span></p>
             <p>This is an open source software. <a href="https://github.com/hello2himel/atomicmemory" target="_blank" rel="noopener noreferrer">View Source Code</a></p>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Donate Modal -->
+    <div id="donateModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Support AtomicMemory">
+      <div class="modal-overlay"></div>
+      <div class="modal-content donate-modal-content">
+        <div class="modal-header">
+          <h3>
+            <i class="ri-heart-fill" aria-hidden="true"></i>
+            Support AtomicMemory
+          </h3>
+          <button id="closeDonateBtn" class="close-modal-btn" aria-label="Close">
+            <i class="ri-close-line" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="modal-body donate-modal-body">
+          <div class="donate-icon-hero">
+            <i class="ri-heart-fill" aria-hidden="true"></i>
+          </div>
+          <p class="donate-message">AtomicMemory is built and maintained by hobbyist devs. Maintenance costs time and money. Please consider donating to help keep this project alive.</p>
+          <a href="https://hello2himel.netlify.app/donate?source=AtomicMemory" target="_blank" rel="noopener noreferrer" class="donate-cta-btn">
+            <i class="ri-heart-fill" aria-hidden="true"></i>
+            Donate Now
+          </a>
         </div>
       </div>
     </div>
