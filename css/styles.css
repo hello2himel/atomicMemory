@@ -647,7 +647,8 @@ body {
 
 /* Donate Modal */
 .donate-modal-content {
-  max-width: 380px;
+  max-width: 340px;
+  width: fit-content;
 }
 
 .donate-modal-body {
