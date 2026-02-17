@@ -667,7 +667,7 @@ body {
 }
 
 .donate-message {
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.5;
   color: var(--text-secondary);
   font-family: var(--font-body);
@@ -690,7 +690,7 @@ body {
   border: none;
   padding: 10px 16px;
   border-radius: var(--radius-md);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   font-family: var(--font-display);
   cursor: pointer;
@@ -713,7 +713,7 @@ body {
   background: var(--bg-tertiary);
   border: 1px solid var(--border-color);
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   font-family: var(--font-display);
   cursor: pointer;
@@ -2775,7 +2775,7 @@ body {
 
 .info-story-card p,
 .info-modal-body p {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text-secondary);
   line-height: 1.6;
 }
@@ -2790,7 +2790,7 @@ body {
 }
 
 .info-quote p {
-  font-size: 13px;
+  font-size: 14px;
   font-style: italic;
   color: var(--text-primary);
   font-weight: 500;
@@ -2818,7 +2818,7 @@ body {
   text-align: center;
   font-weight: 600;
   color: var(--accent-primary) !important;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .info-links {
