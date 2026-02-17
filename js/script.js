@@ -1095,6 +1095,12 @@ function resetChallenge() {
 
 function completeChallenge() {
   stopTimer();
+  
+  // Close mobile input modal if open to prevent jarring transition
+  if (!mobileInputModal.classList.contains('hidden')) {
+    closeMobileInput();
+  }
+  
   viewTableBtn.classList.remove('hidden', 'viewing');
   viewTableBtn.querySelector('i').className = 'ri-eye-line';
   viewTableBtn.querySelector('span').textContent = 'Reveal Table';
