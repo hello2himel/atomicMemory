@@ -71,35 +71,9 @@
   <div id="mainApp" class="main-app hidden">
     <!-- Unified Top Bar -->
     <header class="header">
-      <!-- Row 1: Logo + Title + Rank -->
+      <!-- Row 1: Title -->
       <div class="header-title-row">
-        <div class="logo-grid" aria-label="AtomicMemory">
-          <span class="lg-cell" style="background:#ef4444"></span>
-          <span class="lg-empty"></span>
-          <span class="lg-empty"></span>
-          <span class="lg-empty"></span>
-          <span class="lg-cell" style="background:#ec4899"></span>
-
-          <span class="lg-cell" style="background:#f97316"></span>
-          <span class="lg-empty"></span>
-          <span class="lg-cell" style="background:#10b981"></span>
-          <span class="lg-cell" style="background:#3b82f6"></span>
-          <span class="lg-cell" style="background:#8b5cf6"></span>
-
-          <span class="lg-cell" style="background:#06b6d4"></span>
-          <span class="lg-cell" style="background:#eab308"></span>
-          <span class="lg-cell" style="background:#ec4899"></span>
-          <span class="lg-cell" style="background:#f59e0b"></span>
-          <span class="lg-cell" style="background:#84cc16"></span>
-
-          <span class="lg-empty"></span>
-          <span class="lg-cell" style="background:#3b82f6"></span>
-          <span class="lg-cell" style="background:#ef4444"></span>
-          <span class="lg-cell" style="background:#f97316"></span>
-          <span class="lg-empty"></span>
-        </div>
         <h1 class="site-title">AtomicMemory</h1>
-        <span id="currentRank" class="rank-badge" aria-label="Current rank">Novice</span>
       </div>
       <!-- Row 2: Action Buttons -->
       <div class="header-buttons-row">
@@ -123,38 +97,18 @@
           <i class="ri-menu-line" aria-hidden="true"></i>
         </button>
       </div>
-      <!-- Row 3: Stats Strip -->
-      <div class="header-stats-row">
-        <div class="inline-stats">
-          <div class="inline-stat" title="Score">
-            <span class="inline-stat-value score-value-wrapper">
-              <span id="currentScore" class="inline-score">0</span>
-              <div id="scoreChangeIndicator" class="score-change"></div>
-            </span>
-          </div>
-          <span class="stat-divider">|</span>
-          <div class="inline-stat" title="Time">
-            <i class="ri-timer-line" aria-hidden="true"></i>
-            <span id="timerDisplay" class="inline-stat-value">00:00</span>
-          </div>
-          <span class="stat-divider">|</span>
-          <div class="inline-stat" title="Progress">
-            <i class="ri-check-double-line" aria-hidden="true"></i>
-            <span class="inline-stat-value"><span id="correctCount">0</span>/<span id="totalCount">118</span></span>
-          </div>
-          <span class="stat-divider">|</span>
-          <div class="inline-stat" title="Streak">
-            <i class="ri-fire-line" aria-hidden="true"></i>
-            <span id="streakDisplay" class="inline-stat-value">0</span>
-          </div>
-          <span class="stat-divider">|</span>
-          <div class="inline-stat" title="Accuracy">
-            <i class="ri-percent-line" aria-hidden="true"></i>
-            <span id="accuracyDisplay" class="inline-stat-value">100%</span>
-          </div>
-        </div>
-      </div>
     </header>
+
+    <!-- Hidden elements for JS state tracking (stats shown in bottom HUD) -->
+    <div class="hidden" aria-hidden="true">
+      <span id="currentScore">0</span>
+      <span id="currentRank">Novice</span>
+      <span id="timerDisplay">00:00</span>
+      <span id="correctCount">0</span>
+      <span id="totalCount">118</span>
+      <span id="streakDisplay">0</span>
+      <span id="accuracyDisplay">100%</span>
+    </div>
 
     <!-- Progress Bar -->
     <div class="progress-bar-container">
