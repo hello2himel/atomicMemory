@@ -35,6 +35,7 @@ function showConfirmDialog(message) {
     const msgEl = document.getElementById('confirmMessage');
     const okBtn = document.getElementById('confirmOk');
     const cancelBtn = document.getElementById('confirmCancel');
+    const previousFocus = document.activeElement;
     
     msgEl.textContent = message;
     overlay.classList.remove('hidden');
@@ -45,14 +46,31 @@ function showConfirmDialog(message) {
       okBtn.removeEventListener('click', onOk);
       cancelBtn.removeEventListener('click', onCancel);
       overlay.removeEventListener('click', onOverlay);
+      document.removeEventListener('keydown', onKeydown);
+      if (previousFocus) previousFocus.focus();
     }
     function onOk() { cleanup(); resolve(true); }
     function onCancel() { cleanup(); resolve(false); }
     function onOverlay(e) { if (e.target === overlay) { cleanup(); resolve(false); } }
+    function onKeydown(e) {
+      if (e.key === 'Escape') { cleanup(); resolve(false); }
+      if (e.key === 'Tab') {
+        // Trap focus within dialog
+        const focusable = [cancelBtn, okBtn];
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault(); last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault(); first.focus();
+        }
+      }
+    }
     
     okBtn.addEventListener('click', onOk);
     cancelBtn.addEventListener('click', onCancel);
     overlay.addEventListener('click', onOverlay);
+    document.addEventListener('keydown', onKeydown);
   });
 }
 
