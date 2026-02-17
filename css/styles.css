@@ -1395,7 +1395,7 @@ body {
 
 .gc-cell-box {
   width: 120px;
-  height: 140px;
+  height: 120px;
   border: 3px solid #f59e0b;
   border-radius: var(--radius-md);
   background: var(--bg-secondary);
@@ -1501,30 +1501,6 @@ body {
   font-weight: 500;
 }
 
-/* Backspace button */
-.gc-backspace-btn {
-  position: absolute;
-  right: -40px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-secondary);
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 100ms ease;
-}
-
-.gc-backspace-btn:active {
-  background: var(--bg-hover);
-  transform: translateY(-50%) scale(0.92);
-}
 
 /* SVG connector line */
 .gc-connector-svg {

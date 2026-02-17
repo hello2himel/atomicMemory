@@ -285,11 +285,6 @@ function setupEventListeners() {
     btn.classList.toggle('active', btn.dataset.nav === state.navDirection);
   });
   
-  // Backspace button in game control zone
-  const gcBackspaceBtn = document.getElementById('gcBackspaceBtn');
-  if (gcBackspaceBtn) {
-    gcBackspaceBtn.addEventListener('click', () => handleQwertyKey('BACKSPACE'));
-  }
   
   // Mobile toolbar buttons
   document.getElementById('mobileToolbarTheme').addEventListener('click', () => {
@@ -644,10 +639,8 @@ function handleMobileSubmit() {
 // Update game control zone input box visual state
 function updateGcInputState() {
   const gcInputBox = document.getElementById('gcInputBox');
-  const gcBackspaceBtn = document.getElementById('gcBackspaceBtn');
   const hasInput = mobileInput.value.length > 0;
   if (gcInputBox) gcInputBox.classList.toggle('has-input', hasInput);
-  if (gcBackspaceBtn) gcBackspaceBtn.classList.toggle('hidden', !hasInput);
 }
 
 function formatSymbolInput(input) {
