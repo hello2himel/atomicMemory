@@ -202,8 +202,8 @@ function setupEventListeners() {
   // Finish button
   finishBtn.addEventListener('click', finishChallenge);
   
-  // Hint button
-  hintBtn.addEventListener('click', showHint);
+  // Hint button (removed from UI, guard against null)
+  if (hintBtn) hintBtn.addEventListener('click', showHint);
   
   // History button
   historyBtn.addEventListener('click', openHistoryModal);
@@ -1053,7 +1053,7 @@ function resetChallenge() {
   // Reset view mode
   viewTableBtn.classList.remove('hidden', 'viewing');
   viewTableBtn.querySelector('i').className = 'ri-eye-line';
-  viewTableBtn.querySelector('span').textContent = 'View';
+  viewTableBtn.querySelector('span').textContent = 'Reveal Table';
   
   // Reset mini table if it exists
   const miniTable = document.getElementById('miniPeriodicTable');
@@ -1069,7 +1069,7 @@ function completeChallenge() {
   stopTimer();
   viewTableBtn.classList.remove('hidden', 'viewing');
   viewTableBtn.querySelector('i').className = 'ri-eye-line';
-  viewTableBtn.querySelector('span').textContent = 'View';
+  viewTableBtn.querySelector('span').textContent = 'Reveal Table';
   
   const totalMistakes = Object.values(state.wrongAttempts).reduce((a, b) => a + b, 0);
   
@@ -1172,6 +1172,12 @@ function openInfoModal() {
 }
 
 function toggleViewTable() {
+  // Block viewing while game is active
+  if (state.timerStarted) {
+    showHintToast("Can't view while playing. Finish the game first.");
+    return;
+  }
+
   const isViewing = viewTableBtn.classList.toggle('viewing');
   const icon = viewTableBtn.querySelector('i');
 
@@ -1194,10 +1200,10 @@ function toggleViewTable() {
 
   if (isViewing) {
     icon.className = 'ri-eye-off-line';
-    viewTableBtn.querySelector('span').textContent = 'Hide';
+    viewTableBtn.querySelector('span').textContent = 'Hide Table';
   } else {
     icon.className = 'ri-eye-line';
-    viewTableBtn.querySelector('span').textContent = 'View';
+    viewTableBtn.querySelector('span').textContent = 'Reveal Table';
   }
 }
 

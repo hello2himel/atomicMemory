@@ -20,50 +20,11 @@
   <!-- Unified Intro/Setup Screen (used on both desktop and mobile) -->
   <div id="introOverlay" class="intro-overlay">
     <div class="intro-content">
-      <div class="intro-setup-logo-row">
-        <div class="logo-grid intro-setup-logo" aria-label="AtomicMemory">
-          <span class="lg-cell" style="background:#ef4444"></span>
-          <span class="lg-empty"></span>
-          <span class="lg-empty"></span>
-          <span class="lg-empty"></span>
-          <span class="lg-cell" style="background:#ec4899"></span>
-          <span class="lg-cell" style="background:#f97316"></span>
-          <span class="lg-empty"></span>
-          <span class="lg-cell" style="background:#10b981"></span>
-          <span class="lg-cell" style="background:#3b82f6"></span>
-          <span class="lg-cell" style="background:#8b5cf6"></span>
-          <span class="lg-cell" style="background:#06b6d4"></span>
-          <span class="lg-cell" style="background:#eab308"></span>
-          <span class="lg-cell" style="background:#ec4899"></span>
-          <span class="lg-cell" style="background:#f59e0b"></span>
-          <span class="lg-cell" style="background:#84cc16"></span>
-          <span class="lg-empty"></span>
-          <span class="lg-cell" style="background:#3b82f6"></span>
-          <span class="lg-cell" style="background:#ef4444"></span>
-          <span class="lg-cell" style="background:#f97316"></span>
-          <span class="lg-empty"></span>
-        </div>
-        <h1 class="intro-title-text">AtomicMemory</h1>
-      </div>
-      <p class="intro-tagline">Master all 118 elements through practice</p>
+      <h1 class="intro-title-text">AtomicMemory</h1>
+      <p class="intro-tagline">Learn the periodic table through an interactive, gamified experience.</p>
 
       <div class="intro-table-wrapper">
         <div id="introPeriodicTable" class="intro-periodic-table"></div>
-      </div>
-
-      <div class="intro-features">
-        <div class="intro-feature">
-          <i class="ri-fire-line"></i>
-          <span>Streaks</span>
-        </div>
-        <div class="intro-feature">
-          <i class="ri-medal-line"></i>
-          <span>Achievements</span>
-        </div>
-        <div class="intro-feature">
-          <i class="ri-trophy-line"></i>
-          <span>Leaderboard</span>
-        </div>
       </div>
 
       <button id="startBtn" class="start-button">
@@ -86,87 +47,26 @@
   <div id="mainApp" class="main-app hidden">
     <!-- Unified Top Bar -->
     <header class="header">
-      <div class="header-left">
-        <div class="logo-grid" aria-label="AtomicMemory">
-          <span class="lg-cell" style="background:#ef4444"></span>
-          <span class="lg-empty"></span>
-          <span class="lg-empty"></span>
-          <span class="lg-empty"></span>
-          <span class="lg-cell" style="background:#ec4899"></span>
-
-          <span class="lg-cell" style="background:#f97316"></span>
-          <span class="lg-empty"></span>
-          <span class="lg-cell" style="background:#10b981"></span>
-          <span class="lg-cell" style="background:#3b82f6"></span>
-          <span class="lg-cell" style="background:#8b5cf6"></span>
-
-          <span class="lg-cell" style="background:#06b6d4"></span>
-          <span class="lg-cell" style="background:#eab308"></span>
-          <span class="lg-cell" style="background:#ec4899"></span>
-          <span class="lg-cell" style="background:#f59e0b"></span>
-          <span class="lg-cell" style="background:#84cc16"></span>
-
-          <span class="lg-empty"></span>
-          <span class="lg-cell" style="background:#3b82f6"></span>
-          <span class="lg-cell" style="background:#ef4444"></span>
-          <span class="lg-cell" style="background:#f97316"></span>
-          <span class="lg-empty"></span>
-        </div>
+      <div class="header-title-row">
         <h1 class="site-title">AtomicMemory</h1>
-        <span id="currentRank" class="rank-badge" aria-label="Current rank">Novice</span>
       </div>
-      <div class="header-center">
-        <div class="inline-stats">
-          <div class="inline-stat" title="Score">
-            <span class="inline-stat-value score-value-wrapper">
-              <span id="currentScore" class="inline-score">0</span>
-              <div id="scoreChangeIndicator" class="score-change"></div>
-            </span>
-          </div>
-          <span class="stat-divider"></span>
-          <div class="inline-stat" title="Time">
-            <i class="ri-timer-line" aria-hidden="true"></i>
-            <span id="timerDisplay" class="inline-stat-value">00:00</span>
-          </div>
-          <span class="stat-divider"></span>
-          <div class="inline-stat" title="Progress">
-            <i class="ri-check-double-line" aria-hidden="true"></i>
-            <span class="inline-stat-value"><span id="correctCount">0</span>/<span id="totalCount">118</span></span>
-          </div>
-          <span class="stat-divider"></span>
-          <div class="inline-stat" title="Streak">
-            <i class="ri-fire-line" aria-hidden="true"></i>
-            <span id="streakDisplay" class="inline-stat-value">0</span>
-          </div>
-          <span class="stat-divider"></span>
-          <div class="inline-stat" title="Accuracy">
-            <i class="ri-percent-line" aria-hidden="true"></i>
-            <span id="accuracyDisplay" class="inline-stat-value">100%</span>
-          </div>
-        </div>
-      </div>
-      <div class="header-right">
-        <button id="achievementsBtn" class="header-icon-btn" title="Achievements" aria-label="Achievements">
-          <i class="ri-medal-line" aria-hidden="true"></i>
-          <span id="achievementBadge" class="notification-badge hidden">0</span>
-        </button>
-        <button id="historyBtn" class="header-icon-btn" title="History" aria-label="Practice history">
-          <i class="ri-history-line" aria-hidden="true"></i>
-        </button>
-        <button id="leaderboardBtn" class="header-icon-btn" title="Leaderboard" aria-label="Leaderboard">
-          <i class="ri-trophy-line" aria-hidden="true"></i>
-        </button>
-        <button id="aboutBtn" class="header-icon-btn" title="About" aria-label="About">
-          <i class="ri-information-line" aria-hidden="true"></i>
-        </button>
-        <button id="darkModeBtn" class="header-icon-btn" title="Toggle theme" aria-label="Toggle theme">
-          <i class="ri-moon-line" aria-hidden="true"></i>
-        </button>
+      <div class="header-buttons-row">
         <button id="menuBtn" class="header-icon-btn mobile-menu-btn" title="Menu" aria-label="Menu">
           <i class="ri-menu-line" aria-hidden="true"></i>
         </button>
       </div>
     </header>
+
+    <!-- Hidden elements for JS state tracking (stats shown in bottom HUD) -->
+    <div class="hidden" aria-hidden="true">
+      <span id="currentScore">0</span>
+      <span id="currentRank">Novice</span>
+      <span id="timerDisplay">00:00</span>
+      <span id="correctCount">0</span>
+      <span id="totalCount">118</span>
+      <span id="streakDisplay">0</span>
+      <span id="accuracyDisplay">100%</span>
+    </div>
 
     <!-- Progress Bar -->
     <div class="progress-bar-container">
@@ -192,6 +92,7 @@
 
     <!-- Desktop Bottom HUD -->
     <div id="desktopBottomBar" class="desktop-bottom-bar">
+      <div class="bottom-bar-title">AtomicMemory</div>
       <div class="bottom-bar-stats">
         <div class="bottom-stat" title="Score">
           <i class="ri-star-line"></i>
@@ -215,17 +116,17 @@
         </div>
       </div>
       <div class="bottom-bar-action-row">
-        <button id="hintBtn" class="bottom-action-btn hint-btn" title="Get a hint (-50 points)">
-          <i class="ri-lightbulb-line"></i>
-          <span>Hint</span>
+        <button id="leaderboardBtn" class="bottom-action-btn trophy-btn" title="Leaderboard" aria-label="Leaderboard">
+          <i class="ri-trophy-line"></i>
+          <span>Leaderboard</span>
         </button>
         <button id="finishBtn" class="bottom-action-btn finish-btn" title="Finish challenge">
           <i class="ri-flag-line"></i>
           <span>Finish</span>
         </button>
-        <button id="viewTableBtn" class="bottom-action-btn view-btn" title="View periodic table">
+        <button id="viewTableBtn" class="bottom-action-btn view-btn" title="Reveal periodic table">
           <i class="ri-eye-line"></i>
-          <span>View</span>
+          <span>Reveal Table</span>
         </button>
       </div>
       <div class="bottom-bar-control-row">
@@ -236,10 +137,24 @@
             <button class="hud-nav-option" data-nav="vertical">↓ Next in Group</button>
           </div>
         </div>
-        <button id="resetBtn" class="bottom-action-btn reset-btn" title="Reset challenge">
-          <i class="ri-restart-line"></i>
-          <span>Reset</span>
-        </button>
+        <div class="hud-nav-btns">
+          <button id="achievementsBtn" class="header-icon-btn" title="Achievements" aria-label="Achievements">
+            <i class="ri-medal-line" aria-hidden="true"></i>
+            <span id="achievementBadge" class="notification-badge hidden">0</span>
+          </button>
+          <button id="historyBtn" class="header-icon-btn" title="History" aria-label="Practice history">
+            <i class="ri-history-line" aria-hidden="true"></i>
+          </button>
+          <button id="aboutBtn" class="header-icon-btn" title="About" aria-label="About">
+            <i class="ri-information-line" aria-hidden="true"></i>
+          </button>
+          <button id="darkModeBtn" class="header-icon-btn" title="Toggle theme" aria-label="Toggle theme">
+            <i class="ri-moon-line" aria-hidden="true"></i>
+          </button>
+          <button id="resetBtn" class="header-icon-btn" title="Reset challenge" aria-label="Reset challenge">
+            <i class="ri-restart-line" aria-hidden="true"></i>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -506,13 +421,13 @@
             <h4 class="info-story-title">The Story Behind AtomicMemory</h4>
           </div>
           <div class="info-story-card">
-            <p>I'm a high school student in Bangladesh, and I used to hate memorizing the periodic table. It felt pointless. I wanted to understand chemistry, not just recite it. But exams here mostly reward whoever remembers faster, and I was struggling.</p>
-            <p>My chemistry coach put it simply. Memorizing without strategy is just pain. But with the right approach, it changes completely. Learning group by group means you're not just remembering symbols, you're understanding why elements sit next to each other, what they share, how they behave. Slowly, the table stops feeling like a wall of random letters and starts feeling like a map. You begin seeing patterns instead of trying to force facts into your head.</p>
-            <p>That clicked for me in a way nothing had before. I wanted to practice, so I started thinking about printing blank tables and filling them in by hand, over and over. Then it hit me, I know how to code. Why not just build something? So I did. And somewhere in the middle of building a simple practice tool, I had a moment where I realized this could actually feel rewarding. Streaks, ranks, achievements, a sense of progress. The whole thing came together.</p>
+            <p>This was built while I was in high school in Bangladesh, at a time when I was genuinely struggling. Exams there mostly reward whoever memorizes faster, and I wasn't winning that race. I wanted to understand chemistry, not just recite it. But that didn't matter much when the test was in front of me and the symbols weren't coming.</p>
+            <p>My chemistry coach shifted my thinking. Memorizing without strategy is just pain, he said. But group by group, something changes. You stop forcing isolated facts into your head and start seeing connections. The table starts to feel like a map instead of a wall.</p>
+            <p>That finally clicked for me. I wanted to practice, thought about printing blank tables and filling them in by hand. Then I thought, why not just build something? Midway through building it, I had a moment where I realized this could actually feel rewarding. Streaks, ranks, achievements. That rush of progress.</p>
           </div>
           <blockquote class="info-quote">
             <i class="ri-double-quotes-l info-quote-icon" aria-hidden="true"></i>
-            <p>That's AtomicMemory. Born from a student who didn't want to memorize anything, and a coach who showed him there's a better way.</p>
+            <p>AtomicMemory came from that. From frustration, a coach who cared, and a student who found his way through.</p>
           </blockquote>
           <p class="info-cta">If you're struggling with the same thing, this was made for you.</p>
           <div class="info-links">
@@ -599,6 +514,7 @@
         </div>
       </div>
     </div>
+
 
   </div>
 
