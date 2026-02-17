@@ -143,27 +143,103 @@
       </div>
     </div>
 
-    <!-- Mobile Setup Screen -->
+    <!-- Mobile Intro Screen (replaces desktop intro on mobile) -->
     <div id="mobileSetupScreen" class="mobile-setup-screen hidden">
-      <!-- content will be populated by JS -->
+      <div class="mobile-setup-header">
+        <div class="mobile-setup-logo-row">
+          <div class="logo-grid mobile-setup-logo" aria-label="AtomicMemory">
+            <span class="lg-cell" style="background:#ef4444"></span>
+            <span class="lg-empty"></span>
+            <span class="lg-empty"></span>
+            <span class="lg-empty"></span>
+            <span class="lg-cell" style="background:#ec4899"></span>
+            <span class="lg-cell" style="background:#f97316"></span>
+            <span class="lg-empty"></span>
+            <span class="lg-cell" style="background:#10b981"></span>
+            <span class="lg-cell" style="background:#3b82f6"></span>
+            <span class="lg-cell" style="background:#8b5cf6"></span>
+            <span class="lg-cell" style="background:#06b6d4"></span>
+            <span class="lg-cell" style="background:#eab308"></span>
+            <span class="lg-cell" style="background:#ec4899"></span>
+            <span class="lg-cell" style="background:#f59e0b"></span>
+            <span class="lg-cell" style="background:#84cc16"></span>
+            <span class="lg-empty"></span>
+            <span class="lg-cell" style="background:#3b82f6"></span>
+            <span class="lg-cell" style="background:#ef4444"></span>
+            <span class="lg-cell" style="background:#f97316"></span>
+            <span class="lg-empty"></span>
+          </div>
+          <div class="mobile-setup-title">AtomicMemory</div>
+        </div>
+        <div class="mobile-setup-subtitle">Master the periodic table</div>
+      </div>
+
+      <div id="mobileSetupPreviewContainer" class="mobile-setup-preview">
+        <div id="mobileSetupPreviewTable" class="mini-periodic-table"></div>
+      </div>
+
+      <button class="mobile-start-btn" id="mobileStartBtn">
+        <i class="ri-play-fill"></i>
+        Start Challenge
+      </button>
+
+      <div class="mobile-setup-toolbar">
+        <button class="mobile-setup-toolbar-btn" id="setupHistoryBtn" title="History">
+          <i class="ri-history-line"></i>
+        </button>
+        <button class="mobile-setup-toolbar-btn" id="setupLeaderboardBtn" title="Leaderboard">
+          <i class="ri-trophy-line"></i>
+        </button>
+        <button class="mobile-setup-toolbar-btn" id="setupAchievementsBtn" title="Achievements">
+          <i class="ri-medal-line"></i>
+        </button>
+        <button class="mobile-setup-toolbar-btn" id="setupThemeBtn" title="Toggle theme">
+          <i class="ri-moon-line"></i>
+        </button>
+        <button class="mobile-setup-toolbar-btn" id="setupInfoBtn" title="Info">
+          <i class="ri-information-line"></i>
+        </button>
+      </div>
     </div>
 
-    <!-- Slim Control Bar -->
-    <div class="quick-settings">
-      <div class="settings-right">
-        <button id="viewTableBtn" class="action-btn view-btn" title="View periodic table">
+    <!-- Desktop Bottom Nav Bar -->
+    <div id="desktopBottomBar" class="desktop-bottom-bar">
+      <div class="bottom-bar-stats">
+        <div class="bottom-stat" title="Score">
+          <i class="ri-star-line"></i>
+          <span id="bottomScore">0</span>
+        </div>
+        <div class="bottom-stat" title="Time">
+          <i class="ri-timer-line"></i>
+          <span id="bottomTimer">00:00</span>
+        </div>
+        <div class="bottom-stat" title="Progress">
+          <i class="ri-check-double-line"></i>
+          <span id="bottomProgress">0/118</span>
+        </div>
+        <div class="bottom-stat" title="Streak">
+          <i class="ri-fire-line"></i>
+          <span id="bottomStreak">0</span>
+        </div>
+        <div class="bottom-stat" title="Accuracy">
+          <i class="ri-percent-line"></i>
+          <span id="bottomAccuracy">100%</span>
+        </div>
+      </div>
+      <div class="bottom-bar-actions">
+        <button id="viewTableBtn" class="bottom-action-btn view-btn" title="View periodic table">
           <i class="ri-eye-line"></i>
           <span>View</span>
         </button>
-        <button id="hintBtn" class="action-btn hint-btn" title="Get a hint (-50 points)">
+        <button id="hintBtn" class="bottom-action-btn hint-btn" title="Get a hint (-50 points)">
           <i class="ri-lightbulb-line"></i>
           <span>Hint</span>
         </button>
-        <button id="finishBtn" class="action-btn finish-btn" title="Finish challenge">
+        <button id="finishBtn" class="bottom-action-btn finish-btn" title="Finish challenge">
           <i class="ri-flag-line"></i>
           <span>Finish</span>
         </button>
-        <button id="resetBtn" class="action-btn reset-btn" title="Reset challenge">
+        <button id="resetBtn" class="bottom-action-btn reset-btn" title="Reset challenge">
           <i class="ri-restart-line"></i>
           <span>Reset</span>
         </button>
@@ -179,10 +255,54 @@
       <!-- Mobile Input Modal -->
       <div id="mobileInputModal" class="mobile-input-modal hidden">
         <div class="mobile-input-content">
-          <!-- Score Row -->
-          <div class="mobile-modal-score-row">
-            <div class="mobile-modal-score-value" id="mobileScoreDisplay">0</div>
-            <span class="mobile-modal-rank" id="mobileRankDisplay">Novice</span>
+          <!-- Compact Header -->
+          <div class="mobile-game-header">
+            <div class="mobile-game-logo-row">
+              <div class="logo-grid mobile-game-logo" aria-label="AtomicMemory">
+                <span class="lg-cell" style="background:#ef4444"></span>
+                <span class="lg-empty"></span>
+                <span class="lg-empty"></span>
+                <span class="lg-empty"></span>
+                <span class="lg-cell" style="background:#ec4899"></span>
+                <span class="lg-cell" style="background:#f97316"></span>
+                <span class="lg-empty"></span>
+                <span class="lg-cell" style="background:#10b981"></span>
+                <span class="lg-cell" style="background:#3b82f6"></span>
+                <span class="lg-cell" style="background:#8b5cf6"></span>
+                <span class="lg-cell" style="background:#06b6d4"></span>
+                <span class="lg-cell" style="background:#eab308"></span>
+                <span class="lg-cell" style="background:#ec4899"></span>
+                <span class="lg-cell" style="background:#f59e0b"></span>
+                <span class="lg-cell" style="background:#84cc16"></span>
+                <span class="lg-empty"></span>
+                <span class="lg-cell" style="background:#3b82f6"></span>
+                <span class="lg-cell" style="background:#ef4444"></span>
+                <span class="lg-cell" style="background:#f97316"></span>
+                <span class="lg-empty"></span>
+              </div>
+              <span class="mobile-game-title">AtomicMemory</span>
+            </div>
+            <div class="mobile-game-header-right">
+              <button class="mobile-toolbar-btn" id="mobileToolbarTheme" title="Toggle theme">
+                <i class="ri-moon-line"></i>
+              </button>
+              <button class="mobile-toolbar-btn" id="mobileToolbarReset" title="Reset">
+                <i class="ri-restart-line"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Compact Stats Strip -->
+          <div class="mobile-stats-strip">
+            <span class="mobile-strip-stat"><span class="strip-label">Score</span> <span id="mobileScoreDisplay" class="strip-value">0</span></span>
+            <span class="strip-divider">|</span>
+            <span class="mobile-strip-stat"><span class="strip-label">Time</span> <span id="mobileTimerDisplay" class="strip-value">00:00</span></span>
+            <span class="strip-divider">|</span>
+            <span class="mobile-strip-stat"><span id="mobileProgressDisplay" class="strip-value">0/118</span></span>
+            <span class="strip-divider">|</span>
+            <span class="mobile-strip-stat"><i class="ri-fire-line"></i> <span id="mobileStreakDisplay" class="strip-value">0</span></span>
+            <span class="strip-divider">|</span>
+            <span class="mobile-strip-stat"><span id="mobileAccuracyDisplay" class="strip-value">100%</span></span>
           </div>
 
           <!-- Mini Table Preview -->
@@ -190,82 +310,92 @@
             <div id="miniPeriodicTable" class="mini-periodic-table"></div>
           </div>
 
-          <!-- Stats Bar -->
-          <div class="mobile-modal-stats">
-            <div class="mobile-modal-stat">
-              <div class="mobile-modal-stat-value" id="mobileProgressDisplay">0/118</div>
-              <div class="mobile-modal-stat-label">Progress</div>
-            </div>
-            <div class="mobile-modal-stat">
-              <div class="mobile-modal-stat-value" id="mobileStreakDisplay">0</div>
-              <div class="mobile-modal-stat-label">Streak</div>
-            </div>
-            <div class="mobile-modal-stat">
-              <div class="mobile-modal-stat-value" id="mobileAccuracyDisplay">100%</div>
-              <div class="mobile-modal-stat-label">Accuracy</div>
-            </div>
-            <div class="mobile-modal-stat">
-              <div class="mobile-modal-stat-value" id="mobileTimerDisplay">00:00</div>
-              <div class="mobile-modal-stat-label">Time</div>
-            </div>
-          </div>
-
-          <!-- Toolbar -->
-          <div class="mobile-modal-toolbar">
-            <button class="mobile-toolbar-btn" id="mobileToolbarTheme" title="Toggle theme">
-              <i class="ri-moon-line"></i>
-            </button>
-            <button class="mobile-toolbar-btn" id="mobileToolbarReset" title="Reset">
-              <i class="ri-restart-line"></i>
-            </button>
-          </div>
-
-          <!-- Element Info & Input -->
-          <div class="mobile-input-header">
-            <div class="mobile-input-element-info">
+          <!-- Cell-like Input Display -->
+          <div class="mobile-cell-input-area">
+            <div class="mobile-cell-prompt">
               <span class="mobile-input-number"></span>
               <span class="mobile-input-category"></span>
             </div>
-            <button class="mobile-input-close" aria-label="Close input">
-              <i class="ri-close-line" aria-hidden="true"></i>
-            </button>
+            <div class="mobile-cell-display">
+              <div class="cell-atomic-number" id="cellAtomicNumber"></div>
+              <div class="cell-symbol-display" id="cellSymbolDisplay">?</div>
+              <div class="cell-name-display" id="cellNameDisplay"></div>
+            </div>
+            <div class="mobile-input-hint hidden"></div>
           </div>
-          <input type="text" id="mobileInput" class="mobile-input-field" maxlength="3" autocomplete="off" placeholder="Enter symbol">
-          <div class="mobile-input-actions">
-            <button id="mobileHintBtn" class="mobile-hint-btn">
-              <i class="ri-lightbulb-line"></i>
-              Hint
+
+          <!-- Hidden real input for state tracking -->
+          <input type="text" id="mobileInput" class="mobile-input-field-hidden" maxlength="3" autocomplete="off" inputmode="none" tabindex="-1" aria-hidden="true">
+
+          <!-- Arrow Navigation Row -->
+          <div class="mobile-nav-row">
+            <button id="mobileArrowLeft" class="mobile-nav-btn" title="Move left" aria-label="Move left">
+              <i class="ri-arrow-left-line"></i>
             </button>
-            <button id="mobileSkipBtn" class="mobile-skip-btn">
-              <i class="ri-skip-forward-line"></i>
-              Skip
-            </button>
-            <button id="mobileSubmitBtn" class="mobile-submit-btn">
-              <i class="ri-check-line"></i>
-              Submit
-            </button>
-          </div>
-          <div class="mobile-arrow-keys">
-            <button id="mobileArrowUp" class="mobile-arrow-btn" title="Move up" aria-label="Move up">
+            <button id="mobileArrowUp" class="mobile-nav-btn" title="Move up" aria-label="Move up">
               <i class="ri-arrow-up-line"></i>
             </button>
-            <div class="mobile-arrow-row">
-              <button id="mobileArrowLeft" class="mobile-arrow-btn" title="Move left" aria-label="Move left">
-                <i class="ri-arrow-left-line"></i>
-              </button>
-              <button id="mobileArrowDown" class="mobile-arrow-btn" title="Move down" aria-label="Move down">
-                <i class="ri-arrow-down-line"></i>
-              </button>
-              <button id="mobileArrowRight" class="mobile-arrow-btn" title="Move right" aria-label="Move right">
-                <i class="ri-arrow-right-line"></i>
-              </button>
+            <button id="mobileArrowDown" class="mobile-nav-btn" title="Move down" aria-label="Move down">
+              <i class="ri-arrow-down-line"></i>
+            </button>
+            <button id="mobileArrowRight" class="mobile-nav-btn" title="Move right" aria-label="Move right">
+              <i class="ri-arrow-right-line"></i>
+            </button>
+            <button id="mobileHintBtn" class="mobile-nav-btn mobile-nav-hint" title="Hint" aria-label="Hint">
+              <i class="ri-lightbulb-line"></i>
+            </button>
+            <button id="mobileSkipBtn" class="mobile-nav-btn mobile-nav-skip" title="Skip" aria-label="Skip">
+              <i class="ri-skip-forward-line"></i>
+            </button>
+            <button id="mobileFinishBtn" class="mobile-nav-btn mobile-nav-finish" title="Finish" aria-label="Finish">
+              <i class="ri-flag-line"></i>
+            </button>
+          </div>
+
+          <!-- QWERTY Keyboard -->
+          <div class="qwerty-keyboard" id="qwertyKeyboard">
+            <div class="qwerty-row">
+              <button class="qwerty-key" data-key="Q">Q</button>
+              <button class="qwerty-key" data-key="W">W</button>
+              <button class="qwerty-key" data-key="E">E</button>
+              <button class="qwerty-key" data-key="R">R</button>
+              <button class="qwerty-key" data-key="T">T</button>
+              <button class="qwerty-key" data-key="Y">Y</button>
+              <button class="qwerty-key" data-key="U">U</button>
+              <button class="qwerty-key" data-key="I">I</button>
+              <button class="qwerty-key" data-key="O">O</button>
+              <button class="qwerty-key" data-key="P">P</button>
+            </div>
+            <div class="qwerty-row">
+              <button class="qwerty-key" data-key="A">A</button>
+              <button class="qwerty-key" data-key="S">S</button>
+              <button class="qwerty-key" data-key="D">D</button>
+              <button class="qwerty-key" data-key="F">F</button>
+              <button class="qwerty-key" data-key="G">G</button>
+              <button class="qwerty-key" data-key="H">H</button>
+              <button class="qwerty-key" data-key="J">J</button>
+              <button class="qwerty-key" data-key="K">K</button>
+              <button class="qwerty-key" data-key="L">L</button>
+            </div>
+            <div class="qwerty-row">
+              <button class="qwerty-key" data-key="Z">Z</button>
+              <button class="qwerty-key" data-key="X">X</button>
+              <button class="qwerty-key" data-key="C">C</button>
+              <button class="qwerty-key" data-key="V">V</button>
+              <button class="qwerty-key" data-key="B">B</button>
+              <button class="qwerty-key" data-key="N">N</button>
+              <button class="qwerty-key" data-key="M">M</button>
+            </div>
+            <div class="qwerty-row qwerty-action-row">
+              <button class="qwerty-key qwerty-backspace" data-key="BACKSPACE"><i class="ri-delete-back-2-line"></i></button>
+              <button class="qwerty-key qwerty-submit" data-key="SUBMIT"><i class="ri-check-line"></i> Submit</button>
             </div>
           </div>
-          <button id="mobileFinishBtn" class="mobile-finish-btn">
-            <i class="ri-flag-line"></i>
-            Finish
+
+          <span class="mobile-modal-rank" id="mobileRankDisplay">Novice</span>
+          <button class="mobile-input-close" aria-label="Close input">
+            <i class="ri-close-line" aria-hidden="true"></i>
           </button>
-          <div class="mobile-input-hint hidden"></div>
         </div>
       </div>
     </main>

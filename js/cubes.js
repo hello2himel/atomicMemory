@@ -152,8 +152,10 @@
     }, 3000);
   }
 
-  // Start animation
-  runCycle();
+  // Start animation only on desktop (window > 768px)
+  if (window.innerWidth > 768) {
+    runCycle();
+  }
 
   // Cleanup on start
   document.getElementById('startBtn').addEventListener('click', function() {

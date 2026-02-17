@@ -90,6 +90,12 @@ function detectMobile() {
 
 // Intro Screen
 function setupIntro() {
+  if (state.isMobile) {
+    // On mobile, auto-start immediately (skip animated intro)
+    startApp();
+    return;
+  }
+  
   startBtn.addEventListener('click', startApp);
   
   document.addEventListener('keydown', (e) => {
@@ -100,20 +106,22 @@ function setupIntro() {
 }
 
 function startApp() {
-  introOverlay.classList.add('fade-out');
-  setTimeout(() => {
+  if (state.isMobile) {
+    // On mobile, skip the animated intro and show the setup screen
     introOverlay.classList.add('hidden');
     mainApp.classList.remove('hidden');
     renderPeriodicTable();
     initializeFullTable();
-    if (state.isMobile) {
-      // Open input for the first active element
-      const firstElement = findFirstActiveElement();
-      if (firstElement) {
-        openMobileInput(firstElement);
-      }
-    }
-  }, 600);
+    showMobileSetupScreen();
+  } else {
+    introOverlay.classList.add('fade-out');
+    setTimeout(() => {
+      introOverlay.classList.add('hidden');
+      mainApp.classList.remove('hidden');
+      renderPeriodicTable();
+      initializeFullTable();
+    }, 600);
+  }
 }
 
 // Dark Mode
@@ -172,8 +180,7 @@ function setupEventListeners() {
   menuBtn.addEventListener('click', openMobileMenu);
   closeMobileMenu.addEventListener('click', () => mobileMenu.classList.add('hidden'));
   
-  // Mobile input
-  mobileSubmitBtn.addEventListener('click', handleMobileSubmit);
+  // Mobile input - QWERTY keyboard handles submit now
   mobileHintBtn.addEventListener('click', () => {
     showHint();
     mobileInputModal.querySelector('.mobile-input-hint').classList.remove('hidden');
@@ -184,15 +191,6 @@ function setupEventListeners() {
     if (nextEl) {
       updateMobileInputForElement(nextEl);
     }
-  });
-  mobileInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleMobileSubmit();
-    }
-  });
-  mobileInput.addEventListener('input', () => {
-    formatSymbolInput(mobileInput);
   });
   document.querySelector('.mobile-input-close').addEventListener('click', closeMobileInput);
   
@@ -205,6 +203,43 @@ function setupEventListeners() {
   // Mobile finish button
   document.getElementById('mobileFinishBtn').addEventListener('click', finishChallenge);
   
+  // QWERTY keyboard
+  document.querySelectorAll('.qwerty-key').forEach(key => {
+    key.addEventListener('click', (e) => {
+      e.preventDefault();
+      const k = key.dataset.key;
+      handleQwertyKey(k);
+    });
+  });
+  
+  // Mobile setup screen buttons
+  const mobileStartBtn = document.getElementById('mobileStartBtn');
+  if (mobileStartBtn) {
+    mobileStartBtn.addEventListener('click', () => {
+      mobileSetupScreen.classList.add('hidden');
+      const firstElement = findFirstActiveElement();
+      if (firstElement) {
+        openMobileInput(firstElement);
+      }
+    });
+  }
+  const setupHistoryBtn = document.getElementById('setupHistoryBtn');
+  if (setupHistoryBtn) setupHistoryBtn.addEventListener('click', openHistoryModal);
+  const setupLeaderboardBtn = document.getElementById('setupLeaderboardBtn');
+  if (setupLeaderboardBtn) setupLeaderboardBtn.addEventListener('click', openLeaderboardModal);
+  const setupAchievementsBtn = document.getElementById('setupAchievementsBtn');
+  if (setupAchievementsBtn) setupAchievementsBtn.addEventListener('click', openAchievementsModal);
+  const setupThemeBtn = document.getElementById('setupThemeBtn');
+  if (setupThemeBtn) {
+    setupThemeBtn.addEventListener('click', () => {
+      darkModeBtn.click();
+      const icon = setupThemeBtn.querySelector('i');
+      icon.className = document.body.dataset.theme === 'dark' ? 'ri-sun-line' : 'ri-moon-line';
+    });
+  }
+  const setupInfoBtn = document.getElementById('setupInfoBtn');
+  if (setupInfoBtn) setupInfoBtn.addEventListener('click', openInfoModal);
+  
   // Mobile toolbar buttons
   document.getElementById('mobileToolbarTheme').addEventListener('click', () => {
     darkModeBtn.click();
@@ -216,10 +251,8 @@ function setupEventListeners() {
     if (confirm('Reset current challenge?')) {
       resetChallenge();
       if (state.isMobile) {
-        const firstElement = findFirstActiveElement();
-        if (firstElement) {
-          openMobileInput(firstElement);
-        }
+        closeMobileInput();
+        showMobileSetupScreen();
       }
     }
   });
@@ -232,10 +265,7 @@ function setupEventListeners() {
     closeModal(completeModal);
     resetChallenge();
     if (state.isMobile) {
-      const firstElement = findFirstActiveElement();
-      if (firstElement) {
-        openMobileInput(firstElement);
-      }
+      showMobileSetupScreen();
     }
   });
   shareScoreBtn.addEventListener('click', shareScore);
@@ -471,6 +501,14 @@ function openMobileInput(element) {
   number.textContent = formatMobileElementInfo(element);
   category.textContent = element.dataset.category;
   
+  // Update cell display
+  const cellAtomicNum = document.getElementById('cellAtomicNumber');
+  const cellSymbolDisplay = document.getElementById('cellSymbolDisplay');
+  const cellNameDisplay = document.getElementById('cellNameDisplay');
+  if (cellAtomicNum) cellAtomicNum.textContent = element.dataset.atomic;
+  if (cellSymbolDisplay) cellSymbolDisplay.textContent = '?';
+  if (cellNameDisplay) cellNameDisplay.textContent = '';
+  
   mobileInput.value = '';
   
   mobileInputModal.querySelector('.mobile-input-hint').classList.add('hidden');
@@ -485,8 +523,6 @@ function openMobileInput(element) {
   // Highlight current element in mini table
   updateMiniTable(parseInt(element.dataset.atomic), 'current');
   updateMobileStats();
-  
-  setTimeout(() => mobileInput.focus(), 100);
 }
 
 function closeMobileInput() {
@@ -502,13 +538,18 @@ function handleMobileSubmit() {
   
   validateInput(state.currentElement, value);
   
+  const cellDisplay = document.getElementById('cellSymbolDisplay');
+  const cellName = document.getElementById('cellNameDisplay');
+  
   if (state.currentElement.classList.contains('correct')) {
     // Update mini table
     updateMiniTable(parseInt(state.currentElement.dataset.atomic), 'correct');
     
-    // Flash green feedback on input
-    mobileInput.classList.add('input-correct');
-    setTimeout(() => mobileInput.classList.remove('input-correct'), 400);
+    // Flash green feedback on cell display
+    if (cellDisplay) {
+      cellDisplay.parentElement.classList.add('cell-correct');
+      setTimeout(() => cellDisplay.parentElement.classList.remove('cell-correct'), 400);
+    }
     
     updateMobileStats();
     
@@ -528,10 +569,12 @@ function handleMobileSubmit() {
   } else {
     // Flash red feedback
     updateMiniTable(parseInt(state.currentElement.dataset.atomic), 'incorrect');
-    mobileInput.classList.add('input-incorrect');
-    setTimeout(() => mobileInput.classList.remove('input-incorrect'), 400);
+    if (cellDisplay) {
+      cellDisplay.parentElement.classList.add('cell-incorrect');
+      setTimeout(() => cellDisplay.parentElement.classList.remove('cell-incorrect'), 400);
+    }
     mobileInput.value = '';
-    mobileInput.focus();
+    if (cellDisplay) cellDisplay.textContent = '?';
     updateMobileStats();
   }
 }
@@ -866,6 +909,9 @@ function updateTimerDisplay() {
   // Mirror timer in mobile modal
   const mobileTimer = document.getElementById('mobileTimerDisplay');
   if (mobileTimer) mobileTimer.textContent = timeStr;
+  // Mirror timer in desktop bottom bar
+  const bottomTimer = document.getElementById('bottomTimer');
+  if (bottomTimer) bottomTimer.textContent = timeStr;
 }
 
 // Challenge
@@ -994,6 +1040,9 @@ function updateStats() {
   if (!mobileInputModal.classList.contains('hidden')) {
     updateMobileStats();
   }
+  
+  // Update desktop bottom bar stats
+  updateBottomBarStats();
 }
 
 // Save/Load Total Challenges
@@ -1232,6 +1281,104 @@ function saveToHistory() {
   localStorage.setItem('history', JSON.stringify(history));
 }
 
+// ===== QWERTY KEYBOARD HANDLER =====
+
+function handleQwertyKey(key) {
+  if (!state.currentElement) return;
+  
+  const cellSymbolDisplay = document.getElementById('cellSymbolDisplay');
+  
+  if (key === 'BACKSPACE') {
+    if (mobileInput.value.length > 0) {
+      mobileInput.value = mobileInput.value.slice(0, -1);
+      if (cellSymbolDisplay) {
+        cellSymbolDisplay.textContent = mobileInput.value || '?';
+      }
+    }
+    return;
+  }
+  
+  if (key === 'SUBMIT') {
+    handleMobileSubmit();
+    return;
+  }
+  
+  // Letter key
+  if (mobileInput.value.length < 3) {
+    mobileInput.value += key;
+    formatSymbolInput(mobileInput);
+    if (cellSymbolDisplay) {
+      cellSymbolDisplay.textContent = mobileInput.value;
+    }
+  }
+}
+
+// ===== MOBILE SETUP SCREEN =====
+
+function showMobileSetupScreen() {
+  // Render preview table
+  renderSetupPreviewTable();
+  
+  // Sync theme icon
+  const themeIcon = document.querySelector('#setupThemeBtn i');
+  if (themeIcon) {
+    themeIcon.className = document.body.dataset.theme === 'dark' ? 'ri-sun-line' : 'ri-moon-line';
+  }
+  
+  mobileSetupScreen.classList.remove('hidden');
+}
+
+function renderSetupPreviewTable() {
+  const previewTable = document.getElementById('mobileSetupPreviewTable');
+  if (!previewTable) return;
+  previewTable.innerHTML = '';
+  
+  const layout = getMiniTableLayout();
+  
+  layout.forEach(item => {
+    if (item === 'spacer' || item === 'label' || item === 'placeholder') {
+      const spacer = document.createElement('div');
+      spacer.className = 'mini-spacer';
+      previewTable.appendChild(spacer);
+    } else {
+      const cell = document.createElement('div');
+      cell.className = 'mini-cell';
+      const elData = ELEMENTS_MAP[item];
+      if (elData) {
+        cell.style.background = getCategoryColor(elData.category);
+        cell.style.borderColor = getCategoryColor(elData.category);
+      }
+      previewTable.appendChild(cell);
+    }
+  });
+}
+
+// ===== DESKTOP BOTTOM BAR STATS =====
+
+function updateBottomBarStats() {
+  const correct = state.correctElements.size;
+  const total = state.activeElements.size;
+  const accuracy = state.totalAttempts > 0 ? Math.round((state.correctAttempts / state.totalAttempts) * 100) : 100;
+  
+  const bottomScore = document.getElementById('bottomScore');
+  const bottomTimer = document.getElementById('bottomTimer');
+  const bottomProgress = document.getElementById('bottomProgress');
+  const bottomStreak = document.getElementById('bottomStreak');
+  const bottomAccuracy = document.getElementById('bottomAccuracy');
+  
+  if (bottomScore && typeof scoringSystem !== 'undefined') {
+    bottomScore.textContent = scoringSystem.formatScore(scoringSystem.score);
+  }
+  if (bottomTimer) {
+    const minutes = Math.floor(state.elapsedTime / 60);
+    const seconds = state.elapsedTime % 60;
+    bottomTimer.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  }
+  if (bottomProgress) bottomProgress.textContent = `${correct}/${total}`;
+  if (bottomStreak) bottomStreak.textContent = state.streak;
+  if (bottomAccuracy) bottomAccuracy.textContent = `${accuracy}%`;
+}
+
 // ===== MOBILE PERSISTENT MODAL =====
 
 function findFirstActiveElement() {
@@ -1355,14 +1502,20 @@ function updateMobileInputForElement(element) {
   number.textContent = formatMobileElementInfo(element);
   category.textContent = element.dataset.category;
   
+  // Update cell display
+  const cellAtomicNum = document.getElementById('cellAtomicNumber');
+  const cellSymbolDisplay = document.getElementById('cellSymbolDisplay');
+  const cellNameDisplay = document.getElementById('cellNameDisplay');
+  if (cellAtomicNum) cellAtomicNum.textContent = element.dataset.atomic;
+  if (cellSymbolDisplay) cellSymbolDisplay.textContent = '?';
+  if (cellNameDisplay) cellNameDisplay.textContent = '';
+  
   mobileInput.value = '';
   mobileInputModal.querySelector('.mobile-input-hint').classList.add('hidden');
   
   // Update mini table to highlight new current element
   updateMiniTable(parseInt(element.dataset.atomic), 'current');
   updateMobileStats();
-  
-  setTimeout(() => mobileInput.focus(), 100);
 }
 
 function updateMobileStats() {
