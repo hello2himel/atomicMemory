@@ -1485,9 +1485,11 @@ function renderMiniTable() {
         cell.classList.add('mini-disabled');
       }
       
-      // Mark correct if already answered
+      // Mark correct if already answered and show symbol
       if (state.correctElements.has(item)) {
         cell.classList.add('mini-correct');
+        const el = ELEMENTS[item - 1];
+        if (el) cell.textContent = el.symbol;
       }
       
       miniTable.appendChild(cell);
@@ -1526,6 +1528,8 @@ function updateMiniTable(atomicNumber, status) {
   if (status === 'correct') {
     cell.classList.remove('mini-incorrect');
     cell.classList.add('mini-correct');
+    const el = ELEMENTS[atomicNumber - 1];
+    if (el) cell.textContent = el.symbol;
   } else if (status === 'incorrect') {
     cell.classList.add('mini-incorrect');
     // Flash red then revert to neutral

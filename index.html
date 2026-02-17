@@ -231,53 +231,31 @@
       <!-- Mobile Input Modal -->
       <div id="mobileInputModal" class="mobile-input-modal hidden">
         <div class="mobile-input-content">
-          <!-- Compact Header -->
-          <div class="mobile-game-header">
-            <div class="mobile-game-logo-row">
-              <div class="logo-grid mobile-game-logo" aria-label="AtomicMemory">
-                <span class="lg-cell" style="background:#ef4444"></span>
-                <span class="lg-empty"></span>
-                <span class="lg-empty"></span>
-                <span class="lg-empty"></span>
-                <span class="lg-cell" style="background:#ec4899"></span>
-                <span class="lg-cell" style="background:#f97316"></span>
-                <span class="lg-empty"></span>
-                <span class="lg-cell" style="background:#10b981"></span>
-                <span class="lg-cell" style="background:#3b82f6"></span>
-                <span class="lg-cell" style="background:#8b5cf6"></span>
-                <span class="lg-cell" style="background:#06b6d4"></span>
-                <span class="lg-cell" style="background:#eab308"></span>
-                <span class="lg-cell" style="background:#ec4899"></span>
-                <span class="lg-cell" style="background:#f59e0b"></span>
-                <span class="lg-cell" style="background:#84cc16"></span>
-                <span class="lg-empty"></span>
-                <span class="lg-cell" style="background:#3b82f6"></span>
-                <span class="lg-cell" style="background:#ef4444"></span>
-                <span class="lg-cell" style="background:#f97316"></span>
-                <span class="lg-empty"></span>
-              </div>
-              <span class="mobile-game-title">AtomicMemory</span>
-            </div>
-            <div class="mobile-game-header-right">
-              <button class="mobile-toolbar-btn" id="mobileToolbarHistory" title="History">
-                <i class="ri-history-line"></i>
-              </button>
-              <button class="mobile-toolbar-btn" id="mobileToolbarLeaderboard" title="Leaderboard">
-                <i class="ri-trophy-line"></i>
-              </button>
-              <button class="mobile-toolbar-btn" id="mobileToolbarAchievements" title="Achievements">
-                <i class="ri-medal-line"></i>
-              </button>
-              <button class="mobile-toolbar-btn" id="mobileToolbarAbout" title="About">
-                <i class="ri-information-line"></i>
-              </button>
-              <button class="mobile-toolbar-btn" id="mobileToolbarTheme" title="Toggle theme">
-                <i class="ri-moon-line"></i>
-              </button>
-              <button class="mobile-toolbar-btn" id="mobileToolbarReset" title="Reset">
-                <i class="ri-restart-line"></i>
-              </button>
-            </div>
+          <!-- Row 1: Centered Title -->
+          <div class="mobile-game-title-row">
+            <span class="mobile-game-title">AtomicMemory</span>
+          </div>
+
+          <!-- Row 2: Action Buttons -->
+          <div class="mobile-game-buttons-row">
+            <button class="mobile-toolbar-btn" id="mobileToolbarHistory" title="History">
+              <i class="ri-history-line"></i>
+            </button>
+            <button class="mobile-toolbar-btn" id="mobileToolbarLeaderboard" title="Leaderboard">
+              <i class="ri-trophy-line"></i>
+            </button>
+            <button class="mobile-toolbar-btn" id="mobileToolbarAchievements" title="Achievements">
+              <i class="ri-medal-line"></i>
+            </button>
+            <button class="mobile-toolbar-btn" id="mobileToolbarAbout" title="About">
+              <i class="ri-information-line"></i>
+            </button>
+            <button class="mobile-toolbar-btn" id="mobileToolbarTheme" title="Toggle theme">
+              <i class="ri-moon-line"></i>
+            </button>
+            <button class="mobile-toolbar-btn" id="mobileToolbarReset" title="Reset">
+              <i class="ri-restart-line"></i>
+            </button>
           </div>
 
           <!-- Compact Stats Strip -->
@@ -474,7 +452,7 @@
     <!-- Info Modal -->
     <div id="infoModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="About AtomicMemory">
       <div class="modal-overlay"></div>
-      <div class="modal-content">
+      <div class="modal-content info-modal-content">
         <div class="modal-header">
           <h3>
             <i class="ri-information-line" aria-hidden="true"></i>
@@ -485,12 +463,22 @@
           </button>
         </div>
         <div class="modal-body info-modal-body">
-          <h4 class="info-story-title">The Story Behind AtomicMemory</h4>
-          <p>I'm a high school student in Bangladesh, and I used to hate memorizing the periodic table. It felt pointless. I wanted to understand chemistry, not just recite it. But exams here mostly reward whoever remembers faster, and I was struggling.</p>
-          <p>My chemistry coach put it simply. Memorizing without strategy is just pain. But with the right approach, it changes completely. Learning group by group means you're not just remembering symbols, you're understanding why elements sit next to each other, what they share, how they behave. Slowly, the table stops feeling like a wall of random letters and starts feeling like a map. You begin seeing patterns instead of trying to force facts into your head.</p>
-          <p>That clicked for me in a way nothing had before. I wanted to practice, so I started thinking about printing blank tables and filling them in by hand, over and over. Then it hit me, I know how to code. Why not just build something? So I did. And somewhere in the middle of building a simple practice tool, I had a moment where I realized this could actually feel rewarding. Streaks, ranks, achievements, a sense of progress. The whole thing came together.</p>
-          <p>That's AtomicMemory. Born from a student who didn't want to memorize anything, and a coach who showed him there's a better way.</p>
-          <p>If you're struggling with the same thing, this was made for you.</p>
+          <div class="info-hero">
+            <div class="info-hero-icon">
+              <i class="ri-flask-line" aria-hidden="true"></i>
+            </div>
+            <h4 class="info-story-title">The Story Behind AtomicMemory</h4>
+          </div>
+          <div class="info-story-card">
+            <p>I'm a high school student in Bangladesh, and I used to hate memorizing the periodic table. It felt pointless. I wanted to understand chemistry, not just recite it. But exams here mostly reward whoever remembers faster, and I was struggling.</p>
+            <p>My chemistry coach put it simply. Memorizing without strategy is just pain. But with the right approach, it changes completely. Learning group by group means you're not just remembering symbols, you're understanding why elements sit next to each other, what they share, how they behave. Slowly, the table stops feeling like a wall of random letters and starts feeling like a map. You begin seeing patterns instead of trying to force facts into your head.</p>
+            <p>That clicked for me in a way nothing had before. I wanted to practice, so I started thinking about printing blank tables and filling them in by hand, over and over. Then it hit me, I know how to code. Why not just build something? So I did. And somewhere in the middle of building a simple practice tool, I had a moment where I realized this could actually feel rewarding. Streaks, ranks, achievements, a sense of progress. The whole thing came together.</p>
+          </div>
+          <blockquote class="info-quote">
+            <i class="ri-double-quotes-l info-quote-icon" aria-hidden="true"></i>
+            <p>That's AtomicMemory. Born from a student who didn't want to memorize anything, and a coach who showed him there's a better way.</p>
+          </blockquote>
+          <p class="info-cta">If you're struggling with the same thing, this was made for you.</p>
           <div class="info-links">
             <p>Made with <span aria-label="love">❤️</span> by <a href="https://hello2himel.netlify.app" target="_blank" rel="noopener noreferrer">@hello2himel</a> from <span aria-label="Bangladesh">🇧🇩</span></p>
             <p>This is an open source software. <a href="https://github.com/hello2himel/atomicmemory" target="_blank" rel="noopener noreferrer">View Source Code</a></p>
