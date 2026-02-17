@@ -105,8 +105,6 @@ const mobileMenu = document.getElementById('mobileMenu');
 const closeMobileMenu = document.getElementById('closeMobileMenu');
 const mobileInputModal = document.getElementById('mobileInputModal');
 const mobileInput = document.getElementById('mobileInput');
-const mobileHintBtn = document.getElementById('mobileHintBtn');
-const mobileSkipBtn = document.getElementById('mobileSkipBtn');
 const completeModal = document.getElementById('completeModal');
 const closeCompleteBtn = document.getElementById('closeCompleteBtn');
 const playAgainBtn = document.getElementById('playAgainBtn');
@@ -120,9 +118,9 @@ const viewTableBtn = document.getElementById('viewTableBtn');
 document.addEventListener('DOMContentLoaded', () => {
   detectMobile();
   detectDarkMode();
+  loadTotalChallenges();
   setupIntro();
   setupEventListeners();
-  loadTotalChallenges();
   achievementManager.updateBadge();
 });
 
@@ -143,6 +141,16 @@ function setupIntro() {
       startApp();
     }
   });
+  
+  // Show total challenges completed on intro
+  updateIntroStats();
+}
+
+function updateIntroStats() {
+  const el = document.getElementById('introTotalChallenges');
+  if (el && state.totalChallengesCompleted > 0) {
+    el.textContent = `${state.totalChallengesCompleted} challenge${state.totalChallengesCompleted === 1 ? '' : 's'} completed`;
+  }
 }
 
 function startApp() {
@@ -220,18 +228,7 @@ function setupEventListeners() {
   menuBtn.addEventListener('click', openMobileMenu);
   closeMobileMenu.addEventListener('click', () => mobileMenu.classList.add('hidden'));
   
-  // Mobile input - QWERTY keyboard handles submit now
-  mobileHintBtn.addEventListener('click', () => {
-    showHint();
-    mobileInputModal.querySelector('.mobile-input-hint').classList.remove('hidden');
-  });
-  mobileSkipBtn.addEventListener('click', () => {
-    if (!state.currentElement) return;
-    const nextEl = findNextElementAuto(state.currentElement);
-    if (nextEl) {
-      updateMobileInputForElement(nextEl);
-    }
-  });
+  // Mobile input
   document.querySelector('.mobile-input-close').addEventListener('click', closeMobileInput);
   
   // Mobile arrow key buttons
@@ -252,13 +249,31 @@ function setupEventListeners() {
     });
   });
   
-  // Navigation direction toggle (HUD)
+  // Navigation direction toggle (HUD - desktop)
   document.querySelectorAll('.hud-nav-option').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.hud-nav-option').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       state.navDirection = btn.dataset.nav;
       localStorage.setItem('navDirection', state.navDirection);
+      // Sync mobile pill toggle
+      document.querySelectorAll('.gc-pill').forEach(b => {
+        b.classList.toggle('active', b.dataset.nav === state.navDirection);
+      });
+    });
+  });
+  
+  // Navigation direction toggle (mobile pill toggle)
+  document.querySelectorAll('.gc-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.gc-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.navDirection = btn.dataset.nav;
+      localStorage.setItem('navDirection', state.navDirection);
+      // Sync desktop toggle
+      document.querySelectorAll('.hud-nav-option').forEach(b => {
+        b.classList.toggle('active', b.dataset.nav === state.navDirection);
+      });
     });
   });
   
@@ -266,6 +281,10 @@ function setupEventListeners() {
   document.querySelectorAll('.hud-nav-option').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.nav === state.navDirection);
   });
+  document.querySelectorAll('.gc-pill').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.nav === state.navDirection);
+  });
+  
   
   // Mobile toolbar buttons
   document.getElementById('mobileToolbarTheme').addEventListener('click', () => {
@@ -513,15 +532,13 @@ function handleElementClick(e) {
   }
 }
 
-function formatMobileElementInfo(element) {
-  const atomic = element.dataset.atomic;
+function formatCellPosition(element) {
   const period = element.dataset.period;
   const group = element.dataset.group;
-  let info = `Element #${atomic} · Period ${period}`;
   if (group) {
-    info += ` · Group ${group}`;
+    return `Period ${period} · Group ${group}`;
   }
-  return info;
+  return `Period ${period}`;
 }
 
 function openMobileInput(element) {
@@ -530,21 +547,21 @@ function openMobileInput(element) {
   // Render mini table on first open
   renderMiniTable();
   
-  const number = mobileInputModal.querySelector('.mobile-input-number');
-  const category = mobileInputModal.querySelector('.mobile-input-category');
-  
-  number.textContent = formatMobileElementInfo(element);
-  category.textContent = element.dataset.category;
-  
   // Update cell display
   const cellAtomicNum = document.getElementById('cellAtomicNumber');
   const cellSymbolDisplay = document.getElementById('cellSymbolDisplay');
   const cellNameDisplay = document.getElementById('cellNameDisplay');
+  const cellPosition = document.getElementById('cellPositionDisplay');
   if (cellAtomicNum) cellAtomicNum.textContent = element.dataset.atomic;
-  if (cellSymbolDisplay) cellSymbolDisplay.textContent = '?';
+  if (cellSymbolDisplay) {
+    cellSymbolDisplay.textContent = '—';
+    cellSymbolDisplay.classList.add('empty');
+  }
   if (cellNameDisplay) cellNameDisplay.textContent = '';
+  if (cellPosition) cellPosition.textContent = formatCellPosition(element);
   
   mobileInput.value = '';
+  updateGcInputState();
   
   mobileInputModal.querySelector('.mobile-input-hint').classList.add('hidden');
   mobileInputModal.classList.remove('hidden');
@@ -573,6 +590,7 @@ function handleMobileSubmit() {
   
   validateInput(state.currentElement, value);
   
+  const gcInputBox = document.getElementById('gcInputBox');
   const cellDisplay = document.getElementById('cellSymbolDisplay');
   const cellName = document.getElementById('cellNameDisplay');
   
@@ -580,10 +598,10 @@ function handleMobileSubmit() {
     // Update mini table
     updateMiniTable(parseInt(state.currentElement.dataset.atomic), 'correct');
     
-    // Flash green feedback on cell display
-    if (cellDisplay) {
-      cellDisplay.parentElement.classList.add('cell-correct');
-      setTimeout(() => cellDisplay.parentElement.classList.remove('cell-correct'), 400);
+    // Flash green feedback on input box
+    if (gcInputBox) {
+      gcInputBox.classList.add('cell-correct');
+      setTimeout(() => gcInputBox.classList.remove('cell-correct'), 400);
     }
     
     updateMobileStats();
@@ -604,14 +622,25 @@ function handleMobileSubmit() {
   } else {
     // Flash red feedback
     updateMiniTable(parseInt(state.currentElement.dataset.atomic), 'incorrect');
-    if (cellDisplay) {
-      cellDisplay.parentElement.classList.add('cell-incorrect');
-      setTimeout(() => cellDisplay.parentElement.classList.remove('cell-incorrect'), 400);
+    if (gcInputBox) {
+      gcInputBox.classList.add('cell-incorrect');
+      setTimeout(() => gcInputBox.classList.remove('cell-incorrect'), 400);
     }
     mobileInput.value = '';
-    if (cellDisplay) cellDisplay.textContent = '?';
+    if (cellDisplay) {
+      cellDisplay.textContent = '—';
+      cellDisplay.classList.add('empty');
+    }
+    updateGcInputState();
     updateMobileStats();
   }
+}
+
+// Update game control zone input box visual state
+function updateGcInputState() {
+  const gcInputBox = document.getElementById('gcInputBox');
+  const hasInput = mobileInput.value.length > 0;
+  if (gcInputBox) gcInputBox.classList.toggle('has-input', hasInput);
 }
 
 function formatSymbolInput(input) {
@@ -1368,8 +1397,10 @@ function handleQwertyKey(key) {
     if (mobileInput.value.length > 0) {
       mobileInput.value = mobileInput.value.slice(0, -1);
       if (cellSymbolDisplay) {
-        cellSymbolDisplay.textContent = mobileInput.value || '?';
+        cellSymbolDisplay.textContent = mobileInput.value || '—';
+        cellSymbolDisplay.classList.toggle('empty', !mobileInput.value);
       }
+      updateGcInputState();
     }
     return;
   }
@@ -1385,7 +1416,9 @@ function handleQwertyKey(key) {
     formatSymbolInput(mobileInput);
     if (cellSymbolDisplay) {
       cellSymbolDisplay.textContent = mobileInput.value;
+      cellSymbolDisplay.classList.remove('empty');
     }
+    updateGcInputState();
   }
 }
 
@@ -1395,6 +1428,7 @@ function showIntroScreen() {
   // Show intro overlay again
   introOverlay.classList.remove('hidden', 'fade-out');
   mainApp.classList.add('hidden');
+  updateIntroStats();
 }
 
 // ===== DESKTOP BOTTOM BAR STATS =====
@@ -1485,9 +1519,11 @@ function renderMiniTable() {
         cell.classList.add('mini-disabled');
       }
       
-      // Mark correct if already answered
+      // Mark correct if already answered and show symbol
       if (state.correctElements.has(item)) {
         cell.classList.add('mini-correct');
+        const el = ELEMENTS[item - 1];
+        if (el) cell.textContent = el.symbol;
       }
       
       miniTable.appendChild(cell);
@@ -1526,6 +1562,8 @@ function updateMiniTable(atomicNumber, status) {
   if (status === 'correct') {
     cell.classList.remove('mini-incorrect');
     cell.classList.add('mini-correct');
+    const el = ELEMENTS[atomicNumber - 1];
+    if (el) cell.textContent = el.symbol;
   } else if (status === 'incorrect') {
     cell.classList.add('mini-incorrect');
     // Flash red then revert to neutral
@@ -1534,27 +1572,59 @@ function updateMiniTable(atomicNumber, status) {
     }, 600);
   } else if (status === 'current') {
     cell.classList.add('mini-current');
+    // Draw connector line from mini-table cell to input card
+    drawConnectorLine(atomicNumber);
   }
+}
+
+// Draw a dashed curved line from the current mini-table cell to the input card
+function drawConnectorLine(atomicNumber) {
+  const svg = document.getElementById('gcConnectorSvg');
+  const path = document.getElementById('gcConnectorPath');
+  if (!svg || !path) return;
+  
+  const miniCell = document.querySelector(`#miniPeriodicTable .mini-cell[data-atomic="${atomicNumber}"]`);
+  const inputCard = document.querySelector('.gc-info-card');
+  const container = document.querySelector('.mobile-input-content');
+  if (!miniCell || !inputCard || !container) return;
+  
+  const containerRect = container.getBoundingClientRect();
+  const cellRect = miniCell.getBoundingClientRect();
+  const cardRect = inputCard.getBoundingClientRect();
+  
+  // Start point: bottom center of the mini cell
+  const x1 = cellRect.left + cellRect.width / 2 - containerRect.left;
+  const y1 = cellRect.bottom - containerRect.top;
+  
+  // End point: top center of the input card
+  const x2 = cardRect.left + cardRect.width / 2 - containerRect.left;
+  const y2 = cardRect.top - containerRect.top;
+  
+  // Cubic Bézier curve with two control points for a gentle S-curve
+  const midY = (y1 + y2) / 2;
+  const d = `M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`;
+  
+  path.setAttribute('d', d);
 }
 
 function updateMobileInputForElement(element) {
   state.currentElement = element;
   
-  const number = mobileInputModal.querySelector('.mobile-input-number');
-  const category = mobileInputModal.querySelector('.mobile-input-category');
-  
-  number.textContent = formatMobileElementInfo(element);
-  category.textContent = element.dataset.category;
-  
   // Update cell display
   const cellAtomicNum = document.getElementById('cellAtomicNumber');
   const cellSymbolDisplay = document.getElementById('cellSymbolDisplay');
   const cellNameDisplay = document.getElementById('cellNameDisplay');
+  const cellPosition = document.getElementById('cellPositionDisplay');
   if (cellAtomicNum) cellAtomicNum.textContent = element.dataset.atomic;
-  if (cellSymbolDisplay) cellSymbolDisplay.textContent = '?';
+  if (cellSymbolDisplay) {
+    cellSymbolDisplay.textContent = '—';
+    cellSymbolDisplay.classList.add('empty');
+  }
   if (cellNameDisplay) cellNameDisplay.textContent = '';
+  if (cellPosition) cellPosition.textContent = formatCellPosition(element);
   
   mobileInput.value = '';
+  updateGcInputState();
   mobileInputModal.querySelector('.mobile-input-hint').classList.add('hidden');
   
   // Update mini table to highlight new current element
@@ -1629,28 +1699,55 @@ function navigateToAdjacentElement(direction) {
     .filter(el => !el.classList.contains('placeholder') && !el.classList.contains('disabled'));
   
   if (direction === 'left' || direction === 'right') {
-    // Navigate within the same period (or category for lanthanides/actinides)
+    // Navigate within the same period, including f-block elements in their period
     const sameRow = allElements
-      .filter(el => {
-        if (currentCategory === 'lanthanide' || currentCategory === 'actinide') {
-          return el.dataset.category === currentCategory;
-        }
-        return parseInt(el.dataset.period) === currentPeriod && 
-               el.dataset.category !== 'lanthanide' && el.dataset.category !== 'actinide';
-      })
+      .filter(el => parseInt(el.dataset.period) === currentPeriod)
       .sort((a, b) => parseInt(a.dataset.atomic) - parseInt(b.dataset.atomic));
     
     const currentIndex = sameRow.findIndex(el => parseInt(el.dataset.atomic) === currentAtomic);
     if (currentIndex !== -1) {
-      if (direction === 'left' && currentIndex > 0) {
-        targetElement = sameRow[currentIndex - 1];
-      } else if (direction === 'right' && currentIndex < sameRow.length - 1) {
-        targetElement = sameRow[currentIndex + 1];
+      // Scan past correct cells to find the next unanswered one
+      const step = direction === 'left' ? -1 : 1;
+      for (let i = currentIndex + step; i >= 0 && i < sameRow.length; i += step) {
+        if (!sameRow[i].classList.contains('correct')) {
+          targetElement = sameRow[i];
+          break;
+        }
       }
     }
   } else if (direction === 'up' || direction === 'down') {
-    // Navigate within the same group (column)
-    if (currentGroup) {
+    if (currentCategory === 'lanthanide' || currentCategory === 'actinide') {
+      // For lanthanides/actinides, up/down moves between the two series
+      const elData = ELEMENTS_MAP[currentAtomic];
+      if (elData) {
+        const offset = currentCategory === 'lanthanide' ? currentAtomic - 57 : currentAtomic - 89;
+        let targetAtomic;
+        if (direction === 'down' && currentCategory === 'lanthanide') {
+          targetAtomic = 89 + offset;
+        } else if (direction === 'up' && currentCategory === 'actinide') {
+          targetAtomic = 57 + offset;
+        } else if (direction === 'up' && currentCategory === 'lanthanide') {
+          // Go to the closest unanswered element in the main table in period 6 before lanthanides
+          const mainRow = allElements
+            .filter(el => parseInt(el.dataset.period) === 6 && el.dataset.category !== 'lanthanide')
+            .filter(el => parseInt(el.dataset.atomic) < 57)
+            .sort((a, b) => parseInt(b.dataset.atomic) - parseInt(a.dataset.atomic));
+          for (const el of mainRow) {
+            if (!el.classList.contains('correct')) {
+              targetElement = el;
+              break;
+            }
+          }
+        }
+        if (targetAtomic && !targetElement) {
+          const candidate = allElements.find(el => parseInt(el.dataset.atomic) === targetAtomic);
+          if (candidate && !candidate.classList.contains('correct')) {
+            targetElement = candidate;
+          }
+        }
+      }
+    } else if (currentGroup) {
+      // Navigate within the same group (column), skip over correct cells
       const sameCol = allElements
         .filter(el => parseInt(el.dataset.group) === currentGroup &&
                       el.dataset.category !== 'lanthanide' && el.dataset.category !== 'actinide')
@@ -1658,33 +1755,39 @@ function navigateToAdjacentElement(direction) {
       
       const currentIndex = sameCol.findIndex(el => parseInt(el.dataset.atomic) === currentAtomic);
       if (currentIndex !== -1) {
-        if (direction === 'up' && currentIndex > 0) {
-          targetElement = sameCol[currentIndex - 1];
-        } else if (direction === 'down' && currentIndex < sameCol.length - 1) {
-          targetElement = sameCol[currentIndex + 1];
+        const step = direction === 'up' ? -1 : 1;
+        for (let i = currentIndex + step; i >= 0 && i < sameCol.length; i += step) {
+          if (!sameCol[i].classList.contains('correct')) {
+            targetElement = sameCol[i];
+            break;
+          }
         }
       }
-    } else if (currentCategory === 'lanthanide' || currentCategory === 'actinide') {
-      // For lanthanides/actinides, up/down moves between the two series
-      const elData = ELEMENTS_MAP[currentAtomic];
-      if (elData) {
-        // Lanthanides are 57-71, Actinides are 89-103
-        // Map position within series
-        const offset = currentCategory === 'lanthanide' ? currentAtomic - 57 : currentAtomic - 89;
-        let targetAtomic;
-        if (direction === 'down' && currentCategory === 'lanthanide') {
-          targetAtomic = 89 + offset;
-        } else if (direction === 'up' && currentCategory === 'actinide') {
-          targetAtomic = 57 + offset;
-        }
-        if (targetAtomic) {
-          targetElement = allElements.find(el => parseInt(el.dataset.atomic) === targetAtomic) || null;
+      
+      // Special: going down from group 3 into f-block
+      if (!targetElement && direction === 'down' && currentGroup === 3) {
+        if (currentPeriod === 5) {
+          // Scan lanthanides for first unanswered
+          const lanthSeries = allElements
+            .filter(el => el.dataset.category === 'lanthanide')
+            .sort((a, b) => parseInt(a.dataset.atomic) - parseInt(b.dataset.atomic));
+          for (const el of lanthSeries) {
+            if (!el.classList.contains('correct')) { targetElement = el; break; }
+          }
+        } else if (currentPeriod === 6) {
+          // Scan actinides for first unanswered
+          const actSeries = allElements
+            .filter(el => el.dataset.category === 'actinide')
+            .sort((a, b) => parseInt(a.dataset.atomic) - parseInt(b.dataset.atomic));
+          for (const el of actSeries) {
+            if (!el.classList.contains('correct')) { targetElement = el; break; }
+          }
         }
       }
     }
   }
   
-  if (targetElement && !targetElement.classList.contains('correct')) {
+  if (targetElement) {
     if (state.isMobile) {
       updateMobileInputForElement(targetElement);
     } else {

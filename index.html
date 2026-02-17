@@ -45,10 +45,25 @@
         </div>
         <h1 class="intro-title-text">AtomicMemory</h1>
       </div>
-      <p class="intro-tagline">Learn the periodic table through an interactive, gamified experience.</p>
+      <p class="intro-tagline">Master all 118 elements through practice</p>
 
       <div class="intro-table-wrapper">
         <div id="introPeriodicTable" class="intro-periodic-table"></div>
+      </div>
+
+      <div class="intro-features">
+        <div class="intro-feature">
+          <i class="ri-fire-line"></i>
+          <span>Streaks</span>
+        </div>
+        <div class="intro-feature">
+          <i class="ri-medal-line"></i>
+          <span>Achievements</span>
+        </div>
+        <div class="intro-feature">
+          <i class="ri-trophy-line"></i>
+          <span>Leaderboard</span>
+        </div>
       </div>
 
       <button id="startBtn" class="start-button">
@@ -59,6 +74,10 @@
       <p class="intro-hint">
         <i class="ri-keyboard-line"></i>
         Press Enter to start
+      </p>
+
+      <p class="intro-footer">
+        <span id="introTotalChallenges"></span>
       </p>
     </div>
   </div>
@@ -211,9 +230,11 @@
       </div>
       <div class="bottom-bar-control-row">
         <div class="hud-nav-toggle">
-          <span class="hud-nav-label">Enter →</span>
-          <button class="hud-nav-option active" data-nav="horizontal">Horizontal</button>
-          <button class="hud-nav-option" data-nav="vertical">Vertical</button>
+          <span class="hud-nav-label">After Enter, jump to…</span>
+          <div class="hud-pill-toggle">
+            <button class="hud-nav-option active" data-nav="horizontal">→ Next in Period</button>
+            <button class="hud-nav-option" data-nav="vertical">↓ Next in Group</button>
+          </div>
         </div>
         <button id="resetBtn" class="bottom-action-btn reset-btn" title="Reset challenge">
           <i class="ri-restart-line"></i>
@@ -231,53 +252,31 @@
       <!-- Mobile Input Modal -->
       <div id="mobileInputModal" class="mobile-input-modal hidden">
         <div class="mobile-input-content">
-          <!-- Compact Header -->
-          <div class="mobile-game-header">
-            <div class="mobile-game-logo-row">
-              <div class="logo-grid mobile-game-logo" aria-label="AtomicMemory">
-                <span class="lg-cell" style="background:#ef4444"></span>
-                <span class="lg-empty"></span>
-                <span class="lg-empty"></span>
-                <span class="lg-empty"></span>
-                <span class="lg-cell" style="background:#ec4899"></span>
-                <span class="lg-cell" style="background:#f97316"></span>
-                <span class="lg-empty"></span>
-                <span class="lg-cell" style="background:#10b981"></span>
-                <span class="lg-cell" style="background:#3b82f6"></span>
-                <span class="lg-cell" style="background:#8b5cf6"></span>
-                <span class="lg-cell" style="background:#06b6d4"></span>
-                <span class="lg-cell" style="background:#eab308"></span>
-                <span class="lg-cell" style="background:#ec4899"></span>
-                <span class="lg-cell" style="background:#f59e0b"></span>
-                <span class="lg-cell" style="background:#84cc16"></span>
-                <span class="lg-empty"></span>
-                <span class="lg-cell" style="background:#3b82f6"></span>
-                <span class="lg-cell" style="background:#ef4444"></span>
-                <span class="lg-cell" style="background:#f97316"></span>
-                <span class="lg-empty"></span>
-              </div>
-              <span class="mobile-game-title">AtomicMemory</span>
-            </div>
-            <div class="mobile-game-header-right">
-              <button class="mobile-toolbar-btn" id="mobileToolbarHistory" title="History">
-                <i class="ri-history-line"></i>
-              </button>
-              <button class="mobile-toolbar-btn" id="mobileToolbarLeaderboard" title="Leaderboard">
-                <i class="ri-trophy-line"></i>
-              </button>
-              <button class="mobile-toolbar-btn" id="mobileToolbarAchievements" title="Achievements">
-                <i class="ri-medal-line"></i>
-              </button>
-              <button class="mobile-toolbar-btn" id="mobileToolbarAbout" title="About">
-                <i class="ri-information-line"></i>
-              </button>
-              <button class="mobile-toolbar-btn" id="mobileToolbarTheme" title="Toggle theme">
-                <i class="ri-moon-line"></i>
-              </button>
-              <button class="mobile-toolbar-btn" id="mobileToolbarReset" title="Reset">
-                <i class="ri-restart-line"></i>
-              </button>
-            </div>
+          <!-- Row 1: Centered Title -->
+          <div class="mobile-game-title-row">
+            <span class="mobile-game-title">AtomicMemory</span>
+          </div>
+
+          <!-- Row 2: Action Buttons -->
+          <div class="mobile-game-buttons-row">
+            <button class="mobile-toolbar-btn" id="mobileToolbarHistory" title="History">
+              <i class="ri-history-line"></i>
+            </button>
+            <button class="mobile-toolbar-btn" id="mobileToolbarLeaderboard" title="Leaderboard">
+              <i class="ri-trophy-line"></i>
+            </button>
+            <button class="mobile-toolbar-btn" id="mobileToolbarAchievements" title="Achievements">
+              <i class="ri-medal-line"></i>
+            </button>
+            <button class="mobile-toolbar-btn" id="mobileToolbarAbout" title="About">
+              <i class="ri-information-line"></i>
+            </button>
+            <button class="mobile-toolbar-btn" id="mobileToolbarTheme" title="Toggle theme">
+              <i class="ri-moon-line"></i>
+            </button>
+            <button class="mobile-toolbar-btn" id="mobileToolbarReset" title="Reset">
+              <i class="ri-restart-line"></i>
+            </button>
           </div>
 
           <!-- Compact Stats Strip -->
@@ -298,53 +297,68 @@
             <div id="miniPeriodicTable" class="mini-periodic-table"></div>
           </div>
 
-          <!-- Flexible spacer above cell for vertical centering -->
+          <!-- SVG connector line from mini-table cell to input card -->
+          <svg class="gc-connector-svg" id="gcConnectorSvg" aria-hidden="true">
+            <path class="gc-connector-path" id="gcConnectorPath" fill="none"/>
+          </svg>
+
+          <!-- Flexible spacer above control zone -->
           <div class="mobile-flex-spacer"></div>
 
-          <!-- Cell-like Input Display (vertically centered) -->
-          <div class="mobile-cell-input-area">
-            <div class="mobile-cell-prompt">
-              <span class="mobile-input-number"></span>
-              <span class="mobile-input-category"></span>
+          <!-- Combined Element Info + Answer Input Card (cell-like design) -->
+          <div class="gc-info-card">
+            <div class="gc-cell-box" id="gcInputBox">
+              <div class="gc-cell-atomic" id="cellAtomicNumber"></div>
+              <span class="cell-symbol-display" id="cellSymbolDisplay">—</span>
+              <div class="gc-cell-name" id="cellNameDisplay"></div>
             </div>
-            <div class="mobile-cell-display">
-              <div class="cell-atomic-number" id="cellAtomicNumber"></div>
-              <div class="cell-symbol-display" id="cellSymbolDisplay">?</div>
-              <div class="cell-name-display" id="cellNameDisplay"></div>
-            </div>
+            <div class="gc-cell-position" id="cellPositionDisplay"></div>
             <div class="mobile-input-hint hidden"></div>
           </div>
 
-          <!-- Flexible spacer below cell for vertical centering -->
+          <!-- Flexible spacer below info card -->
           <div class="mobile-flex-spacer"></div>
 
           <!-- Hidden real input for state tracking -->
           <input type="text" id="mobileInput" class="mobile-input-field-hidden" maxlength="3" autocomplete="off" inputmode="none" tabindex="-1" aria-hidden="true">
 
-          <!-- Arrow Navigation Row (just above keyboard) -->
-          <div class="mobile-nav-row">
-            <button id="mobileArrowLeft" class="mobile-nav-btn" title="Move left" aria-label="Move left">
-              <i class="ri-arrow-left-line"></i>
-            </button>
-            <button id="mobileArrowUp" class="mobile-nav-btn" title="Move up" aria-label="Move up">
-              <i class="ri-arrow-up-line"></i>
-            </button>
-            <button id="mobileArrowDown" class="mobile-nav-btn" title="Move down" aria-label="Move down">
-              <i class="ri-arrow-down-line"></i>
-            </button>
-            <button id="mobileArrowRight" class="mobile-nav-btn" title="Move right" aria-label="Move right">
-              <i class="ri-arrow-right-line"></i>
-            </button>
-            <button id="mobileHintBtn" class="mobile-nav-btn mobile-nav-hint" title="Hint" aria-label="Hint">
-              <i class="ri-lightbulb-line"></i>
-            </button>
-            <button id="mobileSkipBtn" class="mobile-nav-btn mobile-nav-skip" title="Skip" aria-label="Skip">
-              <i class="ri-skip-forward-line"></i>
-            </button>
-            <button id="mobileFinishBtn" class="mobile-nav-btn mobile-nav-finish" title="Finish" aria-label="Finish">
-              <i class="ri-flag-line"></i>
-              <span>Finish</span>
-            </button>
+          <!-- Two-column Controls Row -->
+          <div class="gc-controls-row">
+            <!-- Left: D-pad card -->
+            <div class="gc-dpad-card">
+              <span class="gc-micro-label">NAVIGATE</span>
+              <div class="gc-dpad">
+                <div class="gc-dpad-top">
+                  <button id="mobileArrowUp" class="gc-dpad-btn" title="Move up" aria-label="Move up">
+                    <i class="ri-arrow-up-line"></i>
+                  </button>
+                </div>
+                <div class="gc-dpad-bottom">
+                  <button id="mobileArrowLeft" class="gc-dpad-btn" title="Move left" aria-label="Move left">
+                    <i class="ri-arrow-left-line"></i>
+                  </button>
+                  <button id="mobileArrowDown" class="gc-dpad-btn" title="Move down" aria-label="Move down">
+                    <i class="ri-arrow-down-line"></i>
+                  </button>
+                  <button id="mobileArrowRight" class="gc-dpad-btn" title="Move right" aria-label="Move right">
+                    <i class="ri-arrow-right-line"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!-- Right: Enter toggle + Finish -->
+            <div class="gc-right-col">
+              <div class="gc-enter-card">
+                <span class="gc-micro-label">AFTER ENTER, JUMP TO…</span>
+                <div class="gc-pill-toggle">
+                  <button class="gc-pill active" data-nav="horizontal">→ Next in Period</button>
+                  <button class="gc-pill" data-nav="vertical">↓ Next in Group</button>
+                </div>
+              </div>
+              <button id="mobileFinishBtn" class="gc-finish-btn" title="Finish Game" aria-label="Finish Game">
+                <i class="ri-flag-line"></i> Finish Game
+              </button>
+            </div>
           </div>
 
           <!-- QWERTY Keyboard -->
@@ -474,7 +488,7 @@
     <!-- Info Modal -->
     <div id="infoModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="About AtomicMemory">
       <div class="modal-overlay"></div>
-      <div class="modal-content">
+      <div class="modal-content info-modal-content">
         <div class="modal-header">
           <h3>
             <i class="ri-information-line" aria-hidden="true"></i>
@@ -485,12 +499,22 @@
           </button>
         </div>
         <div class="modal-body info-modal-body">
-          <h4 class="info-story-title">The Story Behind AtomicMemory</h4>
-          <p>I'm a high school student in Bangladesh, and I used to hate memorizing the periodic table. It felt pointless. I wanted to understand chemistry, not just recite it. But exams here mostly reward whoever remembers faster, and I was struggling.</p>
-          <p>My chemistry coach put it simply. Memorizing without strategy is just pain. But with the right approach, it changes completely. Learning group by group means you're not just remembering symbols, you're understanding why elements sit next to each other, what they share, how they behave. Slowly, the table stops feeling like a wall of random letters and starts feeling like a map. You begin seeing patterns instead of trying to force facts into your head.</p>
-          <p>That clicked for me in a way nothing had before. I wanted to practice, so I started thinking about printing blank tables and filling them in by hand, over and over. Then it hit me, I know how to code. Why not just build something? So I did. And somewhere in the middle of building a simple practice tool, I had a moment where I realized this could actually feel rewarding. Streaks, ranks, achievements, a sense of progress. The whole thing came together.</p>
-          <p>That's AtomicMemory. Born from a student who didn't want to memorize anything, and a coach who showed him there's a better way.</p>
-          <p>If you're struggling with the same thing, this was made for you.</p>
+          <div class="info-hero">
+            <div class="info-hero-icon">
+              <i class="ri-flask-line" aria-hidden="true"></i>
+            </div>
+            <h4 class="info-story-title">The Story Behind AtomicMemory</h4>
+          </div>
+          <div class="info-story-card">
+            <p>I'm a high school student in Bangladesh, and I used to hate memorizing the periodic table. It felt pointless. I wanted to understand chemistry, not just recite it. But exams here mostly reward whoever remembers faster, and I was struggling.</p>
+            <p>My chemistry coach put it simply. Memorizing without strategy is just pain. But with the right approach, it changes completely. Learning group by group means you're not just remembering symbols, you're understanding why elements sit next to each other, what they share, how they behave. Slowly, the table stops feeling like a wall of random letters and starts feeling like a map. You begin seeing patterns instead of trying to force facts into your head.</p>
+            <p>That clicked for me in a way nothing had before. I wanted to practice, so I started thinking about printing blank tables and filling them in by hand, over and over. Then it hit me, I know how to code. Why not just build something? So I did. And somewhere in the middle of building a simple practice tool, I had a moment where I realized this could actually feel rewarding. Streaks, ranks, achievements, a sense of progress. The whole thing came together.</p>
+          </div>
+          <blockquote class="info-quote">
+            <i class="ri-double-quotes-l info-quote-icon" aria-hidden="true"></i>
+            <p>That's AtomicMemory. Born from a student who didn't want to memorize anything, and a coach who showed him there's a better way.</p>
+          </blockquote>
+          <p class="info-cta">If you're struggling with the same thing, this was made for you.</p>
           <div class="info-links">
             <p>Made with <span aria-label="love">❤️</span> by <a href="https://hello2himel.netlify.app" target="_blank" rel="noopener noreferrer">@hello2himel</a> from <span aria-label="Bangladesh">🇧🇩</span></p>
             <p>This is an open source software. <a href="https://github.com/hello2himel/atomicmemory" target="_blank" rel="noopener noreferrer">View Source Code</a></p>
