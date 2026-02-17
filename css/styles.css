@@ -744,6 +744,7 @@ body {
   left: 50%;
   transform: translateX(-50%);
   width: fit-content;
+  min-width: 860px;
   max-width: 94%;
   background: var(--bg-secondary);
   backdrop-filter: blur(16px);
