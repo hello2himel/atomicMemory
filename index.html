@@ -45,7 +45,7 @@
         </div>
         <h1 class="intro-title-text">AtomicMemory</h1>
       </div>
-      <p class="intro-tagline">Master the periodic table</p>
+      <p class="intro-tagline">Learn the periodic table through an interactive, gamified experience.</p>
 
       <div class="intro-table-wrapper">
         <div id="introPeriodicTable" class="intro-periodic-table"></div>
@@ -210,30 +210,30 @@
           <span id="bottomAccuracy">100%</span>
         </div>
       </div>
-      <div class="bottom-bar-actions">
+      <div class="bottom-bar-action-row">
+        <button id="hintBtn" class="bottom-action-btn hint-btn" title="Get a hint (-50 points)">
+          <i class="ri-lightbulb-line"></i>
+          <span>Hint</span>
+        </button>
         <button id="finishBtn" class="bottom-action-btn finish-btn" title="Finish challenge">
           <i class="ri-flag-line"></i>
           <span>Finish</span>
         </button>
-        <div class="hud-secondary-row">
-          <button id="hintBtn" class="bottom-action-btn hint-btn" title="Get a hint (-50 points)">
-            <i class="ri-lightbulb-line"></i>
-            <span>Hint</span>
-          </button>
-          <button id="viewTableBtn" class="bottom-action-btn view-btn" title="View periodic table">
-            <i class="ri-eye-line"></i>
-            <span>View</span>
-          </button>
+        <button id="viewTableBtn" class="bottom-action-btn view-btn" title="View periodic table">
+          <i class="ri-eye-line"></i>
+          <span>View</span>
+        </button>
+      </div>
+      <div class="bottom-bar-control-row">
+        <div class="hud-nav-toggle">
+          <span class="hud-nav-label">Enter →</span>
+          <button class="hud-nav-option active" data-nav="horizontal">Horizontal</button>
+          <button class="hud-nav-option" data-nav="vertical">Vertical</button>
         </div>
         <button id="resetBtn" class="bottom-action-btn reset-btn" title="Reset challenge">
           <i class="ri-restart-line"></i>
           <span>Reset</span>
         </button>
-      </div>
-      <div class="hud-nav-toggle">
-        <span class="hud-nav-label">Enter →</span>
-        <button class="hud-nav-option active" data-nav="horizontal">Horizontal</button>
-        <button class="hud-nav-option" data-nav="vertical">Vertical</button>
       </div>
     </div>
 
@@ -301,10 +301,10 @@
             <div id="miniPeriodicTable" class="mini-periodic-table"></div>
           </div>
 
-          <!-- Flexible spacer pushes everything below towards the keyboard -->
+          <!-- Flexible spacer above cell for vertical centering -->
           <div class="mobile-flex-spacer"></div>
 
-          <!-- Cell-like Input Display (centered above arrows/keyboard) -->
+          <!-- Cell-like Input Display (vertically centered) -->
           <div class="mobile-cell-input-area">
             <div class="mobile-cell-prompt">
               <span class="mobile-input-number"></span>
@@ -317,6 +317,9 @@
             </div>
             <div class="mobile-input-hint hidden"></div>
           </div>
+
+          <!-- Flexible spacer below cell for vertical centering -->
+          <div class="mobile-flex-spacer"></div>
 
           <!-- Hidden real input for state tracking -->
           <input type="text" id="mobileInput" class="mobile-input-field-hidden" maxlength="3" autocomplete="off" inputmode="none" tabindex="-1" aria-hidden="true">
