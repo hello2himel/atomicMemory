@@ -94,6 +94,10 @@
     <div id="desktopBottomBar" class="desktop-bottom-bar">
       <div class="bottom-bar-stats-row">
         <div class="bottom-bar-stats">
+          <div class="bottom-stat mode-toggle-inline" id="desktopModeBadge" title="Game mode">
+            <button class="mode-toggle-btn active" id="desktopModeClassic" title="Answer one element at a time with immediate feedback">Classic</button>
+            <button class="mode-toggle-btn" id="desktopModeRecall" title="Enter all elements from memory, then check your answers at once">Recall</button>
+          </div>
           <div class="bottom-stat" title="Score">
             <i class="ri-star-line"></i>
             <span id="bottomScore">0</span>
@@ -143,7 +147,7 @@
             <i class="ri-medal-line" aria-hidden="true"></i>
             <span id="achievementBadge" class="notification-badge hidden" title="Total achievements unlocked">0</span>
           </button>
-          <button id="historyBtn" class="header-icon-btn" title="Practice history — view your past challenges" aria-label="Practice history">
+          <button id="historyBtn" class="header-icon-btn" title="Practice history" aria-label="Practice history">
             <i class="ri-history-line" aria-hidden="true"></i>
           </button>
           <button id="aboutBtn" class="header-icon-btn" title="About" aria-label="About">
@@ -211,6 +215,14 @@
             <button class="mobile-toolbar-btn" id="mobileToolbarReset" title="Reset">
               <i class="ri-restart-line"></i>
             </button>
+          </div>
+
+          <!-- Mobile Mode Toggle -->
+          <div class="mobile-stats-strip mobile-mode-badge-strip">
+            <div class="mode-toggle-inline" id="mobileModeBadge">
+              <button class="mode-toggle-btn active" id="mobileModeClassic" title="Answer one element at a time with immediate feedback">Classic</button>
+              <button class="mode-toggle-btn" id="mobileModeRecall" title="Enter all elements from memory, then check your answers at once">Recall</button>
+            </div>
           </div>
 
           <!-- Compact Stats Strip -->
@@ -379,6 +391,20 @@
         <div id="historyModalBody" class="modal-body">
           <!-- Populated by JS -->
         </div>
+        <div class="modal-footer history-footer">
+          <div class="history-data-actions">
+            <button class="history-data-btn" id="exportDataBtn" title="Export all data">
+              <i class="ri-download-2-line"></i> Export
+            </button>
+            <button class="history-data-btn" id="importDataBtn" title="Import data">
+              <i class="ri-upload-2-line"></i> Import
+            </button>
+            <button class="history-data-btn danger" id="resetDataBtn" title="Delete all data">
+              <i class="ri-delete-bin-line"></i> Reset
+            </button>
+          </div>
+          <input type="file" id="importFileInput" accept=".json" class="hidden" aria-hidden="true">
+        </div>
       </div>
     </div>
 
@@ -544,6 +570,17 @@
           </div>
         </div>
 
+        <!-- Recall Mode Suggestion -->
+        <div class="recall-suggestion hidden" id="recallSuggestion">
+          <div class="recall-suggestion-text">
+            🎯 Ready for a challenge? Try <strong>Recall Mode</strong>! Enter all elements from memory, then check your answers.
+          </div>
+          <button class="recall-suggestion-btn" id="tryRecallBtn">
+            <i class="ri-gamepad-line"></i>
+            Try Recall Mode
+          </button>
+        </div>
+
         <!-- Actions -->
         <div class="complete-actions">
           <button id="playAgainBtn" class="complete-btn primary-btn">
@@ -557,6 +594,20 @@
         </div>
       </div>
     </div>
+
+    <!-- Guide Overlay (SVG connector line + message) -->
+    <div id="guideOverlay" class="guide-overlay hidden">
+      <svg class="guide-svg" id="guideSvg" aria-hidden="true">
+        <path class="guide-path" id="guidePath" fill="none"/>
+      </svg>
+      <div class="guide-message" id="guideMessage">
+        <span class="guide-text" id="guideText"></span>
+        <button class="guide-dismiss-btn" id="guideDismissBtn">Got it</button>
+      </div>
+    </div>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confettiCanvas" class="confetti-canvas" aria-hidden="true"></canvas>
 
 
   </div>

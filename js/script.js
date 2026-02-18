@@ -35,7 +35,9 @@ const state = {
   isMobile: false,
   shiftActive: false,
   totalChallengesCompleted: 0,
-  navDirection: safeGetItem('navDirection') || 'horizontal'
+  navDirection: safeGetItem('navDirection') || 'horizontal',
+  gameMode: safeGetItem('gameMode') || 'classic',
+  pendingAnswers: {}
 };
 
 // Custom Confirm Dialog (replaces browser native confirm)
@@ -173,18 +175,26 @@ function startApp() {
     mainApp.classList.remove('hidden');
     renderPeriodicTable();
     initializeFullTable();
+    initInGameModeToggle();
+    updateFinishButtonForMode();
     
     if (state.isMobile) {
-      // On mobile, go straight into the game modal
       const firstElement = findFirstActiveElement();
       if (firstElement) {
         openMobileInput(firstElement);
+        // Show first-play guide after a short delay
+        if (!safeGetItem('guideDismissed')) {
+          setTimeout(() => showMobileGuide(), 600);
+        }
       }
     } else {
-      // On desktop, auto-focus the first element so users see the input field
       const firstElement = findFirstActiveElement();
       if (firstElement) {
         activateElement(firstElement);
+        // Show first-play guide after a short delay
+        if (!safeGetItem('guideDismissed')) {
+          setTimeout(() => showDesktopGuide(firstElement), 600);
+        }
       }
     }
   }, 600);
@@ -215,6 +225,7 @@ function setupEventListeners() {
   resetBtn.addEventListener('click', async () => {
     if (await showConfirmDialog('Are you sure you want to reset? Your current progress will be lost.')) {
       resetChallenge();
+      showIntroScreen();
     }
   });
   
@@ -227,6 +238,19 @@ function setupEventListeners() {
   // History button
   historyBtn.addEventListener('click', openHistoryModal);
   closeHistoryBtn.addEventListener('click', () => closeModal(historyModal));
+  
+  // Data management buttons
+  const exportDataBtn = document.getElementById('exportDataBtn');
+  const importDataBtn = document.getElementById('importDataBtn');
+  const importFileInput = document.getElementById('importFileInput');
+  const resetDataBtn = document.getElementById('resetDataBtn');
+  if (exportDataBtn) exportDataBtn.addEventListener('click', exportData);
+  if (importDataBtn) importDataBtn.addEventListener('click', () => importFileInput.click());
+  if (importFileInput) importFileInput.addEventListener('change', (e) => {
+    if (e.target.files[0]) importData(e.target.files[0]);
+    e.target.value = '';
+  });
+  if (resetDataBtn) resetDataBtn.addEventListener('click', resetAllData);
   
   // Leaderboard button
   leaderboardBtn.addEventListener('click', openLeaderboardModal);
@@ -341,6 +365,29 @@ function setupEventListeners() {
     dismissCompleteModal();
   });
   shareScoreBtn.addEventListener('click', shareScore);
+  
+  // Try Recall Mode button in completion modal
+  const tryRecallBtn = document.getElementById('tryRecallBtn');
+  if (tryRecallBtn) {
+    tryRecallBtn.addEventListener('click', () => {
+      closeModal(completeModal);
+      state.gameMode = 'recall';
+      safeSetItem('gameMode', 'recall');
+      resetChallenge();
+      // Sync mode toggle buttons
+      const desktopClassic = document.getElementById('desktopModeClassic');
+      const desktopRecall = document.getElementById('desktopModeRecall');
+      const mobileClassic = document.getElementById('mobileModeClassic');
+      const mobileRecall = document.getElementById('mobileModeRecall');
+      [desktopClassic, mobileClassic].forEach(b => { if (b) b.classList.remove('active'); });
+      [desktopRecall, mobileRecall].forEach(b => { if (b) b.classList.add('active'); });
+      updateFinishButtonForMode();
+      if (state.isMobile) {
+        const firstElement = findFirstActiveElement();
+        if (firstElement) openMobileInput(firstElement);
+      }
+    });
+  }
   
   // Breakdown toggle
   const breakdownToggle = document.getElementById('breakdownToggle');
@@ -560,7 +607,6 @@ function handleElementClick(e) {
   if (!state.activeElements.has(parseInt(element.dataset.atomic))) return;
   
   if (state.isMobile) {
-    // When modal is already open, just update it
     if (!mobileInputModal.classList.contains('hidden')) {
       updateMobileInputForElement(element);
     } else {
@@ -592,14 +638,26 @@ function openMobileInput(element) {
   const cellNameDisplay = document.getElementById('cellNameDisplay');
   const cellPosition = document.getElementById('cellPositionDisplay');
   if (cellAtomicNum) cellAtomicNum.textContent = element.dataset.atomic;
-  if (cellSymbolDisplay) {
-    cellSymbolDisplay.textContent = '—';
-    cellSymbolDisplay.classList.add('empty');
+  
+  // In Recall mode, pre-fill with pending answer
+  const atomic = parseInt(element.dataset.atomic);
+  if (state.gameMode === 'recall' && state.pendingAnswers[atomic]) {
+    mobileInput.value = state.pendingAnswers[atomic];
+    if (cellSymbolDisplay) {
+      cellSymbolDisplay.textContent = state.pendingAnswers[atomic];
+      cellSymbolDisplay.classList.remove('empty');
+    }
+  } else {
+    mobileInput.value = '';
+    if (cellSymbolDisplay) {
+      cellSymbolDisplay.textContent = '—';
+      cellSymbolDisplay.classList.add('empty');
+    }
   }
+  
   if (cellNameDisplay) cellNameDisplay.textContent = '';
   if (cellPosition) cellPosition.textContent = formatCellPosition(element);
   
-  mobileInput.value = '';
   updateGcInputState();
   
   mobileInputModal.querySelector('.mobile-input-hint').classList.add('hidden');
@@ -626,6 +684,38 @@ function handleMobileSubmit() {
   
   const value = mobileInput.value.trim();
   if (!value) return;
+  
+  // In Recall mode, store pending answer without validating
+  if (state.gameMode === 'recall') {
+    if (!state.timerStarted) startTimer();
+    const atomic = parseInt(state.currentElement.dataset.atomic);
+    state.pendingAnswers[atomic] = value;
+    state.currentElement.classList.add('pending');
+    
+    // Show typed symbol in main table cell
+    const symbolSpan = state.currentElement.querySelector('.element-symbol');
+    if (symbolSpan) symbolSpan.textContent = value;
+    
+    // Update mini table with pending status
+    updateMiniTable(atomic, 'pending');
+    
+    // Flash neutral feedback
+    const gcInputBox = document.getElementById('gcInputBox');
+    if (gcInputBox) {
+      gcInputBox.classList.add('cell-pending');
+      setTimeout(() => gcInputBox.classList.remove('cell-pending'), 400);
+    }
+    
+    // Auto-advance to next element
+    const nextEl = findNextElementAuto(state.currentElement);
+    if (nextEl) {
+      setTimeout(() => updateMobileInputForElement(nextEl), 200);
+    }
+    
+    dismissGuide();
+    updateMobileStats();
+    return;
+  }
   
   validateInput(state.currentElement, value);
   
@@ -706,21 +796,38 @@ function activateElement(element) {
   state.currentElement = element;
   element.classList.add('active');
   
+  const isCorrect = element.classList.contains('correct');
+  
   const input = document.createElement('input');
   input.type = 'text';
   input.maxLength = 3;
   input.autocomplete = 'off';
-  input.placeholder = '?';
+  
+  if (isCorrect) {
+    // Answered cell: read-only, invisible input just to capture arrow keys
+    input.readOnly = true;
+    input.style.cssText = 'position:absolute;opacity:0;width:0;height:0;pointer-events:none;';
+  } else {
+    input.placeholder = '?';
+    // In Recall mode, pre-fill with pending answer if exists
+    const atomic = parseInt(element.dataset.atomic);
+    if (state.gameMode === 'recall' && state.pendingAnswers[atomic]) {
+      input.value = state.pendingAnswers[atomic];
+    }
+  }
   
   element.appendChild(input);
   input.focus();
   
-  input.addEventListener('input', () => {
-    formatSymbolInput(input);
-  });
+  if (!isCorrect) {
+    input.addEventListener('input', () => {
+      formatSymbolInput(input);
+      dismissGuide();
+    });
+  }
   
   input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !isCorrect) {
       e.preventDefault();
       const value = input.value.trim();
       if (value) {
@@ -751,6 +858,26 @@ function activateElement(element) {
 function validateInput(element, userInput) {
   const atomic = parseInt(element.dataset.atomic);
   const correctSymbol = element.dataset.symbol;
+  
+  // In Recall mode, store pending answer without validating
+  if (state.gameMode === 'recall') {
+    if (!state.timerStarted) startTimer();
+    state.pendingAnswers[atomic] = userInput;
+    element.classList.add('pending');
+    element.classList.remove('active');
+    const input = element.querySelector('input');
+    if (input) input.remove();
+    
+    // Show typed symbol in cell with pending style
+    const symbolSpan = element.querySelector('.element-symbol');
+    if (symbolSpan) symbolSpan.textContent = userInput;
+    
+    if (!state.isMobile) {
+      setTimeout(() => moveToNextElement(element), 100);
+    }
+    return;
+  }
+  
   const isCorrect = userInput.toLowerCase() === correctSymbol.toLowerCase();
   
   const input = element.querySelector('input');
@@ -784,6 +911,14 @@ function validateInput(element, userInput) {
     state.streak++;
     if (state.streak > state.maxStreak) {
       state.maxStreak = state.streak;
+    }
+    
+    // Mid-game confetti on new high score (check every 10 correct, skip first game)
+    if (state.correctElements.size % 10 === 0 && state.correctElements.size > 0) {
+      const currentBest = scoringSystem.getPersonalBest();
+      if (currentBest && scoringSystem.score > currentBest.score) {
+        launchConfetti();
+      }
     }
     
     updateStats();
@@ -867,7 +1002,8 @@ function moveToNextElement(currentElement) {
     ? findNextElementByGroup(currentElement) 
     : findNextElementByPeriod(currentElement);
   
-  if (nextElement && !nextElement.classList.contains('correct') && !nextElement.classList.contains('disabled')) {
+  if (nextElement && !nextElement.classList.contains('correct') && !nextElement.classList.contains('disabled')
+      && !(state.gameMode === 'recall' && nextElement.classList.contains('pending'))) {
     if (state.isMobile) {
       if (!mobileInputModal.classList.contains('hidden')) {
         updateMobileInputForElement(nextElement);
@@ -1089,11 +1225,12 @@ function resetChallenge() {
   state.correctAttempts = 0;
   state.accuracy = 100;
   state.hintsUsed = 0;
+  state.pendingAnswers = {};
   
   document.querySelectorAll('.element').forEach(el => {
     if (el.classList.contains('placeholder')) return;
     
-    el.classList.remove('correct', 'incorrect', 'active');
+    el.classList.remove('correct', 'incorrect', 'active', 'pending');
     el.querySelector('.element-symbol').textContent = '';
     el.querySelector('.element-name').textContent = '';
     
@@ -1135,12 +1272,20 @@ function completeChallenge() {
   
   const totalMistakes = Object.values(state.wrongAttempts).reduce((a, b) => a + b, 0);
   
+  // Get personal best before saving new score
+  const previousBest = scoringSystem.getPersonalBest();
+  
   // Calculate final score
   const finalScore = scoringSystem.calculateFinalScore(
     state.correctElements.size,
     state.elapsedTime,
     totalMistakes
   );
+  
+  // Check for new high score and trigger confetti (skip first game)
+  if (previousBest && finalScore > previousBest.score) {
+    launchConfetti();
+  }
   
   // Save score
   scoringSystem.saveScore('full', state.correctElements.size, state.elapsedTime, totalMistakes);
@@ -1168,11 +1313,16 @@ function setFinishButtonToPlayAgain() {
 }
 
 function restoreFinishButton() {
-  finishBtn.querySelector('i').className = 'ri-flag-line';
-  finishBtn.querySelector('span').textContent = 'Finish';
+  finishBtn.querySelector('i').className = state.gameMode === 'recall' ? 'ri-check-double-line' : 'ri-flag-line';
+  finishBtn.querySelector('span').textContent = state.gameMode === 'recall' ? 'Check Answers' : 'Finish';
   finishBtn.classList.remove('play-again');
   finishBtn.removeEventListener('click', handlePlayAgain);
   finishBtn.addEventListener('click', finishChallenge);
+  // Mobile finish button too
+  const mobileFinish = document.getElementById('mobileFinishBtn');
+  if (mobileFinish) {
+    mobileFinish.innerHTML = state.gameMode === 'recall' ? '<i class="ri-check-double-line"></i> Check Answers' : '<i class="ri-flag-line"></i> Finish Game';
+  }
 }
 
 function handlePlayAgain() {
@@ -1243,12 +1393,19 @@ function closeModal(modal) {
 
 function dismissCompleteModal() {
   closeModal(completeModal);
+  // Show recall guide for users who played 3+ games but never tried recall
+  const shouldShowRecallGuide = state.totalChallengesCompleted >= 3
+    && state.gameMode === 'classic'
+    && !safeGetItem('recallModeGuideShown');
   resetChallenge();
   if (state.isMobile) {
     const firstElement = findFirstActiveElement();
     if (firstElement) {
       openMobileInput(firstElement);
     }
+  }
+  if (shouldShowRecallGuide) {
+    setTimeout(() => showRecallModeGuide(), 400);
   }
 }
 
@@ -1357,6 +1514,75 @@ function loadHistory() {
   }).join('');
 }
 
+// ===== DATA MANAGEMENT (Export / Import / Reset) =====
+
+// All localStorage keys used by the app — keep in sync when adding new keys
+const DATA_KEYS = ['history', 'leaderboard', 'achievements', 'totalChallenges', 'darkMode', 'navDirection', 'gameMode', 'guideDismissed', 'recallModeSuggested', 'recallModeGuideShown'];
+
+function exportData() {
+  const data = {};
+  DATA_KEYS.forEach(key => {
+    const val = safeGetItem(key);
+    if (val !== null) data[key] = val;
+  });
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `atomicmemory-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showHintToast('Data exported successfully!');
+}
+
+function importData(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (typeof data !== 'object' || data === null) {
+        showHintToast('Invalid backup file.');
+        return;
+      }
+      DATA_KEYS.forEach(key => {
+        if (data[key] !== undefined) {
+          safeSetItem(key, data[key]);
+        }
+      });
+      // Reload state
+      state.totalChallengesCompleted = parseInt(safeGetItem('totalChallenges') || '0');
+      state.gameMode = safeGetItem('gameMode') || 'classic';
+      state.navDirection = safeGetItem('navDirection') || 'horizontal';
+      achievementManager.load();
+      achievementManager.updateBadge();
+      loadHistory();
+      showHintToast('Data imported successfully!');
+    } catch (err) {
+      showHintToast('Failed to read backup file.');
+    }
+  };
+  reader.readAsText(file);
+}
+
+async function resetAllData() {
+  if (!await showConfirmDialog('Delete all data? This will erase your history, scores, achievements, and settings. This cannot be undone.')) {
+    return;
+  }
+  DATA_KEYS.forEach(key => {
+    try { localStorage.removeItem(key); } catch (e) { /* ignore */ }
+  });
+  state.totalChallengesCompleted = 0;
+  state.gameMode = 'classic';
+  state.navDirection = 'horizontal';
+  achievementManager.load();
+  achievementManager.updateBadge();
+  loadHistory();
+  showHintToast('All data has been reset.');
+}
+
 function openLeaderboardModal() {
   loadLeaderboard();
   leaderboardModal.classList.remove('hidden');
@@ -1437,18 +1663,29 @@ function showCompleteModal() {
   
   completeModal.classList.remove('hidden');
   
+  // Show "Try Recall Mode" suggestion after 3 challenges
+  const recallSuggestion = document.getElementById('recallSuggestion');
+  if (recallSuggestion) {
+    if (state.totalChallengesCompleted >= 3 && !safeGetItem('recallModeSuggested') && state.gameMode === 'classic') {
+      recallSuggestion.classList.remove('hidden');
+      safeSetItem('recallModeSuggested', 'true');
+    } else {
+      recallSuggestion.classList.add('hidden');
+    }
+  }
+  
   // Save to history
   saveToHistory();
 }
 
 function shareScore() {
-  const rank = scoringSystem.getRank();
+  const mode = state.gameMode === 'recall' ? 'Recall' : 'Classic';
   const minutes = Math.floor(state.elapsedTime / 60);
   const seconds = String(state.elapsedTime % 60).padStart(2, '0');
   const completed = state.correctElements.size;
   const total = state.activeElements.size;
   
-  const text = `🧪 I just scored ${scoringSystem.formatScore(scoringSystem.score)} points on AtomicMemory!\n\n🏆 Rank: ${rank.name}\n🧩 Elements: ${completed}/${total}\n⏱️ Time: ${minutes}:${seconds}\n🎯 Accuracy: ${state.accuracy}%\n🔥 Best Streak: ${state.maxStreak}\n\nCan you beat my score?\nPlay now → ${APP_URL}`;
+  const text = `🧪 I just scored ${scoringSystem.formatScore(scoringSystem.score)} points on AtomicMemory!\n\n🎮 Mode: ${mode}\n🧩 Elements: ${completed}/${total}\n⏱️ Time: ${minutes}:${seconds}\n🎯 Accuracy: ${state.accuracy}%\n🔥 Best Streak: ${state.maxStreak}\n\nCan you beat my score?\nPlay now → ${APP_URL}`;
   
   if (navigator.share) {
     navigator.share({
@@ -1469,7 +1706,7 @@ function saveToHistory() {
   const wrongAttempts = Object.values(state.wrongAttempts).reduce((a, b) => a + b, 0);
   
   const record = {
-    mode: 'Full Table',
+    mode: state.gameMode === 'recall' ? 'Recall' : 'Full Table',
     time: state.elapsedTime,
     wrongAttempts: wrongAttempts,
     elementsCount: state.correctElements.size,
@@ -1530,6 +1767,7 @@ function handleQwertyKey(key) {
       cellSymbolDisplay.classList.remove('empty');
     }
     updateGcInputState();
+    dismissGuide();
     // Auto-deactivate shift after typing a letter
     if (state.shiftActive) {
       state.shiftActive = false;
@@ -1581,6 +1819,7 @@ function findFirstActiveElement() {
     .filter(el => !el.classList.contains('placeholder'))
     .filter(el => state.activeElements.has(parseInt(el.dataset.atomic)))
     .filter(el => !el.classList.contains('correct'))
+    .filter(el => !(state.gameMode === 'recall' && el.classList.contains('pending')))
     .sort((a, b) => parseInt(a.dataset.atomic) - parseInt(b.dataset.atomic));
   
   return elements[0] || null;
@@ -1687,6 +1926,8 @@ function updateMiniTable(atomicNumber, status) {
     setTimeout(() => {
       cell.classList.remove('mini-incorrect');
     }, 600);
+  } else if (status === 'pending') {
+    cell.classList.add('mini-pending');
   } else if (status === 'current') {
     cell.classList.add('mini-current');
     // Draw connector line from mini-table cell to input card
@@ -1727,25 +1968,49 @@ function drawConnectorLine(atomicNumber) {
 function updateMobileInputForElement(element) {
   state.currentElement = element;
   
-  // Update cell display
   const cellAtomicNum = document.getElementById('cellAtomicNumber');
   const cellSymbolDisplay = document.getElementById('cellSymbolDisplay');
   const cellNameDisplay = document.getElementById('cellNameDisplay');
   const cellPosition = document.getElementById('cellPositionDisplay');
   if (cellAtomicNum) cellAtomicNum.textContent = element.dataset.atomic;
-  if (cellSymbolDisplay) {
-    cellSymbolDisplay.textContent = '—';
-    cellSymbolDisplay.classList.add('empty');
+  
+  const isCorrect = element.classList.contains('correct');
+  const atomic = parseInt(element.dataset.atomic);
+  
+  if (isCorrect) {
+    // Show the answered element info, disable input
+    const elData = ELEMENTS_MAP[atomic];
+    mobileInput.value = elData ? elData.symbol : '';
+    mobileInput.readOnly = true;
+    if (cellSymbolDisplay) {
+      cellSymbolDisplay.textContent = elData ? elData.symbol : '';
+      cellSymbolDisplay.classList.remove('empty');
+    }
+    if (cellNameDisplay) cellNameDisplay.textContent = elData ? elData.name : '';
+  } else if (state.gameMode === 'recall' && state.pendingAnswers[atomic]) {
+    mobileInput.value = state.pendingAnswers[atomic];
+    mobileInput.readOnly = false;
+    if (cellSymbolDisplay) {
+      cellSymbolDisplay.textContent = state.pendingAnswers[atomic];
+      cellSymbolDisplay.classList.remove('empty');
+    }
+    if (cellNameDisplay) cellNameDisplay.textContent = '';
+  } else {
+    mobileInput.value = '';
+    mobileInput.readOnly = false;
+    if (cellSymbolDisplay) {
+      cellSymbolDisplay.textContent = '—';
+      cellSymbolDisplay.classList.add('empty');
+    }
+    if (cellNameDisplay) cellNameDisplay.textContent = '';
   }
-  if (cellNameDisplay) cellNameDisplay.textContent = '';
+  
   if (cellPosition) cellPosition.textContent = formatCellPosition(element);
   
-  mobileInput.value = '';
   updateGcInputState();
   mobileInputModal.querySelector('.mobile-input-hint').classList.add('hidden');
   
-  // Update mini table to highlight new current element
-  updateMiniTable(parseInt(element.dataset.atomic), 'current');
+  updateMiniTable(parseInt(element.dataset.atomic), isCorrect ? 'correct' : 'current');
   updateMobileStats();
 }
 
@@ -1788,12 +2053,18 @@ function findNextElementAuto(currentElement) {
     ? findNextElementByGroup(currentElement)
     : findNextElementByPeriod(currentElement);
   
-  // If no next element found or it's already correct/disabled, find any unanswered element
-  if (!nextElement || nextElement.classList.contains('correct') || nextElement.classList.contains('disabled')) {
+  // Determine what counts as "answered" - in recall mode, pending elements count too
+  const isAnswered = (el) => {
+    if (el.classList.contains('correct') || el.classList.contains('disabled')) return true;
+    if (state.gameMode === 'recall' && el.classList.contains('pending')) return true;
+    return false;
+  };
+  
+  if (!nextElement || isAnswered(nextElement)) {
     nextElement = findFirstActiveElement();
   }
   
-  if (!nextElement || nextElement.classList.contains('correct') || nextElement.classList.contains('disabled')) {
+  if (!nextElement || isAnswered(nextElement)) {
     return null;
   }
   
@@ -1816,55 +2087,51 @@ function navigateToAdjacentElement(direction) {
     .filter(el => !el.classList.contains('placeholder') && !el.classList.contains('disabled'));
   
   if (direction === 'left' || direction === 'right') {
-    // Navigate within the same period, including f-block elements in their period
-    const sameRow = allElements
-      .filter(el => parseInt(el.dataset.period) === currentPeriod)
-      .sort((a, b) => parseInt(a.dataset.atomic) - parseInt(b.dataset.atomic));
+    // Navigate within the same row visually
+    let sameRow;
+    if (currentCategory === 'lanthanide' || currentCategory === 'actinide') {
+      // Stay within the f-block series
+      sameRow = allElements
+        .filter(el => el.dataset.category === currentCategory)
+        .sort((a, b) => parseInt(a.dataset.atomic) - parseInt(b.dataset.atomic));
+    } else {
+      // Stay within the same period, excluding f-block (they're in a separate visual row)
+      sameRow = allElements
+        .filter(el => parseInt(el.dataset.period) === currentPeriod && el.dataset.category !== 'lanthanide' && el.dataset.category !== 'actinide')
+        .sort((a, b) => parseInt(a.dataset.atomic) - parseInt(b.dataset.atomic));
+    }
     
     const currentIndex = sameRow.findIndex(el => parseInt(el.dataset.atomic) === currentAtomic);
     if (currentIndex !== -1) {
-      // Scan past correct cells to find the next unanswered one
       const step = direction === 'left' ? -1 : 1;
-      for (let i = currentIndex + step; i >= 0 && i < sameRow.length; i += step) {
-        if (!sameRow[i].classList.contains('correct')) {
-          targetElement = sameRow[i];
-          break;
-        }
+      const nextIndex = currentIndex + step;
+      if (nextIndex >= 0 && nextIndex < sameRow.length) {
+        targetElement = sameRow[nextIndex];
       }
     }
   } else if (direction === 'up' || direction === 'down') {
     if (currentCategory === 'lanthanide' || currentCategory === 'actinide') {
-      // For lanthanides/actinides, up/down moves between the two series
-      const elData = ELEMENTS_MAP[currentAtomic];
-      if (elData) {
-        const offset = currentCategory === 'lanthanide' ? currentAtomic - 57 : currentAtomic - 89;
-        let targetAtomic;
-        if (direction === 'down' && currentCategory === 'lanthanide') {
-          targetAtomic = 89 + offset;
-        } else if (direction === 'up' && currentCategory === 'actinide') {
-          targetAtomic = 57 + offset;
-        } else if (direction === 'up' && currentCategory === 'lanthanide') {
-          // Go to the closest unanswered element in the main table in period 6 before lanthanides
-          const mainRow = allElements
-            .filter(el => parseInt(el.dataset.period) === 6 && el.dataset.category !== 'lanthanide')
-            .filter(el => parseInt(el.dataset.atomic) < 57)
-            .sort((a, b) => parseInt(b.dataset.atomic) - parseInt(a.dataset.atomic));
-          for (const el of mainRow) {
-            if (!el.classList.contains('correct')) {
-              targetElement = el;
-              break;
-            }
-          }
-        }
-        if (targetAtomic && !targetElement) {
-          const candidate = allElements.find(el => parseInt(el.dataset.atomic) === targetAtomic);
-          if (candidate && !candidate.classList.contains('correct')) {
-            targetElement = candidate;
-          }
-        }
+      const offset = currentCategory === 'lanthanide' ? currentAtomic - 57 : currentAtomic - 89;
+      const visualGroup = offset + 4; // f-block columns 4-18
+      
+      if (direction === 'down' && currentCategory === 'lanthanide') {
+        // Lanthanide → Actinide (same offset)
+        const targetAtomic = 89 + offset;
+        targetElement = allElements.find(el => parseInt(el.dataset.atomic) === targetAtomic);
+      } else if (direction === 'up' && currentCategory === 'actinide') {
+        // Actinide → Lanthanide (same offset)
+        const targetAtomic = 57 + offset;
+        targetElement = allElements.find(el => parseInt(el.dataset.atomic) === targetAtomic);
+      } else if (direction === 'up' && currentCategory === 'lanthanide') {
+        // Lanthanide → main table period 7 element in same visual column
+        targetElement = allElements.find(el =>
+          parseInt(el.dataset.period) === 7 && parseInt(el.dataset.group) === visualGroup
+          && el.dataset.category !== 'actinide');
+      } else if (direction === 'down' && currentCategory === 'actinide') {
+        // Actinide → nothing below (bottom of table)
       }
     } else if (currentGroup) {
-      // Navigate within the same group (column), skip over correct cells
+      // Navigate within the same group (column)
       const sameCol = allElements
         .filter(el => parseInt(el.dataset.group) === currentGroup &&
                       el.dataset.category !== 'lanthanide' && el.dataset.category !== 'actinide')
@@ -1873,34 +2140,19 @@ function navigateToAdjacentElement(direction) {
       const currentIndex = sameCol.findIndex(el => parseInt(el.dataset.atomic) === currentAtomic);
       if (currentIndex !== -1) {
         const step = direction === 'up' ? -1 : 1;
-        for (let i = currentIndex + step; i >= 0 && i < sameCol.length; i += step) {
-          if (!sameCol[i].classList.contains('correct')) {
-            targetElement = sameCol[i];
-            break;
-          }
+        const nextIndex = currentIndex + step;
+        if (nextIndex >= 0 && nextIndex < sameCol.length) {
+          targetElement = sameCol[nextIndex];
         }
       }
       
-      // Special: going down from group 3 into f-block
-      if (!targetElement && direction === 'down' && currentGroup === 3) {
-        if (currentPeriod === 5) {
-          // Scan lanthanides for first unanswered
-          const lanthSeries = allElements
-            .filter(el => el.dataset.category === 'lanthanide')
-            .sort((a, b) => parseInt(a.dataset.atomic) - parseInt(b.dataset.atomic));
-          for (const el of lanthSeries) {
-            if (!el.classList.contains('correct')) { targetElement = el; break; }
-          }
-        } else if (currentPeriod === 6) {
-          // Scan actinides for first unanswered
-          const actSeries = allElements
-            .filter(el => el.dataset.category === 'actinide')
-            .sort((a, b) => parseInt(a.dataset.atomic) - parseInt(b.dataset.atomic));
-          for (const el of actSeries) {
-            if (!el.classList.contains('correct')) { targetElement = el; break; }
-          }
-        }
+      // Down from bottom of main table (period 7) into f-block
+      if (!targetElement && direction === 'down' && currentPeriod === 7 && currentGroup >= 4 && currentGroup <= 18) {
+        const fOffset = currentGroup - 4;
+        const targetAtomic = 57 + fOffset; // Lanthanide row (visually first f-block row)
+        targetElement = allElements.find(el => parseInt(el.dataset.atomic) === targetAtomic);
       }
+      // Up from period 7 with group < 4 (s-block): no f-block connection (groups 1-3)
     }
   }
   
@@ -1915,6 +2167,20 @@ function navigateToAdjacentElement(direction) {
 
 // Finish challenge early (with partial completion)
 async function finishChallenge() {
+  // In Recall mode, check all answers
+  if (state.gameMode === 'recall') {
+    const pendingCount = Object.keys(state.pendingAnswers).length;
+    if (pendingCount === 0) {
+      showHintToast('Please enter at least one answer before checking.');
+      return;
+    }
+    if (!await showConfirmDialog(`Check ${pendingCount} answer${pendingCount === 1 ? '' : 's'}? Your score will be calculated.`)) {
+      return;
+    }
+    checkAllAnswers();
+    return;
+  }
+  
   if (state.correctElements.size === 0) {
     showHintToast('Please answer at least one element before finishing.');
     return;
@@ -1925,4 +2191,278 @@ async function finishChallenge() {
   }
   
   completeChallenge();
+}
+
+// ===== IN-GAME MODE TOGGLE =====
+
+function initInGameModeToggle() {
+  // Desktop mode toggle in bottom bar
+  const desktopClassic = document.getElementById('desktopModeClassic');
+  const desktopRecall = document.getElementById('desktopModeRecall');
+  // Mobile mode toggle in mobile input modal
+  const mobileClassic = document.getElementById('mobileModeClassic');
+  const mobileRecall = document.getElementById('mobileModeRecall');
+  
+  const allBtns = [desktopClassic, desktopRecall, mobileClassic, mobileRecall].filter(Boolean);
+  
+  function setMode(mode) {
+    state.gameMode = mode;
+    safeSetItem('gameMode', mode);
+    // Sync all toggle buttons
+    [desktopClassic, mobileClassic].forEach(btn => {
+      if (btn) btn.classList.toggle('active', mode === 'classic');
+    });
+    [desktopRecall, mobileRecall].forEach(btn => {
+      if (btn) btn.classList.toggle('active', mode === 'recall');
+    });
+    updateFinishButtonForMode();
+  }
+  
+  // Set initial state
+  if (state.gameMode === 'recall') {
+    setMode('recall');
+  }
+  
+  // Click handlers
+  if (desktopClassic) desktopClassic.addEventListener('click', () => setMode('classic'));
+  if (desktopRecall) desktopRecall.addEventListener('click', () => setMode('recall'));
+  if (mobileClassic) mobileClassic.addEventListener('click', () => setMode('classic'));
+  if (mobileRecall) mobileRecall.addEventListener('click', () => setMode('recall'));
+}
+
+function updateFinishButtonForMode() {
+  if (state.gameMode === 'recall') {
+    finishBtn.querySelector('i').className = 'ri-check-double-line';
+    finishBtn.querySelector('span').textContent = 'Check Answers';
+    const mobileFinish = document.getElementById('mobileFinishBtn');
+    if (mobileFinish) {
+      mobileFinish.innerHTML = '<i class="ri-check-double-line"></i> Check Answers';
+    }
+  } else {
+    finishBtn.querySelector('i').className = 'ri-flag-line';
+    finishBtn.querySelector('span').textContent = 'Finish';
+    const mobileFinish = document.getElementById('mobileFinishBtn');
+    if (mobileFinish) {
+      mobileFinish.innerHTML = '<i class="ri-flag-line"></i> Finish Game';
+    }
+  }
+}
+
+// ===== RECALL MODE: CHECK ALL ANSWERS =====
+
+function checkAllAnswers() {
+  const pendingEntries = Object.entries(state.pendingAnswers);
+  
+  pendingEntries.forEach(([atomicStr, userInput]) => {
+    const atomic = parseInt(atomicStr);
+    const el = document.querySelector(`.element[data-atomic="${atomic}"]`);
+    if (!el) return;
+    
+    const correctSymbol = el.dataset.symbol;
+    const isCorrect = userInput.toLowerCase() === correctSymbol.toLowerCase();
+    
+    state.totalAttempts++;
+    el.classList.remove('pending');
+    
+    if (isCorrect) {
+      state.correctAttempts++;
+      state.correctElements.add(atomic);
+      el.classList.add('correct');
+      
+      const symbolSpan = el.querySelector('.element-symbol');
+      const nameSpan = el.querySelector('.element-name');
+      if (symbolSpan) symbolSpan.textContent = correctSymbol;
+      if (nameSpan) nameSpan.textContent = el.dataset.name;
+      
+      const attemptCount = 1;
+      scoringSystem.addCorrectAnswer(atomic, attemptCount, 0);
+      
+      state.streak++;
+      if (state.streak > state.maxStreak) {
+        state.maxStreak = state.streak;
+      }
+      
+      // Update mini table for mobile
+      updateMiniTable(atomic, 'correct');
+    } else {
+      el.classList.add('incorrect');
+      
+      // Show what user typed vs correct
+      const symbolSpan = el.querySelector('.element-symbol');
+      if (symbolSpan) symbolSpan.textContent = correctSymbol;
+      const nameSpan = el.querySelector('.element-name');
+      if (nameSpan) nameSpan.textContent = el.dataset.name;
+      
+      if (!state.wrongAttempts[atomic]) state.wrongAttempts[atomic] = 0;
+      state.wrongAttempts[atomic]++;
+      
+      scoringSystem.addMistake(atomic, 1);
+      state.streak = 0;
+      
+      updateMiniTable(atomic, 'incorrect');
+    }
+  });
+  
+  state.pendingAnswers = {};
+  updateStats();
+  
+  // Close mobile input modal if open
+  if (!mobileInputModal.classList.contains('hidden')) {
+    closeMobileInput();
+  }
+  
+  completeChallenge();
+}
+
+// ===== GUIDE SYSTEM (SVG connector line + message) =====
+
+function showGuide(targetEl, text, storageKey) {
+  const overlay = document.getElementById('guideOverlay');
+  const svg = document.getElementById('guideSvg');
+  const path = document.getElementById('guidePath');
+  const messageEl = document.getElementById('guideMessage');
+  const textEl = document.getElementById('guideText');
+  const dismissBtn = document.getElementById('guideDismissBtn');
+  if (!overlay || !svg || !path || !messageEl || !textEl || !dismissBtn) return;
+  
+  textEl.textContent = text;
+  overlay.classList.remove('hidden');
+  
+  // Position the message near center of viewport
+  const viewW = window.innerWidth;
+  const viewH = window.innerHeight;
+  const msgW = Math.min(280, viewW - 40);
+  const msgX = (viewW - msgW) / 2;
+  const msgY = viewH * 0.55;
+  
+  messageEl.style.left = msgX + 'px';
+  messageEl.style.top = msgY + 'px';
+  messageEl.style.maxWidth = msgW + 'px';
+  
+  // Wait for layout, then draw connector using actual rendered positions
+  requestAnimationFrame(() => {
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    // Set viewBox to match the viewport so SVG coordinates map 1:1
+    svg.setAttribute('viewBox', `0 0 ${vw} ${vh}`);
+    
+    if (targetEl) {
+      const targetRect = targetEl.getBoundingClientRect();
+      const msgRect = messageEl.getBoundingClientRect();
+      const x1 = targetRect.left + targetRect.width / 2;
+      const y1 = targetRect.bottom + 4;
+      const x2 = msgRect.left + msgRect.width / 2;
+      // Use the CSS-set top position (not animated) for accurate endpoint
+      const y2 = parseFloat(messageEl.style.top) || msgRect.top;
+      
+      const midY = (y1 + y2) / 2;
+      path.setAttribute('d', `M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`);
+    } else {
+      path.setAttribute('d', '');
+    }
+  });
+  
+  // Dismiss handler
+  function dismiss() {
+    overlay.classList.add('hidden');
+    if (storageKey) safeSetItem(storageKey, 'true');
+    dismissBtn.removeEventListener('click', dismiss);
+  }
+  dismissBtn.addEventListener('click', dismiss);
+}
+
+function dismissGuide() {
+  const overlay = document.getElementById('guideOverlay');
+  if (overlay && !overlay.classList.contains('hidden')) {
+    overlay.classList.add('hidden');
+    safeSetItem('guideDismissed', 'true');
+  }
+}
+
+function showDesktopGuide(element) {
+  showGuide(element, 'Type the symbol (e.g. "H") and press Enter to submit.', 'guideDismissed');
+}
+
+function showMobileGuide() {
+  const inputCard = document.querySelector('.gc-info-card');
+  showGuide(inputCard, 'Type the symbol using the keyboard below, then tap Enter ✓ to submit.', 'guideDismissed');
+}
+
+function showRecallModeGuide() {
+  if (safeGetItem('recallModeGuideShown')) return;
+  // Point at the desktop or mobile mode toggle
+  const toggle = state.isMobile
+    ? document.getElementById('mobileModeRecall')
+    : document.getElementById('desktopModeRecall');
+  if (!toggle) return;
+  showGuide(toggle, 'Try Recall Mode! Enter all elements from memory, then check your answers at once.', 'recallModeGuideShown');
+}
+
+// ===== CONFETTI ANIMATION =====
+
+const CONFETTI_PARTICLE_COUNT = 120;
+const CONFETTI_MAX_FRAMES = 180;
+
+function launchConfetti() {
+  const canvas = document.getElementById('confettiCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  canvas.style.display = 'block';
+  
+  const colors = ['#6366f1', '#f59e0b', '#10b981', '#ef4444', '#3b82f6', '#ec4899', '#8b5cf6'];
+  const particles = [];
+  
+  for (let i = 0; i < CONFETTI_PARTICLE_COUNT; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height * -1,
+      w: Math.random() * 8 + 4,
+      h: Math.random() * 4 + 2,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      vx: (Math.random() - 0.5) * 4,
+      vy: Math.random() * 3 + 2,
+      rot: Math.random() * Math.PI * 2,
+      vr: (Math.random() - 0.5) * 0.2,
+      opacity: 1
+    });
+  }
+  
+  let frame = 0;
+  
+  function animate() {
+    frame++;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    let alive = false;
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.05;
+      p.rot += p.vr;
+      if (frame > CONFETTI_MAX_FRAMES * 0.6) {
+        p.opacity -= 0.02;
+      }
+      if (p.opacity <= 0 || p.y > canvas.height + 20) return;
+      alive = true;
+      
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.globalAlpha = Math.max(0, p.opacity);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    });
+    
+    if (alive && frame < CONFETTI_MAX_FRAMES) {
+      requestAnimationFrame(animate);
+    } else {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      canvas.style.display = 'none';
+    }
+  }
+  
+  requestAnimationFrame(animate);
 }

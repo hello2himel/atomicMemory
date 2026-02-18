@@ -2366,6 +2366,54 @@ body {
   opacity: 0.5;
 }
 
+/* History Footer (data management) */
+.modal-footer {
+  padding: var(--space-md) var(--space-xl);
+  border-top: 1px solid var(--border-color);
+}
+
+.history-data-actions {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.history-data-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.history-data-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.history-data-btn.danger {
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.history-data-btn.danger:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+}
+
+.history-data-btn i {
+  font-size: 14px;
+}
+
 /* Leaderboard Modal */
 .leaderboard-item {
   background: var(--bg-tertiary);
@@ -3245,4 +3293,232 @@ body {
   .gc-micro-label {
     font-size: 7px;
   }
+}
+
+/* ===== DESKTOP/MOBILE VISIBILITY HELPERS ===== */
+
+.desktop-only { display: inline; }
+.mobile-only { display: none; }
+
+@media (max-width: 768px) {
+  .desktop-only { display: none; }
+  .mobile-only { display: inline; }
+}
+
+/* ===== IN-GAME MODE TOGGLE (inline pill) ===== */
+
+.mode-toggle-inline {
+  display: inline-flex;
+  background: var(--surface-2, rgba(255,255,255,0.06));
+  border-radius: 999px;
+  padding: 2px;
+  gap: 2px;
+  align-items: center;
+}
+
+.mode-toggle-inline .mode-toggle-btn {
+  padding: 3px 12px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-secondary, #94a3b8);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  line-height: 1.4;
+}
+
+.mode-toggle-inline .mode-toggle-btn.active {
+  background: var(--primary, #6366f1);
+  color: #fff;
+  box-shadow: 0 1px 4px rgba(99, 102, 241, 0.3);
+}
+
+.mode-toggle-inline .mode-toggle-btn:hover:not(.active) {
+  background: rgba(255,255,255,0.08);
+}
+
+.mobile-mode-badge-strip {
+  justify-content: center;
+  padding: 2px 0 0 !important;
+}
+
+.mobile-mode-badge-strip .mode-toggle-inline .mode-toggle-btn {
+  font-size: 10px;
+  padding: 2px 10px;
+}
+
+/* ===== GUIDE OVERLAY (SVG connector + message) ===== */
+
+.guide-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9998;
+  pointer-events: none;
+}
+
+.guide-svg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.guide-path {
+  stroke: var(--primary, #6366f1);
+  stroke-width: 1.5;
+  stroke-dasharray: 6 4;
+  opacity: 0.6;
+  animation: guideDash 1s linear infinite;
+}
+
+@keyframes guideDash {
+  to { stroke-dashoffset: -20; }
+}
+
+.guide-message {
+  position: fixed;
+  background: var(--surface-1, #1e293b);
+  border: 1px solid var(--primary, #6366f1);
+  border-radius: 12px;
+  padding: 14px 18px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(99, 102, 241, 0.2);
+  pointer-events: auto;
+  animation: guideMessageIn 0.4s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 9999;
+}
+
+.guide-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary, #e2e8f0);
+  line-height: 1.5;
+}
+
+.guide-dismiss-btn {
+  align-self: flex-end;
+  padding: 5px 14px;
+  border: none;
+  border-radius: 999px;
+  background: var(--primary, #6366f1);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.guide-dismiss-btn:hover {
+  background: #4f46e5;
+  transform: translateY(-1px);
+}
+
+@keyframes guideMessageIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== CONFETTI CANVAS ===== */
+
+.confetti-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10000;
+  display: none;
+}
+
+/* ===== PENDING STATE (Recall mode) ===== */
+
+.element.pending {
+  border-color: var(--primary, #6366f1) !important;
+  background: rgba(99, 102, 241, 0.08) !important;
+}
+
+.element.pending .element-symbol {
+  color: var(--primary, #6366f1);
+  font-weight: 600;
+}
+
+[data-theme="dark"] .element.pending {
+  background: rgba(99, 102, 241, 0.15) !important;
+}
+
+.mini-cell.mini-pending {
+  background: var(--primary, #6366f1) !important;
+  opacity: 0.5;
+}
+
+.gc-info-card .cell-pending {
+  border-color: var(--primary, #6366f1) !important;
+}
+
+/* ===== RECALL SUGGESTION ===== */
+
+.recall-suggestion {
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin: 24px 0;
+  font-size: 13px;
+  color: var(--text-primary, #e2e8f0);
+  line-height: 1.5;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.recall-suggestion-text {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.recall-suggestion strong {
+  color: var(--primary, #6366f1);
+}
+
+.recall-suggestion-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 999px;
+  background: var(--primary, #6366f1);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.recall-suggestion-btn:hover {
+  background: #4f46e5;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
