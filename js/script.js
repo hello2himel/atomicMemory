@@ -1946,23 +1946,30 @@ function drawConnectorLine(atomicNumber) {
   const container = document.querySelector('.mobile-input-content');
   if (!miniCell || !inputCard || !container) return;
   
-  const containerRect = container.getBoundingClientRect();
-  const cellRect = miniCell.getBoundingClientRect();
-  const cardRect = inputCard.getBoundingClientRect();
-  
-  // Start point: bottom center of the mini cell
-  const x1 = cellRect.left + cellRect.width / 2 - containerRect.left;
-  const y1 = cellRect.bottom - containerRect.top;
-  
-  // End point: top center of the input card
-  const x2 = cardRect.left + cardRect.width / 2 - containerRect.left;
-  const y2 = cardRect.top - containerRect.top;
-  
-  // Cubic Bézier curve with two control points for a gentle S-curve
-  const midY = (y1 + y2) / 2;
-  const d = `M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`;
-  
-  path.setAttribute('d', d);
+  // Wait for layout to stabilise before reading positions
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      const containerRect = container.getBoundingClientRect();
+      const cellRect = miniCell.getBoundingClientRect();
+      const cardRect = inputCard.getBoundingClientRect();
+      
+      // Start point: bottom center of the mini cell
+      const x1 = cellRect.left + cellRect.width / 2 - containerRect.left;
+      const y1 = cellRect.bottom - containerRect.top;
+      
+      // End point: top center of the input card
+      const x2 = cardRect.left + cardRect.width / 2 - containerRect.left;
+      const y2 = cardRect.top - containerRect.top;
+      
+      if (isNaN(x1) || isNaN(y1) || isNaN(x2) || isNaN(y2)) return;
+      
+      // Cubic Bézier curve with two control points for a gentle S-curve
+      const midY = (y1 + y2) / 2;
+      const d = `M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`;
+      
+      path.setAttribute('d', d);
+    }, 100);
+  });
 }
 
 function updateMobileInputForElement(element) {
@@ -2339,36 +2346,73 @@ function showGuide(targetEl, text, storageKey) {
   messageEl.style.top = msgY + 'px';
   messageEl.style.maxWidth = msgW + 'px';
   
-  // Wait for layout, then draw connector using actual rendered positions
+  // Wait for the guideMessageIn animation (400ms) to finish before drawing
+  // the path so getBoundingClientRect returns the final resting position.
   requestAnimationFrame(() => {
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    // Set viewBox to match the viewport so SVG coordinates map 1:1
-    svg.setAttribute('viewBox', `0 0 ${vw} ${vh}`);
-    
-    if (targetEl) {
-      const targetRect = targetEl.getBoundingClientRect();
-      const msgRect = messageEl.getBoundingClientRect();
-      const x1 = targetRect.left + targetRect.width / 2;
-      const y1 = targetRect.bottom + 4;
-      const x2 = msgRect.left + msgRect.width / 2;
-      // Use the CSS-set top position (not animated) for accurate endpoint
-      const y2 = parseFloat(messageEl.style.top) || msgRect.top;
-      
-      const midY = (y1 + y2) / 2;
-      path.setAttribute('d', `M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`);
-    } else {
-      path.setAttribute('d', '');
-    }
+    setTimeout(() => {
+      drawGuidePath(svg, path, targetEl, messageEl);
+    }, 450);
   });
+  
+  // Redraw path on window resize while overlay is visible
+  const resizeHandler = () => {
+    if (!overlay.classList.contains('hidden')) {
+      drawGuidePath(svg, path, targetEl, messageEl);
+    }
+  };
+  window.addEventListener('resize', resizeHandler);
+  // Store handler on overlay so dismissGuide() can also clean up
+  overlay._guideResizeHandler = resizeHandler;
   
   // Dismiss handler
   function dismiss() {
     overlay.classList.add('hidden');
     if (storageKey) safeSetItem(storageKey, 'true');
     dismissBtn.removeEventListener('click', dismiss);
+    window.removeEventListener('resize', resizeHandler);
+    overlay._guideResizeHandler = null;
   }
   dismissBtn.addEventListener('click', dismiss);
+}
+
+function drawGuidePath(svg, path, targetEl, messageEl) {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  svg.setAttribute('viewBox', `0 0 ${vw} ${vh}`);
+  svg.setAttribute('width', vw);
+  svg.setAttribute('height', vh);
+  
+  if (!targetEl || !document.contains(targetEl)) {
+    path.setAttribute('d', '');
+    return;
+  }
+  
+  const targetRect = targetEl.getBoundingClientRect();
+  const msgRect = messageEl.getBoundingClientRect();
+  
+  const isMessageBelow = msgRect.top > targetRect.bottom;
+  
+  let x1, y1;
+  if (isMessageBelow) {
+    x1 = targetRect.left + targetRect.width / 2;
+    y1 = targetRect.bottom + 4;
+  } else {
+    x1 = targetRect.left + targetRect.width / 2;
+    y1 = targetRect.top - 4;
+  }
+  
+  const msgCenterX = msgRect.left + msgRect.width / 2;
+  let x2, y2;
+  if (isMessageBelow) {
+    x2 = msgCenterX;
+    y2 = msgRect.top;
+  } else {
+    x2 = msgCenterX;
+    y2 = msgRect.bottom;
+  }
+  
+  const midY = (y1 + y2) / 2;
+  path.setAttribute('d', `M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`);
 }
 
 function dismissGuide() {
@@ -2376,6 +2420,10 @@ function dismissGuide() {
   if (overlay && !overlay.classList.contains('hidden')) {
     overlay.classList.add('hidden');
     safeSetItem('guideDismissed', 'true');
+    if (overlay._guideResizeHandler) {
+      window.removeEventListener('resize', overlay._guideResizeHandler);
+      overlay._guideResizeHandler = null;
+    }
   }
 }
 
