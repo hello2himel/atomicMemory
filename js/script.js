@@ -2180,6 +2180,8 @@ function checkAllAnswers() {
 
 // ===== GUIDE TOOLTIPS =====
 
+const GUIDE_TOOLTIP_TIMEOUT_MS = 5000;
+
 function showDesktopGuideTooltip(element) {
   // Remove any existing tooltip
   dismissDesktopGuideTooltip();
@@ -2197,8 +2199,8 @@ function showDesktopGuideTooltip(element) {
   
   document.body.appendChild(tooltip);
   
-  // Auto-dismiss after 5 seconds
-  setTimeout(() => dismissDesktopGuideTooltip(), 5000);
+  // Auto-dismiss after timeout
+  setTimeout(() => dismissDesktopGuideTooltip(), GUIDE_TOOLTIP_TIMEOUT_MS);
 }
 
 function dismissDesktopGuideTooltip() {
@@ -2223,8 +2225,8 @@ function showMobileGuideTooltip() {
   
   keyboard.parentNode.insertBefore(tooltip, keyboard);
   
-  // Auto-dismiss after 5 seconds
-  setTimeout(() => dismissMobileGuideTooltip(), 5000);
+  // Auto-dismiss after timeout
+  setTimeout(() => dismissMobileGuideTooltip(), GUIDE_TOOLTIP_TIMEOUT_MS);
 }
 
 function dismissMobileGuideTooltip() {
