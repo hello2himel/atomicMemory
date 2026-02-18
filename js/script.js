@@ -2237,6 +2237,13 @@ function updateFinishButtonForMode() {
     if (mobileFinish) {
       mobileFinish.innerHTML = '<i class="ri-check-double-line"></i> Check Answers';
     }
+  } else {
+    finishBtn.querySelector('i').className = 'ri-flag-line';
+    finishBtn.querySelector('span').textContent = 'Finish';
+    const mobileFinish = document.getElementById('mobileFinishBtn');
+    if (mobileFinish) {
+      mobileFinish.innerHTML = '<i class="ri-flag-line"></i> Finish Game';
+    }
   }
 }
 
@@ -2331,18 +2338,28 @@ function showGuide(targetEl, text, storageKey) {
   messageEl.style.top = msgY + 'px';
   messageEl.style.maxWidth = msgW + 'px';
   
-  // Draw connector from target to message
-  if (targetEl) {
-    const targetRect = targetEl.getBoundingClientRect();
-    const x1 = targetRect.left + targetRect.width / 2;
-    const y1 = targetRect.bottom + 4;
-    const x2 = msgX + msgW / 2;
-    const y2 = msgY;
-    const midY = (y1 + y2) / 2;
-    path.setAttribute('d', `M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`);
-  } else {
-    path.setAttribute('d', '');
-  }
+  // Wait for layout, then draw connector using actual rendered positions
+  requestAnimationFrame(() => {
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    // Set viewBox to match the viewport so SVG coordinates map 1:1
+    svg.setAttribute('viewBox', `0 0 ${vw} ${vh}`);
+    
+    if (targetEl) {
+      const targetRect = targetEl.getBoundingClientRect();
+      const msgRect = messageEl.getBoundingClientRect();
+      const x1 = targetRect.left + targetRect.width / 2;
+      const y1 = targetRect.bottom + 4;
+      const x2 = msgRect.left + msgRect.width / 2;
+      // Use the CSS-set top position (not animated) for accurate endpoint
+      const y2 = parseFloat(messageEl.style.top) || msgRect.top;
+      
+      const midY = (y1 + y2) / 2;
+      path.setAttribute('d', `M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`);
+    } else {
+      path.setAttribute('d', '');
+    }
+  });
   
   // Dismiss handler
   function dismiss() {
