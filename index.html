@@ -27,33 +27,10 @@
       <h1 class="intro-title-text">AtomicMemory</h1>
       <p class="intro-tagline">Learn the periodic table through an interactive, gamified experience.</p>
 
-      <div class="how-to-play">
-        <div class="how-to-play-step">
-          <i class="ri-cursor-line how-to-play-icon desktop-only"></i>
-          <i class="ri-tap-line how-to-play-icon mobile-only"></i>
-          <span class="desktop-only">Click an element on the table</span>
-          <span class="mobile-only">Tap an element on the table</span>
-        </div>
-        <div class="how-to-play-step">
-          <i class="ri-keyboard-box-line how-to-play-icon"></i>
-          <span>Type its chemical symbol</span>
-        </div>
-        <div class="how-to-play-step">
-          <i class="ri-corner-down-left-line how-to-play-icon"></i>
-          <span>Press Enter to submit</span>
-        </div>
-      </div>
-
       <button id="startBtn" class="start-button">
         <i class="ri-play-fill"></i>
         <span>Start Challenge</span>
       </button>
-
-      <div class="mode-toggle" id="modeToggle">
-        <button class="mode-toggle-btn active" id="modeToggleClassic">Classic</button>
-        <button class="mode-toggle-btn" id="modeToggleRecall">Recall</button>
-      </div>
-      <span class="mode-description" id="modeDescription">Immediate feedback for each element.</span>
 
       <p class="intro-hint">
         <i class="ri-keyboard-line"></i>
@@ -117,9 +94,9 @@
     <div id="desktopBottomBar" class="desktop-bottom-bar">
       <div class="bottom-bar-stats-row">
         <div class="bottom-bar-stats">
-          <div class="bottom-stat mode-badge" id="desktopModeBadge" title="Game mode">
-            <i class="ri-gamepad-line"></i>
-            <span id="desktopModeLabel">Classic</span>
+          <div class="bottom-stat mode-toggle-inline" id="desktopModeBadge" title="Game mode">
+            <button class="mode-toggle-btn active" id="desktopModeClassic">Classic</button>
+            <button class="mode-toggle-btn" id="desktopModeRecall">Recall</button>
           </div>
           <div class="bottom-stat" title="Score">
             <i class="ri-star-line"></i>
@@ -240,12 +217,12 @@
             </button>
           </div>
 
-          <!-- Mobile Mode Badge -->
+          <!-- Mobile Mode Toggle -->
           <div class="mobile-stats-strip mobile-mode-badge-strip">
-            <span class="mode-badge" id="mobileModeBadge">
-              <i class="ri-gamepad-line"></i>
-              <span id="mobileModeLabel">Classic</span>
-            </span>
+            <div class="mode-toggle-inline" id="mobileModeBadge">
+              <button class="mode-toggle-btn active" id="mobileModeClassic">Classic</button>
+              <button class="mode-toggle-btn" id="mobileModeRecall">Recall</button>
+            </div>
           </div>
 
           <!-- Compact Stats Strip -->
@@ -597,6 +574,20 @@
         </div>
       </div>
     </div>
+
+    <!-- Guide Overlay (SVG connector line + message) -->
+    <div id="guideOverlay" class="guide-overlay hidden">
+      <svg class="guide-svg" id="guideSvg" aria-hidden="true">
+        <path class="guide-path" id="guidePath" fill="none"/>
+      </svg>
+      <div class="guide-message" id="guideMessage">
+        <span class="guide-text" id="guideText"></span>
+        <button class="guide-dismiss-btn" id="guideDismissBtn">Got it</button>
+      </div>
+    </div>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confettiCanvas" class="confetti-canvas" aria-hidden="true"></canvas>
 
 
   </div>

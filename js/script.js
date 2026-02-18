@@ -134,7 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
   detectMobile();
   detectDarkMode();
   loadTotalChallenges();
-  initModeToggle();
   setupIntro();
   setupEventListeners();
   achievementManager.updateBadge();
@@ -176,25 +175,25 @@ function startApp() {
     mainApp.classList.remove('hidden');
     renderPeriodicTable();
     initializeFullTable();
-    updateModeBadges();
+    initInGameModeToggle();
     updateFinishButtonForMode();
     
     if (state.isMobile) {
       const firstElement = findFirstActiveElement();
       if (firstElement) {
         openMobileInput(firstElement);
-        // Mobile first-play tooltip
+        // Show first-play guide after a short delay
         if (!safeGetItem('guideDismissed')) {
-          showMobileGuideTooltip();
+          setTimeout(() => showMobileGuide(), 600);
         }
       }
     } else {
       const firstElement = findFirstActiveElement();
       if (firstElement) {
         activateElement(firstElement);
-        // Desktop first-play tooltip
+        // Show first-play guide after a short delay
         if (!safeGetItem('guideDismissed')) {
-          showDesktopGuideTooltip(firstElement);
+          setTimeout(() => showDesktopGuide(firstElement), 600);
         }
       }
     }
@@ -676,7 +675,7 @@ function handleMobileSubmit() {
       setTimeout(() => updateMobileInputForElement(nextEl), 200);
     }
     
-    dismissMobileGuideTooltip();
+    dismissGuide();
     updateMobileStats();
     return;
   }
@@ -777,7 +776,7 @@ function activateElement(element) {
   
   input.addEventListener('input', () => {
     formatSymbolInput(input);
-    dismissDesktopGuideTooltip();
+    dismissGuide();
   });
   
   input.addEventListener('keydown', (e) => {
@@ -865,6 +864,14 @@ function validateInput(element, userInput) {
     state.streak++;
     if (state.streak > state.maxStreak) {
       state.maxStreak = state.streak;
+    }
+    
+    // Mid-game confetti on new high score (check every 10 correct)
+    if (state.correctElements.size % 10 === 0 && state.correctElements.size > 0) {
+      const currentBest = scoringSystem.getPersonalBest();
+      if (!currentBest || scoringSystem.score > currentBest.score) {
+        launchConfetti();
+      }
     }
     
     updateStats();
@@ -1218,12 +1225,20 @@ function completeChallenge() {
   
   const totalMistakes = Object.values(state.wrongAttempts).reduce((a, b) => a + b, 0);
   
+  // Get personal best before saving new score
+  const previousBest = scoringSystem.getPersonalBest();
+  
   // Calculate final score
   const finalScore = scoringSystem.calculateFinalScore(
     state.correctElements.size,
     state.elapsedTime,
     totalMistakes
   );
+  
+  // Check for new high score and trigger confetti
+  if (!previousBest || finalScore > previousBest.score) {
+    launchConfetti();
+  }
   
   // Save score
   scoringSystem.saveScore('full', state.correctElements.size, state.elapsedTime, totalMistakes);
@@ -1331,12 +1346,17 @@ function closeModal(modal) {
 
 function dismissCompleteModal() {
   closeModal(completeModal);
+  // Show leaderboard guide after first completion
+  const shouldShowLeaderboardGuide = !safeGetItem('leaderboardGuideShown');
   resetChallenge();
   if (state.isMobile) {
     const firstElement = findFirstActiveElement();
     if (firstElement) {
       openMobileInput(firstElement);
     }
+  }
+  if (shouldShowLeaderboardGuide) {
+    setTimeout(() => showLeaderboardGuide(), 400);
   }
 }
 
@@ -2060,45 +2080,41 @@ async function finishChallenge() {
   completeChallenge();
 }
 
-// ===== MODE TOGGLE =====
+// ===== IN-GAME MODE TOGGLE =====
 
-function initModeToggle() {
-  const classicBtn = document.getElementById('modeToggleClassic');
-  const recallBtn = document.getElementById('modeToggleRecall');
-  const desc = document.getElementById('modeDescription');
+function initInGameModeToggle() {
+  // Desktop mode toggle in bottom bar
+  const desktopClassic = document.getElementById('desktopModeClassic');
+  const desktopRecall = document.getElementById('desktopModeRecall');
+  // Mobile mode toggle in mobile input modal
+  const mobileClassic = document.getElementById('mobileModeClassic');
+  const mobileRecall = document.getElementById('mobileModeRecall');
   
-  if (!classicBtn || !recallBtn) return;
+  const allBtns = [desktopClassic, desktopRecall, mobileClassic, mobileRecall].filter(Boolean);
   
-  // Set initial state from localStorage
-  if (state.gameMode === 'recall') {
-    classicBtn.classList.remove('active');
-    recallBtn.classList.add('active');
-    if (desc) desc.textContent = 'Enter all symbols, then check at once.';
+  function setMode(mode) {
+    state.gameMode = mode;
+    safeSetItem('gameMode', mode);
+    // Sync all toggle buttons
+    [desktopClassic, mobileClassic].forEach(btn => {
+      if (btn) btn.classList.toggle('active', mode === 'classic');
+    });
+    [desktopRecall, mobileRecall].forEach(btn => {
+      if (btn) btn.classList.toggle('active', mode === 'recall');
+    });
+    updateFinishButtonForMode();
   }
   
-  classicBtn.addEventListener('click', () => {
-    state.gameMode = 'classic';
-    safeSetItem('gameMode', 'classic');
-    classicBtn.classList.add('active');
-    recallBtn.classList.remove('active');
-    if (desc) desc.textContent = 'Immediate feedback for each element.';
-  });
+  // Set initial state
+  if (state.gameMode === 'recall') {
+    setMode('recall');
+  }
   
-  recallBtn.addEventListener('click', () => {
-    state.gameMode = 'recall';
-    safeSetItem('gameMode', 'recall');
-    recallBtn.classList.add('active');
-    classicBtn.classList.remove('active');
-    if (desc) desc.textContent = 'Enter all symbols, then check at once.';
-  });
-}
-
-function updateModeBadges() {
-  const label = state.gameMode === 'recall' ? 'Recall' : 'Classic';
-  const desktopLabel = document.getElementById('desktopModeLabel');
-  const mobileLabel = document.getElementById('mobileModeLabel');
-  if (desktopLabel) desktopLabel.textContent = label;
-  if (mobileLabel) mobileLabel.textContent = label;
+  // Click handlers
+  if (desktopClassic) desktopClassic.addEventListener('click', () => setMode('classic'));
+  if (desktopRecall) desktopRecall.addEventListener('click', () => setMode('recall'));
+  if (mobileClassic) mobileClassic.addEventListener('click', () => setMode('classic'));
+  if (mobileRecall) mobileRecall.addEventListener('click', () => setMode('recall'));
 }
 
 function updateFinishButtonForMode() {
@@ -2178,61 +2194,150 @@ function checkAllAnswers() {
   completeChallenge();
 }
 
-// ===== GUIDE TOOLTIPS =====
+// ===== GUIDE SYSTEM (SVG connector line + message) =====
 
-const GUIDE_TOOLTIP_TIMEOUT_MS = 5000;
-
-function showDesktopGuideTooltip(element) {
-  // Remove any existing tooltip
-  dismissDesktopGuideTooltip();
+function showGuide(targetEl, text, storageKey) {
+  const overlay = document.getElementById('guideOverlay');
+  const svg = document.getElementById('guideSvg');
+  const path = document.getElementById('guidePath');
+  const messageEl = document.getElementById('guideMessage');
+  const textEl = document.getElementById('guideText');
+  const dismissBtn = document.getElementById('guideDismissBtn');
+  if (!overlay || !svg || !path || !messageEl || !textEl || !dismissBtn) return;
   
-  const tooltip = document.createElement('div');
-  tooltip.className = 'guide-tooltip';
-  tooltip.id = 'desktopGuideTooltip';
-  tooltip.innerHTML = '<i class="ri-keyboard-box-line"></i> Type the symbol and press Enter';
+  textEl.textContent = text;
+  overlay.classList.remove('hidden');
   
-  const rect = element.getBoundingClientRect();
-  tooltip.style.position = 'fixed';
-  tooltip.style.left = (rect.left + rect.width / 2) + 'px';
-  tooltip.style.top = (rect.bottom + 8) + 'px';
-  tooltip.style.transform = 'translateX(-50%)';
+  // Position the message near center of viewport
+  const viewW = window.innerWidth;
+  const viewH = window.innerHeight;
+  const msgW = Math.min(280, viewW - 40);
+  const msgX = (viewW - msgW) / 2;
+  const msgY = viewH * 0.55;
   
-  document.body.appendChild(tooltip);
+  messageEl.style.left = msgX + 'px';
+  messageEl.style.top = msgY + 'px';
+  messageEl.style.maxWidth = msgW + 'px';
   
-  // Auto-dismiss after timeout
-  setTimeout(() => dismissDesktopGuideTooltip(), GUIDE_TOOLTIP_TIMEOUT_MS);
+  // Draw connector from target to message
+  if (targetEl) {
+    const targetRect = targetEl.getBoundingClientRect();
+    const x1 = targetRect.left + targetRect.width / 2;
+    const y1 = targetRect.bottom + 4;
+    const x2 = msgX + msgW / 2;
+    const y2 = msgY;
+    const midY = (y1 + y2) / 2;
+    path.setAttribute('d', `M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`);
+  } else {
+    path.setAttribute('d', '');
+  }
+  
+  // Dismiss handler
+  function dismiss() {
+    overlay.classList.add('hidden');
+    if (storageKey) safeSetItem(storageKey, 'true');
+    dismissBtn.removeEventListener('click', dismiss);
+  }
+  dismissBtn.addEventListener('click', dismiss);
 }
 
-function dismissDesktopGuideTooltip() {
-  const tooltip = document.getElementById('desktopGuideTooltip');
-  if (tooltip) {
-    tooltip.remove();
+function dismissGuide() {
+  const overlay = document.getElementById('guideOverlay');
+  if (overlay && !overlay.classList.contains('hidden')) {
+    overlay.classList.add('hidden');
     safeSetItem('guideDismissed', 'true');
   }
 }
 
-function showMobileGuideTooltip() {
-  // Remove any existing tooltip
-  dismissMobileGuideTooltip();
-  
-  const keyboard = document.getElementById('qwertyKeyboard');
-  if (!keyboard) return;
-  
-  const tooltip = document.createElement('div');
-  tooltip.className = 'guide-tooltip mobile-guide-tooltip';
-  tooltip.id = 'mobileGuideTooltip';
-  tooltip.innerHTML = '<i class="ri-keyboard-box-line"></i> Type the symbol, then tap Enter ✓';
-  
-  keyboard.parentNode.insertBefore(tooltip, keyboard);
-  
-  // Auto-dismiss after timeout
-  setTimeout(() => dismissMobileGuideTooltip(), GUIDE_TOOLTIP_TIMEOUT_MS);
+function showDesktopGuide(element) {
+  showGuide(element, 'Type the symbol (e.g. "H") and press Enter to submit.', 'guideDismissed');
 }
 
-function dismissMobileGuideTooltip() {
-  const tooltip = document.getElementById('mobileGuideTooltip');
-  if (tooltip) {
-    tooltip.remove();
-    safeSetItem('guideDismissed', 'true');
+function showMobileGuide() {
+  const inputCard = document.querySelector('.gc-info-card');
+  showGuide(inputCard, 'Type the symbol using the keyboard below, then tap Enter ✓ to submit.', 'guideDismissed');
+}
+
+function showLeaderboardGuide() {
+  if (safeGetItem('leaderboardGuideShown')) return;
+  const btn = document.getElementById('leaderboardBtn');
+  if (!btn) return;
+  showGuide(btn, 'You can view your top scores and track your progress here!', 'leaderboardGuideShown');
+}
+
+function showRecallModeGuide() {
+  if (safeGetItem('recallModeGuideShown')) return;
+  // Point at the desktop or mobile mode toggle
+  const toggle = state.isMobile
+    ? document.getElementById('mobileModeRecall')
+    : document.getElementById('desktopModeRecall');
+  if (!toggle) return;
+  showGuide(toggle, 'Try Recall Mode — enter all elements from memory, then check your answers at once!', 'recallModeGuideShown');
+}
+
+// ===== CONFETTI ANIMATION =====
+
+function launchConfetti() {
+  const canvas = document.getElementById('confettiCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  canvas.style.display = 'block';
+  
+  const colors = ['#6366f1', '#f59e0b', '#10b981', '#ef4444', '#3b82f6', '#ec4899', '#8b5cf6'];
+  const particles = [];
+  
+  for (let i = 0; i < 120; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height * -1,
+      w: Math.random() * 8 + 4,
+      h: Math.random() * 4 + 2,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      vx: (Math.random() - 0.5) * 4,
+      vy: Math.random() * 3 + 2,
+      rot: Math.random() * Math.PI * 2,
+      vr: (Math.random() - 0.5) * 0.2,
+      opacity: 1
+    });
   }
+  
+  let frame = 0;
+  const maxFrames = 180;
+  
+  function animate() {
+    frame++;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    let alive = false;
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.05;
+      p.rot += p.vr;
+      if (frame > maxFrames * 0.6) {
+        p.opacity -= 0.02;
+      }
+      if (p.opacity <= 0 || p.y > canvas.height + 20) return;
+      alive = true;
+      
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.globalAlpha = Math.max(0, p.opacity);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    });
+    
+    if (alive && frame < maxFrames) {
+      requestAnimationFrame(animate);
+    } else {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      canvas.style.display = 'none';
+    }
+  }
+  
+  requestAnimationFrame(animate);
 }
