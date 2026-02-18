@@ -352,6 +352,29 @@ function setupEventListeners() {
   });
   shareScoreBtn.addEventListener('click', shareScore);
   
+  // Try Recall Mode button in completion modal
+  const tryRecallBtn = document.getElementById('tryRecallBtn');
+  if (tryRecallBtn) {
+    tryRecallBtn.addEventListener('click', () => {
+      closeModal(completeModal);
+      state.gameMode = 'recall';
+      safeSetItem('gameMode', 'recall');
+      resetChallenge();
+      // Sync mode toggle buttons
+      const desktopClassic = document.getElementById('desktopModeClassic');
+      const desktopRecall = document.getElementById('desktopModeRecall');
+      const mobileClassic = document.getElementById('mobileModeClassic');
+      const mobileRecall = document.getElementById('mobileModeRecall');
+      [desktopClassic, mobileClassic].forEach(b => { if (b) b.classList.remove('active'); });
+      [desktopRecall, mobileRecall].forEach(b => { if (b) b.classList.add('active'); });
+      updateFinishButtonForMode();
+      if (state.isMobile) {
+        const firstElement = findFirstActiveElement();
+        if (firstElement) openMobileInput(firstElement);
+      }
+    });
+  }
+  
   // Breakdown toggle
   const breakdownToggle = document.getElementById('breakdownToggle');
   if (breakdownToggle) {
@@ -866,10 +889,10 @@ function validateInput(element, userInput) {
       state.maxStreak = state.streak;
     }
     
-    // Mid-game confetti on new high score (check every 10 correct)
+    // Mid-game confetti on new high score (check every 10 correct, skip first game)
     if (state.correctElements.size % 10 === 0 && state.correctElements.size > 0) {
       const currentBest = scoringSystem.getPersonalBest();
-      if (!currentBest || scoringSystem.score > currentBest.score) {
+      if (currentBest && scoringSystem.score > currentBest.score) {
         launchConfetti();
       }
     }
@@ -1235,8 +1258,8 @@ function completeChallenge() {
     totalMistakes
   );
   
-  // Check for new high score and trigger confetti
-  if (!previousBest || finalScore > previousBest.score) {
+  // Check for new high score and trigger confetti (skip first game)
+  if (previousBest && finalScore > previousBest.score) {
     launchConfetti();
   }
   
@@ -1348,6 +1371,11 @@ function dismissCompleteModal() {
   closeModal(completeModal);
   // Show leaderboard guide after first completion
   const shouldShowLeaderboardGuide = !safeGetItem('leaderboardGuideShown');
+  // Show recall guide for users who played 3+ games but never tried recall
+  const shouldShowRecallGuide = !shouldShowLeaderboardGuide
+    && state.totalChallengesCompleted >= 3
+    && state.gameMode === 'classic'
+    && !safeGetItem('recallModeGuideShown');
   resetChallenge();
   if (state.isMobile) {
     const firstElement = findFirstActiveElement();
@@ -1357,6 +1385,8 @@ function dismissCompleteModal() {
   }
   if (shouldShowLeaderboardGuide) {
     setTimeout(() => showLeaderboardGuide(), 400);
+  } else if (shouldShowRecallGuide) {
+    setTimeout(() => showRecallModeGuide(), 400);
   }
 }
 
@@ -1649,7 +1679,7 @@ function handleQwertyKey(key) {
       cellSymbolDisplay.classList.remove('empty');
     }
     updateGcInputState();
-    dismissMobileGuideTooltip();
+    dismissGuide();
     // Auto-deactivate shift after typing a letter
     if (state.shiftActive) {
       state.shiftActive = false;
