@@ -391,6 +391,20 @@
         <div id="historyModalBody" class="modal-body">
           <!-- Populated by JS -->
         </div>
+        <div class="modal-footer history-footer">
+          <div class="history-data-actions">
+            <button class="history-data-btn" id="exportDataBtn" title="Export all data">
+              <i class="ri-download-2-line"></i> Export
+            </button>
+            <button class="history-data-btn" id="importDataBtn" title="Import data">
+              <i class="ri-upload-2-line"></i> Import
+            </button>
+            <button class="history-data-btn danger" id="resetDataBtn" title="Delete all data">
+              <i class="ri-delete-bin-line"></i> Reset
+            </button>
+          </div>
+          <input type="file" id="importFileInput" accept=".json" class="hidden" aria-hidden="true">
+        </div>
       </div>
     </div>
 

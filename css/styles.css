@@ -2366,6 +2366,54 @@ body {
   opacity: 0.5;
 }
 
+/* History Footer (data management) */
+.modal-footer {
+  padding: var(--space-md) var(--space-xl);
+  border-top: 1px solid var(--border-color);
+}
+
+.history-data-actions {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.history-data-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.history-data-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.history-data-btn.danger {
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.history-data-btn.danger:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+}
+
+.history-data-btn i {
+  font-size: 14px;
+}
+
 /* Leaderboard Modal */
 .leaderboard-item {
   background: var(--bg-tertiary);

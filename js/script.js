@@ -238,6 +238,19 @@ function setupEventListeners() {
   historyBtn.addEventListener('click', openHistoryModal);
   closeHistoryBtn.addEventListener('click', () => closeModal(historyModal));
   
+  // Data management buttons
+  const exportDataBtn = document.getElementById('exportDataBtn');
+  const importDataBtn = document.getElementById('importDataBtn');
+  const importFileInput = document.getElementById('importFileInput');
+  const resetDataBtn = document.getElementById('resetDataBtn');
+  if (exportDataBtn) exportDataBtn.addEventListener('click', exportData);
+  if (importDataBtn) importDataBtn.addEventListener('click', () => importFileInput.click());
+  if (importFileInput) importFileInput.addEventListener('change', (e) => {
+    if (e.target.files[0]) importData(e.target.files[0]);
+    e.target.value = '';
+  });
+  if (resetDataBtn) resetDataBtn.addEventListener('click', resetAllData);
+  
   // Leaderboard button
   leaderboardBtn.addEventListener('click', openLeaderboardModal);
   closeLeaderboardBtn.addEventListener('click', () => closeModal(leaderboardModal));
@@ -1493,6 +1506,74 @@ function loadHistory() {
       </div>
     `;
   }).join('');
+}
+
+// ===== DATA MANAGEMENT (Export / Import / Reset) =====
+
+const DATA_KEYS = ['history', 'leaderboard', 'achievements', 'totalChallenges', 'darkMode', 'navDirection', 'gameMode', 'guideDismissed', 'leaderboardGuideShown', 'recallModeSuggested', 'recallModeGuideShown'];
+
+function exportData() {
+  const data = {};
+  DATA_KEYS.forEach(key => {
+    const val = safeGetItem(key);
+    if (val !== null) data[key] = val;
+  });
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `atomicmemory-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showHintToast('Data exported successfully!');
+}
+
+function importData(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (typeof data !== 'object' || data === null) {
+        showHintToast('Invalid backup file.');
+        return;
+      }
+      DATA_KEYS.forEach(key => {
+        if (data[key] !== undefined) {
+          safeSetItem(key, data[key]);
+        }
+      });
+      // Reload state
+      state.totalChallengesCompleted = parseInt(safeGetItem('totalChallenges') || '0');
+      state.gameMode = safeGetItem('gameMode') || 'classic';
+      state.navDirection = safeGetItem('navDirection') || 'horizontal';
+      achievementManager.load();
+      achievementManager.updateBadge();
+      loadHistory();
+      showHintToast('Data imported successfully!');
+    } catch (err) {
+      showHintToast('Failed to read backup file.');
+    }
+  };
+  reader.readAsText(file);
+}
+
+async function resetAllData() {
+  if (!await showConfirmDialog('Delete all data? This will erase your history, scores, achievements, and settings. This cannot be undone.')) {
+    return;
+  }
+  DATA_KEYS.forEach(key => {
+    try { localStorage.removeItem(key); } catch (e) { /* ignore */ }
+  });
+  state.totalChallengesCompleted = 0;
+  state.gameMode = 'classic';
+  state.navDirection = 'horizontal';
+  achievementManager.load();
+  achievementManager.updateBadge();
+  loadHistory();
+  showHintToast('All data has been reset.');
 }
 
 function openLeaderboardModal() {
