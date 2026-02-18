@@ -233,30 +233,36 @@ class AchievementManager {
     
     const sortedAchievements = [...unlockedAchievements, ...lockedAchievements];
 
+    const pct = (this.getUnlockedCount() / this.getTotalCount()) * 100;
+
     container.innerHTML = `
       <div class="achievements-stats" style="margin-bottom: 24px; text-align: center;">
         <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;">
-          Unlocked ${this.getUnlockedCount()} of ${this.getTotalCount()} achievements
+          Unlocked ${parseInt(this.getUnlockedCount())} of ${parseInt(this.getTotalCount())} achievements
         </div>
         <div style="background: var(--bg-tertiary); height: 8px; border-radius: 999px; overflow: hidden;">
-          <div style="height: 100%; background: var(--accent-gradient); width: ${(this.getUnlockedCount() / this.getTotalCount()) * 100}%; transition: width 300ms ease;"></div>
+          <div style="height: 100%; background: var(--accent-gradient); width: ${pct}%; transition: width 300ms ease;"></div>
         </div>
       </div>
       <div class="achievements-grid">
-        ${sortedAchievements.map(achievement => `
+        ${sortedAchievements.map(achievement => {
+          const safeDate = achievement.unlocked && achievement.unlockedAt
+            ? new Date(achievement.unlockedAt).toLocaleDateString()
+            : '';
+          return `
           <div class="achievement-card ${achievement.unlocked ? 'unlocked' : 'locked'}">
             <div class="achievement-card-icon">
               <i class="${achievement.icon}"></i>
             </div>
             <div class="achievement-card-title">${achievement.title}</div>
             <div class="achievement-card-description">${achievement.description}</div>
-            ${achievement.unlocked && achievement.unlockedAt ? `
+            ${safeDate ? `
               <div style="margin-top: 8px; font-size: 10px; color: var(--text-tertiary);">
-                ${new Date(achievement.unlockedAt).toLocaleDateString()}
+                ${safeDate}
               </div>
             ` : ''}
           </div>
-        `).join('')}
+        `;}).join('')}
       </div>
     `;
   }

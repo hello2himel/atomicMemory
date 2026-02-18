@@ -4,6 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#0f172a">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self';
+                 script-src 'self';
+                 style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net;
+                 font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net;
+                 img-src 'self' data:;
+                 connect-src 'self';">
   <meta name="description" content="Master all 118 elements of the periodic table through competitive practice. Test your knowledge with score tracking, achievements, and leaderboards.">
   <meta property="og:title" content="AtomicMemory - Master the Elements">
   <meta property="og:description" content="Master all 118 elements of the periodic table through competitive practice. Test your knowledge with score tracking, achievements, and leaderboards.">
@@ -98,24 +105,24 @@
             <button class="mode-toggle-btn active" id="desktopModeClassic" title="Answer one element at a time with immediate feedback">Classic</button>
             <button class="mode-toggle-btn" id="desktopModeRecall" title="Enter all elements from memory, then check your answers at once">Recall</button>
           </div>
-          <div class="bottom-stat" title="Score">
-            <i class="ri-star-line"></i>
-            <span id="bottomScore">0</span>
+          <div class="bottom-stat" title="Score" aria-label="Score">
+            <i class="ri-star-line" aria-hidden="true"></i>
+            <span id="bottomScore" role="status" aria-live="polite">0</span>
           </div>
-          <div class="bottom-stat" title="Time">
-            <i class="ri-timer-line"></i>
+          <div class="bottom-stat" title="Time" aria-label="Time">
+            <i class="ri-timer-line" aria-hidden="true"></i>
             <span id="bottomTimer">00:00</span>
           </div>
-          <div class="bottom-stat" title="Progress">
-            <i class="ri-check-double-line"></i>
+          <div class="bottom-stat" title="Progress" aria-label="Progress">
+            <i class="ri-check-double-line" aria-hidden="true"></i>
             <span id="bottomProgress">0/118</span>
           </div>
-          <div class="bottom-stat" title="Streak">
-            <i class="ri-fire-line"></i>
+          <div class="bottom-stat" title="Streak" aria-label="Streak">
+            <i class="ri-fire-line" aria-hidden="true"></i>
             <span id="bottomStreak">0</span>
           </div>
-          <div class="bottom-stat" title="Accuracy">
-            <i class="ri-percent-line"></i>
+          <div class="bottom-stat" title="Accuracy" aria-label="Accuracy">
+            <i class="ri-percent-line" aria-hidden="true"></i>
             <span id="bottomAccuracy">—</span>
           </div>
         </div>
@@ -125,12 +132,12 @@
           <i class="ri-trophy-line"></i>
           <span>Leaderboard</span>
         </button>
-        <button id="finishBtn" class="bottom-action-btn finish-btn" title="Finish challenge">
-          <i class="ri-flag-line"></i>
+        <button id="finishBtn" class="bottom-action-btn finish-btn" title="Finish challenge" aria-label="Finish challenge">
+          <i class="ri-flag-line" aria-hidden="true"></i>
           <span>Finish</span>
         </button>
-        <button id="viewTableBtn" class="bottom-action-btn view-btn" title="Reveal periodic table">
-          <i class="ri-eye-line"></i>
+        <button id="viewTableBtn" class="bottom-action-btn view-btn" title="Reveal periodic table" aria-label="Reveal periodic table">
+          <i class="ri-eye-line" aria-hidden="true"></i>
           <span>Reveal Table</span>
         </button>
       </div>
@@ -194,26 +201,26 @@
 
           <!-- Row 2: Action Buttons -->
           <div class="mobile-game-buttons-row">
-            <button class="mobile-toolbar-btn" id="mobileToolbarHistory" title="History">
-              <i class="ri-history-line"></i>
+            <button class="mobile-toolbar-btn" id="mobileToolbarHistory" title="History" aria-label="Practice history">
+              <i class="ri-history-line" aria-hidden="true"></i>
             </button>
-            <button class="mobile-toolbar-btn" id="mobileToolbarLeaderboard" title="Leaderboard">
-              <i class="ri-trophy-line"></i>
+            <button class="mobile-toolbar-btn" id="mobileToolbarLeaderboard" title="Leaderboard" aria-label="Leaderboard">
+              <i class="ri-trophy-line" aria-hidden="true"></i>
             </button>
-            <button class="mobile-toolbar-btn" id="mobileToolbarAchievements" title="Achievements">
-              <i class="ri-medal-line"></i>
+            <button class="mobile-toolbar-btn" id="mobileToolbarAchievements" title="Achievements" aria-label="Achievements">
+              <i class="ri-medal-line" aria-hidden="true"></i>
             </button>
-            <button class="mobile-toolbar-btn" id="mobileToolbarAbout" title="About">
-              <i class="ri-information-line"></i>
+            <button class="mobile-toolbar-btn" id="mobileToolbarAbout" title="About" aria-label="About">
+              <i class="ri-information-line" aria-hidden="true"></i>
             </button>
-            <button class="mobile-toolbar-btn donate-mobile-btn" id="mobileToolbarDonate" title="Donate">
-              <i class="ri-heart-fill"></i>
+            <button class="mobile-toolbar-btn donate-mobile-btn" id="mobileToolbarDonate" title="Donate" aria-label="Donate">
+              <i class="ri-heart-fill" aria-hidden="true"></i>
             </button>
-            <button class="mobile-toolbar-btn" id="mobileToolbarTheme" title="Toggle theme">
-              <i class="ri-moon-line"></i>
+            <button class="mobile-toolbar-btn" id="mobileToolbarTheme" title="Toggle theme" aria-label="Toggle theme">
+              <i class="ri-moon-line" aria-hidden="true"></i>
             </button>
-            <button class="mobile-toolbar-btn" id="mobileToolbarReset" title="Reset">
-              <i class="ri-restart-line"></i>
+            <button class="mobile-toolbar-btn" id="mobileToolbarReset" title="Reset" aria-label="Reset challenge">
+              <i class="ri-restart-line" aria-hidden="true"></i>
             </button>
           </div>
 

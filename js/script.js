@@ -6,13 +6,29 @@ if (typeof ELEMENTS !== 'undefined') {
 
 const APP_URL = 'https://atomicmemory.netlify.app';
 
+// Escape HTML to prevent XSS when inserting dynamic data into innerHTML
+function escapeHTML(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
 // Safe localStorage helpers
 function safeGetItem(key) {
   try { return localStorage.getItem(key); } catch (e) { return null; }
 }
 
 function safeSetItem(key, value) {
-  try { localStorage.setItem(key, value); } catch (e) { /* quota exceeded or disabled */ }
+  try {
+    localStorage.setItem(key, value);
+  } catch (e) {
+    if (e.name === 'QuotaExceededError') {
+      console.error('Storage quota exceeded');
+      if (typeof showHintToast === 'function') {
+        showHintToast('Storage full. Please clear some data.');
+      }
+    }
+  }
 }
 
 // State
@@ -433,35 +449,51 @@ function setupEventListeners() {
 // Mobile Menu
 function openMobileMenu() {
   const menuBody = document.getElementById('mobileMenuBody');
+  const unlockedCount = parseInt(achievementManager.getUnlockedCount()) || 0;
+  const totalCount = parseInt(achievementManager.getTotalCount()) || 0;
+  const themeIcon = document.body.dataset.theme === 'dark' ? 'ri-sun-line' : 'ri-moon-line';
   
   menuBody.innerHTML = `
     <div style="display: flex; flex-direction: column; gap: 16px;">
-      <button class="mobile-menu-btn" onclick="openHistoryModal(); mobileMenu.classList.add('hidden')">
+      <button class="mobile-menu-btn" data-action="history">
         <i class="ri-history-line"></i>
         <span>Practice History</span>
       </button>
-      <button class="mobile-menu-btn" onclick="openLeaderboardModal(); mobileMenu.classList.add('hidden')">
+      <button class="mobile-menu-btn" data-action="leaderboard">
         <i class="ri-trophy-line"></i>
         <span>Top Scores</span>
       </button>
-      <button class="mobile-menu-btn" onclick="openAchievementsModal(); mobileMenu.classList.add('hidden')">
+      <button class="mobile-menu-btn" data-action="achievements">
         <i class="ri-medal-line"></i>
-        <span>Achievements (${achievementManager.getUnlockedCount()}/${achievementManager.getTotalCount()})</span>
+        <span>Achievements (${unlockedCount}/${totalCount})</span>
       </button>
-      <button class="mobile-menu-btn" onclick="darkModeBtn.click(); mobileMenu.classList.add('hidden')">
-        <i class="${document.body.dataset.theme === 'dark' ? 'ri-sun-line' : 'ri-moon-line'}"></i>
+      <button class="mobile-menu-btn" data-action="theme">
+        <i class="${themeIcon}"></i>
         <span>Toggle Theme</span>
       </button>
-      <button class="mobile-menu-btn" onclick="openInfoModal(); mobileMenu.classList.add('hidden')">
+      <button class="mobile-menu-btn" data-action="about">
         <i class="ri-information-line"></i>
         <span>About</span>
       </button>
-      <button class="mobile-menu-btn" onclick="openDonateModal(); mobileMenu.classList.add('hidden')">
+      <button class="mobile-menu-btn" data-action="donate">
         <i class="ri-heart-fill donate-heart-icon"></i>
         <span>Donate</span>
       </button>
     </div>
   `;
+  
+  menuBody.querySelectorAll('[data-action]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const action = btn.dataset.action;
+      mobileMenu.classList.add('hidden');
+      if (action === 'history') openHistoryModal();
+      else if (action === 'leaderboard') openLeaderboardModal();
+      else if (action === 'achievements') openAchievementsModal();
+      else if (action === 'theme') darkModeBtn.click();
+      else if (action === 'about') openInfoModal();
+      else if (action === 'donate') openDonateModal();
+    });
+  });
   
   mobileMenu.classList.remove('hidden');
 }
@@ -790,6 +822,8 @@ function formatTime(seconds) {
 }
 
 function activateElement(element) {
+  if (!element) return;
+  
   document.querySelectorAll('.element input').forEach(input => input.remove());
   document.querySelectorAll('.element').forEach(el => el.classList.remove('active'));
   
@@ -856,6 +890,8 @@ function activateElement(element) {
 }
 
 function validateInput(element, userInput) {
+  if (!element || !userInput) return;
+  
   const atomic = parseInt(element.dataset.atomic);
   const correctSymbol = element.dataset.symbol;
   
@@ -1152,6 +1188,11 @@ function findNextElementByGroup(currentElement) {
 
 // Timer
 function startTimer() {
+  // Prevent multiple timers
+  if (state.timerInterval) {
+    stopTimer();
+  }
+  
   state.timerStarted = true;
   state.startTime = Date.now();
   // Reset view mode if active
@@ -1476,7 +1517,13 @@ function openHistoryModal() {
 }
 
 function loadHistory() {
-  const history = JSON.parse(safeGetItem('history') || '[]');
+  let history;
+  try {
+    history = JSON.parse(safeGetItem('history') || '[]');
+    if (!Array.isArray(history)) history = [];
+  } catch (e) {
+    history = [];
+  }
   
   if (history.length === 0) {
     historyModalBody.innerHTML = `
@@ -1490,25 +1537,30 @@ function loadHistory() {
   
   historyModalBody.innerHTML = history.slice(0, 20).map(record => {
     const date = new Date(record.date);
-    const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    const timeStr = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    const dateStr = escapeHTML(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }));
+    const timeStr = escapeHTML(date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }));
     
-    const minutes = Math.floor(record.time / 60);
-    const seconds = record.time % 60;
+    const minutes = Math.floor(Number(record.time) / 60);
+    const seconds = Number(record.time) % 60;
     const durationStr = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    
+    const elementsCount = parseInt(record.elementsCount) || 118;
+    const score = Number(record.score) || 0;
+    const wrongAttempts = parseInt(record.wrongAttempts) || 0;
+    const maxStreak = parseInt(record.maxStreak) || 0;
     
     return `
       <div class="history-item">
         <div class="history-info">
-          <div class="history-mode">${record.elementsCount || 118}/118 Elements</div>
-          <div class="history-score">Score: ${scoringSystem.formatScore(record.score || 0)}</div>
+          <div class="history-mode">${elementsCount}/118 Elements</div>
+          <div class="history-score">Score: ${escapeHTML(scoringSystem.formatScore(score))}</div>
           <div class="history-details">
             <span><i class="ri-calendar-line"></i> ${dateStr} ${timeStr}</span>
-            <span><i class="ri-close-circle-line"></i> ${record.wrongAttempts} errors</span>
-            <span><i class="ri-fire-line"></i> ${record.maxStreak || 0} streak</span>
+            <span><i class="ri-close-circle-line"></i> ${wrongAttempts} errors</span>
+            <span><i class="ri-fire-line"></i> ${maxStreak} streak</span>
           </div>
         </div>
-        <div class="history-time">${durationStr}</div>
+        <div class="history-time">${escapeHTML(durationStr)}</div>
       </div>
     `;
   }).join('');
@@ -1603,7 +1655,12 @@ function loadLeaderboard() {
   
   leaderboardModalBody.innerHTML = scores.map((entry, index) => {
     const date = new Date(entry.date);
-    const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const dateStr = escapeHTML(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+    
+    const rank = escapeHTML(String(entry.rank || 'Novice'));
+    const elementsCount = parseInt(entry.elementsCount) || 118;
+    const accuracy = parseInt(entry.accuracy) || 0;
+    const score = Number(entry.score) || 0;
     
     return `
       <div class="leaderboard-item">
@@ -1611,11 +1668,11 @@ function loadLeaderboard() {
           ${index + 1}
         </div>
         <div class="leaderboard-info">
-          <div class="leaderboard-mode">${entry.rank || 'Novice'}</div>
-          <div class="leaderboard-date">${dateStr} • ${entry.elementsCount || 118}/118 • ${formatTime(entry.time)} • ${entry.accuracy}% acc</div>
+          <div class="leaderboard-mode">${rank}</div>
+          <div class="leaderboard-date">${dateStr} • ${elementsCount}/118 • ${escapeHTML(formatTime(entry.time))} • ${accuracy}% acc</div>
         </div>
         <div class="leaderboard-score">
-          ${scoringSystem.formatScore(entry.score)}
+          ${escapeHTML(scoringSystem.formatScore(score))}
         </div>
       </div>
     `;
