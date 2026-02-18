@@ -2277,6 +2277,9 @@ function showRecallModeGuide() {
 
 // ===== CONFETTI ANIMATION =====
 
+const CONFETTI_PARTICLE_COUNT = 120;
+const CONFETTI_MAX_FRAMES = 180;
+
 function launchConfetti() {
   const canvas = document.getElementById('confettiCanvas');
   if (!canvas) return;
@@ -2288,7 +2291,7 @@ function launchConfetti() {
   const colors = ['#6366f1', '#f59e0b', '#10b981', '#ef4444', '#3b82f6', '#ec4899', '#8b5cf6'];
   const particles = [];
   
-  for (let i = 0; i < 120; i++) {
+  for (let i = 0; i < CONFETTI_PARTICLE_COUNT; i++) {
     particles.push({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height * -1,
@@ -2304,7 +2307,6 @@ function launchConfetti() {
   }
   
   let frame = 0;
-  const maxFrames = 180;
   
   function animate() {
     frame++;
@@ -2316,7 +2318,7 @@ function launchConfetti() {
       p.y += p.vy;
       p.vy += 0.05;
       p.rot += p.vr;
-      if (frame > maxFrames * 0.6) {
+      if (frame > CONFETTI_MAX_FRAMES * 0.6) {
         p.opacity -= 0.02;
       }
       if (p.opacity <= 0 || p.y > canvas.height + 20) return;
@@ -2331,7 +2333,7 @@ function launchConfetti() {
       ctx.restore();
     });
     
-    if (alive && frame < maxFrames) {
+    if (alive && frame < CONFETTI_MAX_FRAMES) {
       requestAnimationFrame(animate);
     } else {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
