@@ -650,7 +650,7 @@ function openMobileInput(element) {
   } else {
     mobileInput.value = '';
     if (cellSymbolDisplay) {
-      cellSymbolDisplay.textContent = '—';
+      cellSymbolDisplay.textContent = '-';
       cellSymbolDisplay.classList.add('empty');
     }
   }
@@ -757,7 +757,7 @@ function handleMobileSubmit() {
     }
     mobileInput.value = '';
     if (cellDisplay) {
-      cellDisplay.textContent = '—';
+      cellDisplay.textContent = '-';
       cellDisplay.classList.add('empty');
     }
     updateGcInputState();
@@ -1360,7 +1360,7 @@ function updateStats() {
   correctCountDisplay.textContent = correct;
   totalCountDisplay.textContent = total;
   streakDisplay.textContent = state.streak;
-  accuracyDisplay.textContent = state.totalAttempts > 0 ? `${state.accuracy}%` : '—';
+  accuracyDisplay.textContent = state.totalAttempts > 0 ? `${state.accuracy}%` : '-';
   progressFill.style.width = `${percent}%`;
   
   scoringSystem.updateScoreDisplay();
@@ -1744,7 +1744,7 @@ function handleQwertyKey(key) {
     if (mobileInput.value.length > 0) {
       mobileInput.value = mobileInput.value.slice(0, -1);
       if (cellSymbolDisplay) {
-        cellSymbolDisplay.textContent = mobileInput.value || '—';
+        cellSymbolDisplay.textContent = mobileInput.value || '-';
         cellSymbolDisplay.classList.toggle('empty', !mobileInput.value);
       }
       updateGcInputState();
@@ -1809,7 +1809,7 @@ function updateBottomBarStats() {
   }
   if (bottomProgress) bottomProgress.textContent = `${correct}/${total}`;
   if (bottomStreak) bottomStreak.textContent = state.streak;
-  if (bottomAccuracy) bottomAccuracy.textContent = state.totalAttempts > 0 ? `${accuracy}%` : '—';
+  if (bottomAccuracy) bottomAccuracy.textContent = state.totalAttempts > 0 ? `${accuracy}%` : '-';
 }
 
 // ===== MOBILE PERSISTENT MODAL =====
@@ -1999,7 +1999,7 @@ function updateMobileInputForElement(element) {
     mobileInput.value = '';
     mobileInput.readOnly = false;
     if (cellSymbolDisplay) {
-      cellSymbolDisplay.textContent = '—';
+      cellSymbolDisplay.textContent = '-';
       cellSymbolDisplay.classList.add('empty');
     }
     if (cellNameDisplay) cellNameDisplay.textContent = '';
@@ -2026,7 +2026,7 @@ function updateMobileStats() {
   
   if (progressEl) progressEl.textContent = `${correct}/${total}`;
   if (streakEl) streakEl.textContent = state.streak;
-  if (accuracyEl) accuracyEl.textContent = state.totalAttempts > 0 ? `${accuracy}%` : '—';
+  if (accuracyEl) accuracyEl.textContent = state.totalAttempts > 0 ? `${accuracy}%` : '-';
   if (timerEl) {
     const minutes = Math.floor(state.elapsedTime / 60);
     const seconds = state.elapsedTime % 60;

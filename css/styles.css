@@ -3481,7 +3481,7 @@ body {
   border: 1px solid rgba(99, 102, 241, 0.25);
   border-radius: 12px;
   padding: 16px 20px;
-  margin: 16px 0;
+  margin: 24px 0;
   font-size: 13px;
   color: var(--text-primary, #e2e8f0);
   line-height: 1.5;
