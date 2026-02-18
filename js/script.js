@@ -713,6 +713,7 @@ function closeMobileInput() {
 
 function handleMobileSubmit() {
   if (!state.currentElement) return;
+  if (state.currentElement.classList.contains('correct')) return;
   
   const value = mobileInput.value.trim();
   if (!value) return;
@@ -891,6 +892,7 @@ function activateElement(element) {
 
 function validateInput(element, userInput) {
   if (!element || !userInput) return;
+  if (element.classList.contains('correct')) return;
   
   const atomic = parseInt(element.dataset.atomic);
   const correctSymbol = element.dataset.symbol;
@@ -1787,6 +1789,7 @@ function saveToHistory() {
 
 function handleQwertyKey(key) {
   if (!state.currentElement) return;
+  if (state.currentElement.classList.contains('correct')) return;
   
   const cellSymbolDisplay = document.getElementById('cellSymbolDisplay');
   
