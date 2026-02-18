@@ -713,6 +713,7 @@ function closeMobileInput() {
 
 function handleMobileSubmit() {
   if (!state.currentElement) return;
+  if (state.currentElement.classList.contains('correct')) return;
   
   const value = mobileInput.value.trim();
   if (!value) return;
@@ -891,6 +892,7 @@ function activateElement(element) {
 
 function validateInput(element, userInput) {
   if (!element || !userInput) return;
+  if (element.classList.contains('correct')) return;
   
   const atomic = parseInt(element.dataset.atomic);
   const correctSymbol = element.dataset.symbol;
@@ -1608,7 +1610,7 @@ function importData(file) {
       state.totalChallengesCompleted = parseInt(safeGetItem('totalChallenges') || '0');
       state.gameMode = safeGetItem('gameMode') || 'classic';
       state.navDirection = safeGetItem('navDirection') || 'horizontal';
-      achievementManager.load();
+      achievementManager.loadAchievements();
       achievementManager.updateBadge();
       loadHistory();
       showHintToast('Data imported successfully!');
@@ -1629,7 +1631,7 @@ async function resetAllData() {
   state.totalChallengesCompleted = 0;
   state.gameMode = 'classic';
   state.navDirection = 'horizontal';
-  achievementManager.load();
+  achievementManager.loadAchievements();
   achievementManager.updateBadge();
   loadHistory();
   showHintToast('All data has been reset.');
@@ -1787,6 +1789,7 @@ function saveToHistory() {
 
 function handleQwertyKey(key) {
   if (!state.currentElement) return;
+  if (state.currentElement.classList.contains('correct')) return;
   
   const cellSymbolDisplay = document.getElementById('cellSymbolDisplay');
   
