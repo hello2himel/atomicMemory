@@ -1510,6 +1510,7 @@ function loadHistory() {
 
 // ===== DATA MANAGEMENT (Export / Import / Reset) =====
 
+// All localStorage keys used by the app — keep in sync when adding new keys
 const DATA_KEYS = ['history', 'leaderboard', 'achievements', 'totalChallenges', 'darkMode', 'navDirection', 'gameMode', 'guideDismissed', 'leaderboardGuideShown', 'recallModeSuggested', 'recallModeGuideShown'];
 
 function exportData() {
