@@ -1608,7 +1608,7 @@ function importData(file) {
       state.totalChallengesCompleted = parseInt(safeGetItem('totalChallenges') || '0');
       state.gameMode = safeGetItem('gameMode') || 'classic';
       state.navDirection = safeGetItem('navDirection') || 'horizontal';
-      achievementManager.load();
+      achievementManager.loadAchievements();
       achievementManager.updateBadge();
       loadHistory();
       showHintToast('Data imported successfully!');
@@ -1629,7 +1629,7 @@ async function resetAllData() {
   state.totalChallengesCompleted = 0;
   state.gameMode = 'classic';
   state.navDirection = 'horizontal';
-  achievementManager.load();
+  achievementManager.loadAchievements();
   achievementManager.updateBadge();
   loadHistory();
   showHintToast('All data has been reset.');
