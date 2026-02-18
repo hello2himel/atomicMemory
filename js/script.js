@@ -225,6 +225,7 @@ function setupEventListeners() {
   resetBtn.addEventListener('click', async () => {
     if (await showConfirmDialog('Are you sure you want to reset? Your current progress will be lost.')) {
       resetChallenge();
+      showIntroScreen();
     }
   });
   
@@ -1392,11 +1393,8 @@ function closeModal(modal) {
 
 function dismissCompleteModal() {
   closeModal(completeModal);
-  // Show leaderboard guide after first completion
-  const shouldShowLeaderboardGuide = !safeGetItem('leaderboardGuideShown');
   // Show recall guide for users who played 3+ games but never tried recall
-  const shouldShowRecallGuide = !shouldShowLeaderboardGuide
-    && state.totalChallengesCompleted >= 3
+  const shouldShowRecallGuide = state.totalChallengesCompleted >= 3
     && state.gameMode === 'classic'
     && !safeGetItem('recallModeGuideShown');
   resetChallenge();
@@ -1406,9 +1404,7 @@ function dismissCompleteModal() {
       openMobileInput(firstElement);
     }
   }
-  if (shouldShowLeaderboardGuide) {
-    setTimeout(() => showLeaderboardGuide(), 400);
-  } else if (shouldShowRecallGuide) {
+  if (shouldShowRecallGuide) {
     setTimeout(() => showRecallModeGuide(), 400);
   }
 }
@@ -1521,7 +1517,7 @@ function loadHistory() {
 // ===== DATA MANAGEMENT (Export / Import / Reset) =====
 
 // All localStorage keys used by the app — keep in sync when adding new keys
-const DATA_KEYS = ['history', 'leaderboard', 'achievements', 'totalChallenges', 'darkMode', 'navDirection', 'gameMode', 'guideDismissed', 'leaderboardGuideShown', 'recallModeSuggested', 'recallModeGuideShown'];
+const DATA_KEYS = ['history', 'leaderboard', 'achievements', 'totalChallenges', 'darkMode', 'navDirection', 'gameMode', 'guideDismissed', 'recallModeSuggested', 'recallModeGuideShown'];
 
 function exportData() {
   const data = {};
@@ -1683,13 +1679,13 @@ function showCompleteModal() {
 }
 
 function shareScore() {
-  const rank = scoringSystem.getRank();
+  const mode = state.gameMode === 'recall' ? 'Recall' : 'Classic';
   const minutes = Math.floor(state.elapsedTime / 60);
   const seconds = String(state.elapsedTime % 60).padStart(2, '0');
   const completed = state.correctElements.size;
   const total = state.activeElements.size;
   
-  const text = `🧪 I just scored ${scoringSystem.formatScore(scoringSystem.score)} points on AtomicMemory!\n\n🏆 Rank: ${rank.name}\n🧩 Elements: ${completed}/${total}\n⏱️ Time: ${minutes}:${seconds}\n🎯 Accuracy: ${state.accuracy}%\n🔥 Best Streak: ${state.maxStreak}\n\nCan you beat my score?\nPlay now → ${APP_URL}`;
+  const text = `🧪 I just scored ${scoringSystem.formatScore(scoringSystem.score)} points on AtomicMemory!\n\n🎮 Mode: ${mode}\n🧩 Elements: ${completed}/${total}\n⏱️ Time: ${minutes}:${seconds}\n🎯 Accuracy: ${state.accuracy}%\n🔥 Best Streak: ${state.maxStreak}\n\nCan you beat my score?\nPlay now → ${APP_URL}`;
   
   if (navigator.share) {
     navigator.share({
@@ -2392,13 +2388,6 @@ function showMobileGuide() {
   showGuide(inputCard, 'Type the symbol using the keyboard below, then tap Enter ✓ to submit.', 'guideDismissed');
 }
 
-function showLeaderboardGuide() {
-  if (safeGetItem('leaderboardGuideShown')) return;
-  const btn = document.getElementById('leaderboardBtn');
-  if (!btn) return;
-  showGuide(btn, 'You can view your top scores and track your progress here!', 'leaderboardGuideShown');
-}
-
 function showRecallModeGuide() {
   if (safeGetItem('recallModeGuideShown')) return;
   // Point at the desktop or mobile mode toggle
@@ -2406,7 +2395,7 @@ function showRecallModeGuide() {
     ? document.getElementById('mobileModeRecall')
     : document.getElementById('desktopModeRecall');
   if (!toggle) return;
-  showGuide(toggle, 'Try Recall Mode — enter all elements from memory, then check your answers at once!', 'recallModeGuideShown');
+  showGuide(toggle, 'Try Recall Mode! Enter all elements from memory, then check your answers at once.', 'recallModeGuideShown');
 }
 
 // ===== CONFETTI ANIMATION =====
