@@ -2379,8 +2379,6 @@ function drawGuidePath(svg, path, targetEl, messageEl) {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
   svg.setAttribute('viewBox', `0 0 ${vw} ${vh}`);
-  svg.setAttribute('width', vw);
-  svg.setAttribute('height', vh);
   
   if (!targetEl || !document.contains(targetEl)) {
     path.setAttribute('d', '');
