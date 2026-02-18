@@ -35,7 +35,9 @@ const state = {
   isMobile: false,
   shiftActive: false,
   totalChallengesCompleted: 0,
-  navDirection: safeGetItem('navDirection') || 'horizontal'
+  navDirection: safeGetItem('navDirection') || 'horizontal',
+  gameMode: safeGetItem('gameMode') || 'classic',
+  pendingAnswers: {}
 };
 
 // Custom Confirm Dialog (replaces browser native confirm)
@@ -132,6 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
   detectMobile();
   detectDarkMode();
   loadTotalChallenges();
+  initModeToggle();
   setupIntro();
   setupEventListeners();
   achievementManager.updateBadge();
@@ -173,18 +176,26 @@ function startApp() {
     mainApp.classList.remove('hidden');
     renderPeriodicTable();
     initializeFullTable();
+    updateModeBadges();
+    updateFinishButtonForMode();
     
     if (state.isMobile) {
-      // On mobile, go straight into the game modal
       const firstElement = findFirstActiveElement();
       if (firstElement) {
         openMobileInput(firstElement);
+        // Mobile first-play tooltip
+        if (!safeGetItem('guideDismissed')) {
+          showMobileGuideTooltip();
+        }
       }
     } else {
-      // On desktop, auto-focus the first element so users see the input field
       const firstElement = findFirstActiveElement();
       if (firstElement) {
         activateElement(firstElement);
+        // Desktop first-play tooltip
+        if (!safeGetItem('guideDismissed')) {
+          showDesktopGuideTooltip(firstElement);
+        }
       }
     }
   }, 600);
@@ -560,7 +571,6 @@ function handleElementClick(e) {
   if (!state.activeElements.has(parseInt(element.dataset.atomic))) return;
   
   if (state.isMobile) {
-    // When modal is already open, just update it
     if (!mobileInputModal.classList.contains('hidden')) {
       updateMobileInputForElement(element);
     } else {
@@ -592,14 +602,26 @@ function openMobileInput(element) {
   const cellNameDisplay = document.getElementById('cellNameDisplay');
   const cellPosition = document.getElementById('cellPositionDisplay');
   if (cellAtomicNum) cellAtomicNum.textContent = element.dataset.atomic;
-  if (cellSymbolDisplay) {
-    cellSymbolDisplay.textContent = '—';
-    cellSymbolDisplay.classList.add('empty');
+  
+  // In Recall mode, pre-fill with pending answer
+  const atomic = parseInt(element.dataset.atomic);
+  if (state.gameMode === 'recall' && state.pendingAnswers[atomic]) {
+    mobileInput.value = state.pendingAnswers[atomic];
+    if (cellSymbolDisplay) {
+      cellSymbolDisplay.textContent = state.pendingAnswers[atomic];
+      cellSymbolDisplay.classList.remove('empty');
+    }
+  } else {
+    mobileInput.value = '';
+    if (cellSymbolDisplay) {
+      cellSymbolDisplay.textContent = '—';
+      cellSymbolDisplay.classList.add('empty');
+    }
   }
+  
   if (cellNameDisplay) cellNameDisplay.textContent = '';
   if (cellPosition) cellPosition.textContent = formatCellPosition(element);
   
-  mobileInput.value = '';
   updateGcInputState();
   
   mobileInputModal.querySelector('.mobile-input-hint').classList.add('hidden');
@@ -626,6 +648,38 @@ function handleMobileSubmit() {
   
   const value = mobileInput.value.trim();
   if (!value) return;
+  
+  // In Recall mode, store pending answer without validating
+  if (state.gameMode === 'recall') {
+    if (!state.timerStarted) startTimer();
+    const atomic = parseInt(state.currentElement.dataset.atomic);
+    state.pendingAnswers[atomic] = value;
+    state.currentElement.classList.add('pending');
+    
+    // Show typed symbol in main table cell
+    const symbolSpan = state.currentElement.querySelector('.element-symbol');
+    if (symbolSpan) symbolSpan.textContent = value;
+    
+    // Update mini table with pending status
+    updateMiniTable(atomic, 'pending');
+    
+    // Flash neutral feedback
+    const gcInputBox = document.getElementById('gcInputBox');
+    if (gcInputBox) {
+      gcInputBox.classList.add('cell-pending');
+      setTimeout(() => gcInputBox.classList.remove('cell-pending'), 400);
+    }
+    
+    // Auto-advance to next element
+    const nextEl = findNextElementAuto(state.currentElement);
+    if (nextEl) {
+      setTimeout(() => updateMobileInputForElement(nextEl), 200);
+    }
+    
+    dismissMobileGuideTooltip();
+    updateMobileStats();
+    return;
+  }
   
   validateInput(state.currentElement, value);
   
@@ -712,11 +766,18 @@ function activateElement(element) {
   input.autocomplete = 'off';
   input.placeholder = '?';
   
+  // In Recall mode, pre-fill with pending answer if exists
+  const atomic = parseInt(element.dataset.atomic);
+  if (state.gameMode === 'recall' && state.pendingAnswers[atomic]) {
+    input.value = state.pendingAnswers[atomic];
+  }
+  
   element.appendChild(input);
   input.focus();
   
   input.addEventListener('input', () => {
     formatSymbolInput(input);
+    dismissDesktopGuideTooltip();
   });
   
   input.addEventListener('keydown', (e) => {
@@ -751,6 +812,26 @@ function activateElement(element) {
 function validateInput(element, userInput) {
   const atomic = parseInt(element.dataset.atomic);
   const correctSymbol = element.dataset.symbol;
+  
+  // In Recall mode, store pending answer without validating
+  if (state.gameMode === 'recall') {
+    if (!state.timerStarted) startTimer();
+    state.pendingAnswers[atomic] = userInput;
+    element.classList.add('pending');
+    element.classList.remove('active');
+    const input = element.querySelector('input');
+    if (input) input.remove();
+    
+    // Show typed symbol in cell with pending style
+    const symbolSpan = element.querySelector('.element-symbol');
+    if (symbolSpan) symbolSpan.textContent = userInput;
+    
+    if (!state.isMobile) {
+      setTimeout(() => moveToNextElement(element), 100);
+    }
+    return;
+  }
+  
   const isCorrect = userInput.toLowerCase() === correctSymbol.toLowerCase();
   
   const input = element.querySelector('input');
@@ -867,7 +948,8 @@ function moveToNextElement(currentElement) {
     ? findNextElementByGroup(currentElement) 
     : findNextElementByPeriod(currentElement);
   
-  if (nextElement && !nextElement.classList.contains('correct') && !nextElement.classList.contains('disabled')) {
+  if (nextElement && !nextElement.classList.contains('correct') && !nextElement.classList.contains('disabled')
+      && !(state.gameMode === 'recall' && nextElement.classList.contains('pending'))) {
     if (state.isMobile) {
       if (!mobileInputModal.classList.contains('hidden')) {
         updateMobileInputForElement(nextElement);
@@ -1089,11 +1171,12 @@ function resetChallenge() {
   state.correctAttempts = 0;
   state.accuracy = 100;
   state.hintsUsed = 0;
+  state.pendingAnswers = {};
   
   document.querySelectorAll('.element').forEach(el => {
     if (el.classList.contains('placeholder')) return;
     
-    el.classList.remove('correct', 'incorrect', 'active');
+    el.classList.remove('correct', 'incorrect', 'active', 'pending');
     el.querySelector('.element-symbol').textContent = '';
     el.querySelector('.element-name').textContent = '';
     
@@ -1168,11 +1251,16 @@ function setFinishButtonToPlayAgain() {
 }
 
 function restoreFinishButton() {
-  finishBtn.querySelector('i').className = 'ri-flag-line';
-  finishBtn.querySelector('span').textContent = 'Finish';
+  finishBtn.querySelector('i').className = state.gameMode === 'recall' ? 'ri-check-double-line' : 'ri-flag-line';
+  finishBtn.querySelector('span').textContent = state.gameMode === 'recall' ? 'Check Answers' : 'Finish';
   finishBtn.classList.remove('play-again');
   finishBtn.removeEventListener('click', handlePlayAgain);
   finishBtn.addEventListener('click', finishChallenge);
+  // Mobile finish button too
+  const mobileFinish = document.getElementById('mobileFinishBtn');
+  if (mobileFinish) {
+    mobileFinish.innerHTML = state.gameMode === 'recall' ? '<i class="ri-check-double-line"></i> Check Answers' : '<i class="ri-flag-line"></i> Finish Game';
+  }
 }
 
 function handlePlayAgain() {
@@ -1437,6 +1525,17 @@ function showCompleteModal() {
   
   completeModal.classList.remove('hidden');
   
+  // Show "Try Recall Mode" suggestion after 3 challenges
+  const recallSuggestion = document.getElementById('recallSuggestion');
+  if (recallSuggestion) {
+    if (state.totalChallengesCompleted >= 3 && !safeGetItem('recallModeSuggested') && state.gameMode === 'classic') {
+      recallSuggestion.classList.remove('hidden');
+      safeSetItem('recallModeSuggested', 'true');
+    } else {
+      recallSuggestion.classList.add('hidden');
+    }
+  }
+  
   // Save to history
   saveToHistory();
 }
@@ -1469,7 +1568,7 @@ function saveToHistory() {
   const wrongAttempts = Object.values(state.wrongAttempts).reduce((a, b) => a + b, 0);
   
   const record = {
-    mode: 'Full Table',
+    mode: state.gameMode === 'recall' ? 'Recall' : 'Full Table',
     time: state.elapsedTime,
     wrongAttempts: wrongAttempts,
     elementsCount: state.correctElements.size,
@@ -1530,6 +1629,7 @@ function handleQwertyKey(key) {
       cellSymbolDisplay.classList.remove('empty');
     }
     updateGcInputState();
+    dismissMobileGuideTooltip();
     // Auto-deactivate shift after typing a letter
     if (state.shiftActive) {
       state.shiftActive = false;
@@ -1581,6 +1681,7 @@ function findFirstActiveElement() {
     .filter(el => !el.classList.contains('placeholder'))
     .filter(el => state.activeElements.has(parseInt(el.dataset.atomic)))
     .filter(el => !el.classList.contains('correct'))
+    .filter(el => !(state.gameMode === 'recall' && el.classList.contains('pending')))
     .sort((a, b) => parseInt(a.dataset.atomic) - parseInt(b.dataset.atomic));
   
   return elements[0] || null;
@@ -1687,6 +1788,8 @@ function updateMiniTable(atomicNumber, status) {
     setTimeout(() => {
       cell.classList.remove('mini-incorrect');
     }, 600);
+  } else if (status === 'pending') {
+    cell.classList.add('mini-pending');
   } else if (status === 'current') {
     cell.classList.add('mini-current');
     // Draw connector line from mini-table cell to input card
@@ -1727,24 +1830,34 @@ function drawConnectorLine(atomicNumber) {
 function updateMobileInputForElement(element) {
   state.currentElement = element;
   
-  // Update cell display
   const cellAtomicNum = document.getElementById('cellAtomicNumber');
   const cellSymbolDisplay = document.getElementById('cellSymbolDisplay');
   const cellNameDisplay = document.getElementById('cellNameDisplay');
   const cellPosition = document.getElementById('cellPositionDisplay');
   if (cellAtomicNum) cellAtomicNum.textContent = element.dataset.atomic;
-  if (cellSymbolDisplay) {
-    cellSymbolDisplay.textContent = '—';
-    cellSymbolDisplay.classList.add('empty');
+  
+  // In Recall mode, pre-fill with pending answer if exists
+  const atomic = parseInt(element.dataset.atomic);
+  if (state.gameMode === 'recall' && state.pendingAnswers[atomic]) {
+    mobileInput.value = state.pendingAnswers[atomic];
+    if (cellSymbolDisplay) {
+      cellSymbolDisplay.textContent = state.pendingAnswers[atomic];
+      cellSymbolDisplay.classList.remove('empty');
+    }
+  } else {
+    mobileInput.value = '';
+    if (cellSymbolDisplay) {
+      cellSymbolDisplay.textContent = '—';
+      cellSymbolDisplay.classList.add('empty');
+    }
   }
+  
   if (cellNameDisplay) cellNameDisplay.textContent = '';
   if (cellPosition) cellPosition.textContent = formatCellPosition(element);
   
-  mobileInput.value = '';
   updateGcInputState();
   mobileInputModal.querySelector('.mobile-input-hint').classList.add('hidden');
   
-  // Update mini table to highlight new current element
   updateMiniTable(parseInt(element.dataset.atomic), 'current');
   updateMobileStats();
 }
@@ -1788,12 +1901,18 @@ function findNextElementAuto(currentElement) {
     ? findNextElementByGroup(currentElement)
     : findNextElementByPeriod(currentElement);
   
-  // If no next element found or it's already correct/disabled, find any unanswered element
-  if (!nextElement || nextElement.classList.contains('correct') || nextElement.classList.contains('disabled')) {
+  // Determine what counts as "answered" - in recall mode, pending elements count too
+  const isAnswered = (el) => {
+    if (el.classList.contains('correct') || el.classList.contains('disabled')) return true;
+    if (state.gameMode === 'recall' && el.classList.contains('pending')) return true;
+    return false;
+  };
+  
+  if (!nextElement || isAnswered(nextElement)) {
     nextElement = findFirstActiveElement();
   }
   
-  if (!nextElement || nextElement.classList.contains('correct') || nextElement.classList.contains('disabled')) {
+  if (!nextElement || isAnswered(nextElement)) {
     return null;
   }
   
@@ -1915,6 +2034,20 @@ function navigateToAdjacentElement(direction) {
 
 // Finish challenge early (with partial completion)
 async function finishChallenge() {
+  // In Recall mode, check all answers
+  if (state.gameMode === 'recall') {
+    const pendingCount = Object.keys(state.pendingAnswers).length;
+    if (pendingCount === 0) {
+      showHintToast('Please enter at least one answer before checking.');
+      return;
+    }
+    if (!await showConfirmDialog(`Check ${pendingCount} answer${pendingCount === 1 ? '' : 's'}? Your score will be calculated.`)) {
+      return;
+    }
+    checkAllAnswers();
+    return;
+  }
+  
   if (state.correctElements.size === 0) {
     showHintToast('Please answer at least one element before finishing.');
     return;
@@ -1925,4 +2058,179 @@ async function finishChallenge() {
   }
   
   completeChallenge();
+}
+
+// ===== MODE TOGGLE =====
+
+function initModeToggle() {
+  const classicBtn = document.getElementById('modeToggleClassic');
+  const recallBtn = document.getElementById('modeToggleRecall');
+  const desc = document.getElementById('modeDescription');
+  
+  if (!classicBtn || !recallBtn) return;
+  
+  // Set initial state from localStorage
+  if (state.gameMode === 'recall') {
+    classicBtn.classList.remove('active');
+    recallBtn.classList.add('active');
+    if (desc) desc.textContent = 'Enter all symbols, then check at once.';
+  }
+  
+  classicBtn.addEventListener('click', () => {
+    state.gameMode = 'classic';
+    safeSetItem('gameMode', 'classic');
+    classicBtn.classList.add('active');
+    recallBtn.classList.remove('active');
+    if (desc) desc.textContent = 'Immediate feedback for each element.';
+  });
+  
+  recallBtn.addEventListener('click', () => {
+    state.gameMode = 'recall';
+    safeSetItem('gameMode', 'recall');
+    recallBtn.classList.add('active');
+    classicBtn.classList.remove('active');
+    if (desc) desc.textContent = 'Enter all symbols, then check at once.';
+  });
+}
+
+function updateModeBadges() {
+  const label = state.gameMode === 'recall' ? 'Recall' : 'Classic';
+  const desktopLabel = document.getElementById('desktopModeLabel');
+  const mobileLabel = document.getElementById('mobileModeLabel');
+  if (desktopLabel) desktopLabel.textContent = label;
+  if (mobileLabel) mobileLabel.textContent = label;
+}
+
+function updateFinishButtonForMode() {
+  if (state.gameMode === 'recall') {
+    finishBtn.querySelector('i').className = 'ri-check-double-line';
+    finishBtn.querySelector('span').textContent = 'Check Answers';
+    const mobileFinish = document.getElementById('mobileFinishBtn');
+    if (mobileFinish) {
+      mobileFinish.innerHTML = '<i class="ri-check-double-line"></i> Check Answers';
+    }
+  }
+}
+
+// ===== RECALL MODE: CHECK ALL ANSWERS =====
+
+function checkAllAnswers() {
+  const pendingEntries = Object.entries(state.pendingAnswers);
+  
+  pendingEntries.forEach(([atomicStr, userInput]) => {
+    const atomic = parseInt(atomicStr);
+    const el = document.querySelector(`.element[data-atomic="${atomic}"]`);
+    if (!el) return;
+    
+    const correctSymbol = el.dataset.symbol;
+    const isCorrect = userInput.toLowerCase() === correctSymbol.toLowerCase();
+    
+    state.totalAttempts++;
+    el.classList.remove('pending');
+    
+    if (isCorrect) {
+      state.correctAttempts++;
+      state.correctElements.add(atomic);
+      el.classList.add('correct');
+      
+      const symbolSpan = el.querySelector('.element-symbol');
+      const nameSpan = el.querySelector('.element-name');
+      if (symbolSpan) symbolSpan.textContent = correctSymbol;
+      if (nameSpan) nameSpan.textContent = el.dataset.name;
+      
+      const attemptCount = 1;
+      scoringSystem.addCorrectAnswer(atomic, attemptCount, 0);
+      
+      state.streak++;
+      if (state.streak > state.maxStreak) {
+        state.maxStreak = state.streak;
+      }
+      
+      // Update mini table for mobile
+      updateMiniTable(atomic, 'correct');
+    } else {
+      el.classList.add('incorrect');
+      
+      // Show what user typed vs correct
+      const symbolSpan = el.querySelector('.element-symbol');
+      if (symbolSpan) symbolSpan.textContent = correctSymbol;
+      const nameSpan = el.querySelector('.element-name');
+      if (nameSpan) nameSpan.textContent = el.dataset.name;
+      
+      if (!state.wrongAttempts[atomic]) state.wrongAttempts[atomic] = 0;
+      state.wrongAttempts[atomic]++;
+      
+      scoringSystem.addMistake(atomic, 1);
+      state.streak = 0;
+      
+      updateMiniTable(atomic, 'incorrect');
+    }
+  });
+  
+  state.pendingAnswers = {};
+  updateStats();
+  
+  // Close mobile input modal if open
+  if (!mobileInputModal.classList.contains('hidden')) {
+    closeMobileInput();
+  }
+  
+  completeChallenge();
+}
+
+// ===== GUIDE TOOLTIPS =====
+
+function showDesktopGuideTooltip(element) {
+  // Remove any existing tooltip
+  dismissDesktopGuideTooltip();
+  
+  const tooltip = document.createElement('div');
+  tooltip.className = 'guide-tooltip';
+  tooltip.id = 'desktopGuideTooltip';
+  tooltip.innerHTML = '<i class="ri-keyboard-box-line"></i> Type the symbol and press Enter';
+  
+  const rect = element.getBoundingClientRect();
+  tooltip.style.position = 'fixed';
+  tooltip.style.left = (rect.left + rect.width / 2) + 'px';
+  tooltip.style.top = (rect.bottom + 8) + 'px';
+  tooltip.style.transform = 'translateX(-50%)';
+  
+  document.body.appendChild(tooltip);
+  
+  // Auto-dismiss after 5 seconds
+  setTimeout(() => dismissDesktopGuideTooltip(), 5000);
+}
+
+function dismissDesktopGuideTooltip() {
+  const tooltip = document.getElementById('desktopGuideTooltip');
+  if (tooltip) {
+    tooltip.remove();
+    safeSetItem('guideDismissed', 'true');
+  }
+}
+
+function showMobileGuideTooltip() {
+  // Remove any existing tooltip
+  dismissMobileGuideTooltip();
+  
+  const keyboard = document.getElementById('qwertyKeyboard');
+  if (!keyboard) return;
+  
+  const tooltip = document.createElement('div');
+  tooltip.className = 'guide-tooltip mobile-guide-tooltip';
+  tooltip.id = 'mobileGuideTooltip';
+  tooltip.innerHTML = '<i class="ri-keyboard-box-line"></i> Type the symbol, then tap Enter ✓';
+  
+  keyboard.parentNode.insertBefore(tooltip, keyboard);
+  
+  // Auto-dismiss after 5 seconds
+  setTimeout(() => dismissMobileGuideTooltip(), 5000);
+}
+
+function dismissMobileGuideTooltip() {
+  const tooltip = document.getElementById('mobileGuideTooltip');
+  if (tooltip) {
+    tooltip.remove();
+    safeSetItem('guideDismissed', 'true');
+  }
 }

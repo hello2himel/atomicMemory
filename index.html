@@ -27,10 +27,33 @@
       <h1 class="intro-title-text">AtomicMemory</h1>
       <p class="intro-tagline">Learn the periodic table through an interactive, gamified experience.</p>
 
+      <div class="how-to-play">
+        <div class="how-to-play-step">
+          <i class="ri-cursor-line how-to-play-icon desktop-only"></i>
+          <i class="ri-tap-line how-to-play-icon mobile-only"></i>
+          <span class="desktop-only">Click an element on the table</span>
+          <span class="mobile-only">Tap an element on the table</span>
+        </div>
+        <div class="how-to-play-step">
+          <i class="ri-keyboard-box-line how-to-play-icon"></i>
+          <span>Type its chemical symbol</span>
+        </div>
+        <div class="how-to-play-step">
+          <i class="ri-corner-down-left-line how-to-play-icon"></i>
+          <span>Press Enter to submit</span>
+        </div>
+      </div>
+
       <button id="startBtn" class="start-button">
         <i class="ri-play-fill"></i>
         <span>Start Challenge</span>
       </button>
+
+      <div class="mode-toggle" id="modeToggle">
+        <button class="mode-toggle-btn active" id="modeToggleClassic">Classic</button>
+        <button class="mode-toggle-btn" id="modeToggleRecall">Recall</button>
+      </div>
+      <span class="mode-description" id="modeDescription">Immediate feedback for each element.</span>
 
       <p class="intro-hint">
         <i class="ri-keyboard-line"></i>
@@ -94,6 +117,10 @@
     <div id="desktopBottomBar" class="desktop-bottom-bar">
       <div class="bottom-bar-stats-row">
         <div class="bottom-bar-stats">
+          <div class="bottom-stat mode-badge" id="desktopModeBadge" title="Game mode">
+            <i class="ri-gamepad-line"></i>
+            <span id="desktopModeLabel">Classic</span>
+          </div>
           <div class="bottom-stat" title="Score">
             <i class="ri-star-line"></i>
             <span id="bottomScore">0</span>
@@ -211,6 +238,14 @@
             <button class="mobile-toolbar-btn" id="mobileToolbarReset" title="Reset">
               <i class="ri-restart-line"></i>
             </button>
+          </div>
+
+          <!-- Mobile Mode Badge -->
+          <div class="mobile-stats-strip mobile-mode-badge-strip">
+            <span class="mode-badge" id="mobileModeBadge">
+              <i class="ri-gamepad-line"></i>
+              <span id="mobileModeLabel">Classic</span>
+            </span>
           </div>
 
           <!-- Compact Stats Strip -->
@@ -542,6 +577,11 @@
               <span id="breakdownPenalty">-0</span>
             </div>
           </div>
+        </div>
+
+        <!-- Recall Mode Suggestion -->
+        <div class="recall-suggestion hidden" id="recallSuggestion">
+          🎯 Ready for a challenge? Try <strong>Recall Mode</strong> — enter all elements from memory, then check your answers!
         </div>
 
         <!-- Actions -->

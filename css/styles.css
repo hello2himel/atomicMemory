@@ -3246,3 +3246,181 @@ body {
     font-size: 7px;
   }
 }
+
+/* ===== HOW TO PLAY SECTION ===== */
+
+.how-to-play {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  align-items: flex-start;
+  margin: 16px 0 24px;
+  flex-wrap: wrap;
+}
+
+.how-to-play-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-secondary, #94a3b8);
+  max-width: 140px;
+  text-align: center;
+}
+
+.how-to-play-icon {
+  font-size: 22px;
+  color: var(--primary, #6366f1);
+}
+
+.desktop-only { display: inline; }
+.mobile-only { display: none; }
+
+@media (max-width: 768px) {
+  .desktop-only { display: none; }
+  .mobile-only { display: inline; }
+}
+
+/* ===== MODE TOGGLE ===== */
+
+.mode-toggle {
+  display: inline-flex;
+  background: var(--surface-2, rgba(255,255,255,0.06));
+  border-radius: 999px;
+  padding: 3px;
+  margin-top: 12px;
+  gap: 2px;
+}
+
+.mode-toggle-btn {
+  padding: 6px 20px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-secondary, #94a3b8);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.mode-toggle-btn.active {
+  background: var(--primary, #6366f1);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+.mode-toggle-btn:hover:not(.active) {
+  background: rgba(255,255,255,0.08);
+}
+
+.mode-description {
+  display: block;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--text-secondary, #94a3b8);
+  opacity: 0.7;
+}
+
+/* ===== MODE BADGE (in-game) ===== */
+
+.mode-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--primary, #6366f1);
+  opacity: 0.8;
+}
+
+.mobile-mode-badge-strip {
+  justify-content: center;
+  padding: 2px 0 0 !important;
+}
+
+.mobile-mode-badge-strip .mode-badge {
+  font-size: 10px;
+}
+
+/* ===== GUIDE TOOLTIPS ===== */
+
+.guide-tooltip {
+  background: var(--primary, #6366f1);
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+  z-index: 9999;
+  pointer-events: none;
+  animation: guideTooltipFadeIn 0.3s ease;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.guide-tooltip i {
+  font-size: 16px;
+}
+
+.mobile-guide-tooltip {
+  position: relative;
+  justify-content: center;
+  margin: 4px auto 6px;
+  white-space: normal;
+  text-align: center;
+  pointer-events: none;
+}
+
+@keyframes guideTooltipFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== PENDING STATE (Recall mode) ===== */
+
+.element.pending {
+  border-color: var(--primary, #6366f1) !important;
+  background: rgba(99, 102, 241, 0.08) !important;
+}
+
+.element.pending .element-symbol {
+  color: var(--primary, #6366f1);
+  font-weight: 600;
+}
+
+[data-theme="dark"] .element.pending {
+  background: rgba(99, 102, 241, 0.15) !important;
+}
+
+.mini-cell.mini-pending {
+  background: var(--primary, #6366f1) !important;
+  opacity: 0.5;
+}
+
+.gc-info-card .cell-pending {
+  border-color: var(--primary, #6366f1) !important;
+}
+
+/* ===== RECALL SUGGESTION ===== */
+
+.recall-suggestion {
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--text-primary, #e2e8f0);
+  line-height: 1.5;
+  text-align: center;
+}
+
+.recall-suggestion strong {
+  color: var(--primary, #6366f1);
+}
