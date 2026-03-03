@@ -664,6 +664,9 @@ function openMobileInput(element) {
   // Render mini table on first open
   renderMiniTable();
   
+  // Reset readOnly state (may persist from viewing a correct element)
+  mobileInput.readOnly = false;
+  
   // Update cell display
   const cellAtomicNum = document.getElementById('cellAtomicNumber');
   const cellSymbolDisplay = document.getElementById('cellSymbolDisplay');
