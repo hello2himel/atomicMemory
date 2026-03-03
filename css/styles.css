@@ -1694,13 +1694,13 @@ body {
 
 /* Element name — below symbol */
 .gc-cell-name {
-  font-size: 9px;
-  color: var(--text-tertiary);
+  font-size: 10px;
+  color: var(--text-secondary);
   text-align: center;
   margin-top: 4px;
   min-height: 12px;
   text-transform: capitalize;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 /* Position info — below cell */

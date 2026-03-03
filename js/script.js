@@ -760,6 +760,13 @@ function handleMobileSubmit() {
     // Update mini table
     updateMiniTable(parseInt(state.currentElement.dataset.atomic), 'correct');
     
+    // Show correct symbol and element name in mobile input card
+    if (cellDisplay) {
+      cellDisplay.textContent = state.currentElement.dataset.symbol;
+      cellDisplay.classList.remove('empty');
+    }
+    if (cellName) cellName.textContent = state.currentElement.dataset.name;
+    
     // Flash green feedback on input box
     if (gcInputBox) {
       gcInputBox.classList.add('cell-correct');
@@ -777,7 +784,7 @@ function handleMobileSubmit() {
     // Auto-advance to next element (don't close modal)
     const nextEl = findNextElementAuto(state.currentElement);
     if (nextEl) {
-      setTimeout(() => updateMobileInputForElement(nextEl), 200);
+      setTimeout(() => updateMobileInputForElement(nextEl), 500);
     } else {
       closeMobileInput();
     }
