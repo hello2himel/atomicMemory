@@ -241,6 +241,7 @@ class ScoringSystem {
   saveScore(config, elementsCount, time, mistakes) {
     let leaderboard;
     try { leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]'); } catch (e) { leaderboard = []; }
+    if (!Array.isArray(leaderboard)) leaderboard = [];
     
     const entry = {
       score: this.score,
@@ -271,12 +272,14 @@ class ScoringSystem {
   getTopScores(limit = 10) {
     let leaderboard;
     try { leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]'); } catch (e) { leaderboard = []; }
+    if (!Array.isArray(leaderboard)) leaderboard = [];
     return leaderboard.slice(0, limit);
   }
 
   getPersonalBest() {
     let leaderboard;
     try { leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]'); } catch (e) { leaderboard = []; }
+    if (!Array.isArray(leaderboard)) leaderboard = [];
     
     if (leaderboard.length === 0) return null;
     

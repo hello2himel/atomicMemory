@@ -141,14 +141,19 @@ class AchievementManager {
     let saved;
     try { saved = localStorage.getItem('achievements'); } catch (e) { saved = null; }
     if (saved) {
-      const savedData = JSON.parse(saved);
-      this.achievements.forEach(achievement => {
-        const savedAchievement = savedData.find(a => a.id === achievement.id);
-        if (savedAchievement) {
-          achievement.unlocked = savedAchievement.unlocked;
-          achievement.unlockedAt = savedAchievement.unlockedAt;
-        }
-      });
+      try {
+        const savedData = JSON.parse(saved);
+        if (!Array.isArray(savedData)) return;
+        this.achievements.forEach(achievement => {
+          const savedAchievement = savedData.find(a => a.id === achievement.id);
+          if (savedAchievement) {
+            achievement.unlocked = savedAchievement.unlocked;
+            achievement.unlockedAt = savedAchievement.unlockedAt;
+          }
+        });
+      } catch (e) {
+        // Corrupted data — ignore and use defaults
+      }
     }
   }
 

@@ -1770,7 +1770,13 @@ function shareScore() {
 }
 
 function saveToHistory() {
-  const history = JSON.parse(safeGetItem('history') || '[]');
+  let history;
+  try {
+    history = JSON.parse(safeGetItem('history') || '[]');
+    if (!Array.isArray(history)) history = [];
+  } catch (e) {
+    history = [];
+  }
   
   const wrongAttempts = Object.values(state.wrongAttempts).reduce((a, b) => a + b, 0);
   
