@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0f172a">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self';
+                 script-src 'self';
+                 style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net;
+                 font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net;
+                 img-src 'self' data:;
+                 connect-src 'self';">
+  <meta name="description" content="Master all 118 elements of the periodic table through competitive practice. Test your knowledge with score tracking, achievements, and leaderboards.">
+  <meta property="og:title" content="AtomicMemory - Master the Elements">
+  <meta property="og:description" content="Master all 118 elements of the periodic table through competitive practice. Test your knowledge with score tracking, achievements, and leaderboards.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://atomicmemory.netlify.app">
+  <title>AtomicMemory - Master the Elements</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- Unified Intro/Setup Screen (used on both desktop and mobile) -->
+  <div id="introOverlay" class="intro-overlay">
+    <div class="intro-content">
+      <div class="intro-table-wrapper">
+        <div id="introPeriodicTable" class="intro-periodic-table"></div>
+      </div>
+
+      <h1 class="intro-title-text">AtomicMemory</h1>
+      <p class="intro-tagline">Learn the periodic table through an interactive, gamified experience.</p>
+      <a href="https://github.com/hello2himel/atomicmemory" target="_blank" rel="noopener noreferrer" class="intro-opensource">
+        <i class="ri-github-fill"></i> Free &amp; Open Source
+      </a>
+
+      <button id="startBtn" class="start-button">
+        <i class="ri-play-fill"></i>
+        <span>Start Challenge</span>
+      </button>
+
+      <p class="intro-hint">
+        <i class="ri-keyboard-line"></i>
+        Press Enter to start
+      </p>
+
+      <p class="intro-footer">
+        <span id="introTotalChallenges"></span>
+      </p>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div id="mainApp" class="main-app hidden">
+    <!-- Unified Top Bar -->
+    <header class="header">
+      <div class="header-title-row">
+        <h1 class="site-title">AtomicMemory</h1>
+      </div>
+      <div class="header-buttons-row">
+        <button id="menuBtn" class="header-icon-btn mobile-menu-btn" title="Menu" aria-label="Menu">
+          <i class="ri-menu-line" aria-hidden="true"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Hidden elements for JS state tracking (stats shown in bottom HUD) -->
+    <div class="hidden" aria-hidden="true">
+      <span id="currentScore">0</span>
+      <span id="currentRank">Novice</span>
+      <span id="timerDisplay">00:00</span>
+      <span id="correctCount">0</span>
+      <span id="totalCount">118</span>
+      <span id="streakDisplay">0</span>
+      <span id="accuracyDisplay">—</span>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar-container">
+      <div id="progressFill" class="progress-fill"></div>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobileMenu" class="mobile-menu hidden">
+      <div class="mobile-menu-content">
+        <div class="mobile-menu-header">
+          <h3>Menu</h3>
+          <button id="closeMobileMenu" class="close-btn" aria-label="Close menu">
+            <i class="ri-close-line" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div id="mobileMenuBody" class="mobile-menu-body">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Setup Screen is now unified with intro overlay above -->
+
+    <!-- Desktop Bottom HUD -->
+    <div id="desktopBottomBar" class="desktop-bottom-bar">
+      <div class="bottom-bar-stats-row">
+        <div class="bottom-bar-stats">
+          <div class="bottom-stat mode-toggle-inline" id="desktopModeBadge" title="Game mode">
+            <button class="mode-toggle-btn active" id="desktopModeClassic" title="Answer one element at a time with immediate feedback">Classic</button>
+            <button class="mode-toggle-btn" id="desktopModeRecall" title="Enter all elements from memory, then check your answers at once">Recall</button>
+          </div>
+          <div class="bottom-stat" title="Score" aria-label="Score">
+            <i class="ri-star-line" aria-hidden="true"></i>
+            <span id="bottomScore" role="status" aria-live="polite">0</span>
+          </div>
+          <div class="bottom-stat" title="Time" aria-label="Time">
+            <i class="ri-timer-line" aria-hidden="true"></i>
+            <span id="bottomTimer">00:00</span>
+          </div>
+          <div class="bottom-stat" title="Progress" aria-label="Progress">
+            <i class="ri-check-double-line" aria-hidden="true"></i>
+            <span id="bottomProgress">0/118</span>
+          </div>
+          <div class="bottom-stat" title="Streak" aria-label="Streak">
+            <i class="ri-fire-line" aria-hidden="true"></i>
+            <span id="bottomStreak">0</span>
+          </div>
+          <div class="bottom-stat" title="Accuracy" aria-label="Accuracy">
+            <i class="ri-percent-line" aria-hidden="true"></i>
+            <span id="bottomAccuracy">—</span>
+          </div>
+        </div>
+      </div>
+      <div class="bottom-bar-action-row">
+        <button id="leaderboardBtn" class="bottom-action-btn trophy-btn" title="Leaderboard" aria-label="Leaderboard">
+          <i class="ri-trophy-line"></i>
+          <span>Leaderboard</span>
+        </button>
+        <button id="finishBtn" class="bottom-action-btn finish-btn" title="Finish challenge" aria-label="Finish challenge">
+          <i class="ri-flag-line" aria-hidden="true"></i>
+          <span>Finish</span>
+        </button>
+        <button id="viewTableBtn" class="bottom-action-btn view-btn" title="Reveal periodic table" aria-label="Reveal periodic table">
+          <i class="ri-eye-line" aria-hidden="true"></i>
+          <span>Reveal Table</span>
+        </button>
+      </div>
+      <div class="bottom-bar-control-row">
+        <div class="hud-nav-toggle">
+          <span class="hud-nav-label">After Enter, jump to…</span>
+          <div class="hud-pill-toggle">
+            <button class="hud-nav-option active" data-nav="horizontal" title="After submitting an answer, move to the next element in the same row (period)">→ Next in Period</button>
+            <button class="hud-nav-option" data-nav="vertical" title="After submitting an answer, move to the next element in the same column (group)">↓ Next in Group</button>
+          </div>
+        </div>
+        <div class="hud-nav-btns">
+          <button id="achievementsBtn" class="header-icon-btn" title="Achievements unlocked" aria-label="Achievements">
+            <i class="ri-medal-line" aria-hidden="true"></i>
+            <span id="achievementBadge" class="notification-badge hidden" title="Total achievements unlocked">0</span>
+          </button>
+          <button id="historyBtn" class="header-icon-btn" title="Practice history" aria-label="Practice history">
+            <i class="ri-history-line" aria-hidden="true"></i>
+          </button>
+          <button id="aboutBtn" class="header-icon-btn" title="About" aria-label="About">
+            <i class="ri-information-line" aria-hidden="true"></i>
+          </button>
+          <button id="donateBtn" class="header-icon-btn donate-icon-btn" title="Donate" aria-label="Donate">
+            <i class="ri-heart-fill" aria-hidden="true"></i>
+          </button>
+          <button id="darkModeBtn" class="header-icon-btn" title="Toggle theme" aria-label="Toggle theme">
+            <i class="ri-moon-line" aria-hidden="true"></i>
+          </button>
+          <button id="resetBtn" class="header-icon-btn" title="Reset challenge" aria-label="Reset challenge">
+            <i class="ri-restart-line" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Periodic Table Container -->
+    <main class="table-container">
+      <div class="table-wrapper">
+        <div id="periodicTable" class="periodic-table"></div>
+        <div class="category-legend hidden">
+          <span class="legend-item"><span class="legend-swatch" style="background: var(--cat-alkali)"></span>Alkali Metal</span>
+          <span class="legend-item"><span class="legend-swatch" style="background: var(--cat-alkaline)"></span>Alkaline Earth</span>
+          <span class="legend-item"><span class="legend-swatch" style="background: var(--cat-transition)"></span>Transition Metal</span>
+          <span class="legend-item"><span class="legend-swatch" style="background: var(--cat-post-transition)"></span>Post-Transition</span>
+          <span class="legend-item"><span class="legend-swatch" style="background: var(--cat-metalloid)"></span>Metalloid</span>
+          <span class="legend-item"><span class="legend-swatch" style="background: var(--cat-nonmetal)"></span>Nonmetal</span>
+          <span class="legend-item"><span class="legend-swatch" style="background: var(--cat-halogen)"></span>Halogen</span>
+          <span class="legend-item"><span class="legend-swatch" style="background: var(--cat-noble)"></span>Noble Gas</span>
+          <span class="legend-item"><span class="legend-swatch" style="background: var(--cat-lanthanide)"></span>Lanthanide</span>
+          <span class="legend-item"><span class="legend-swatch" style="background: var(--cat-actinide)"></span>Actinide</span>
+        </div>
+      </div>
+      
+      <!-- Mobile Input Modal -->
+      <div id="mobileInputModal" class="mobile-input-modal hidden">
+        <div class="mobile-input-content">
+          <!-- Row 1: Centered Title -->
+          <div class="mobile-game-title-row">
+            <span class="mobile-game-title">AtomicMemory</span>
+          </div>
+
+          <!-- Row 2: Action Buttons -->
+          <div class="mobile-game-buttons-row">
+            <button class="mobile-toolbar-btn" id="mobileToolbarHistory" title="History" aria-label="Practice history">
+              <i class="ri-history-line" aria-hidden="true"></i>
+            </button>
+            <button class="mobile-toolbar-btn" id="mobileToolbarLeaderboard" title="Leaderboard" aria-label="Leaderboard">
+              <i class="ri-trophy-line" aria-hidden="true"></i>
+            </button>
+            <button class="mobile-toolbar-btn" id="mobileToolbarAchievements" title="Achievements" aria-label="Achievements">
+              <i class="ri-medal-line" aria-hidden="true"></i>
+            </button>
+            <button class="mobile-toolbar-btn" id="mobileToolbarAbout" title="About" aria-label="About">
+              <i class="ri-information-line" aria-hidden="true"></i>
+            </button>
+            <button class="mobile-toolbar-btn donate-mobile-btn" id="mobileToolbarDonate" title="Donate" aria-label="Donate">
+              <i class="ri-heart-fill" aria-hidden="true"></i>
+            </button>
+            <button class="mobile-toolbar-btn" id="mobileToolbarTheme" title="Toggle theme" aria-label="Toggle theme">
+              <i class="ri-moon-line" aria-hidden="true"></i>
+            </button>
+            <button class="mobile-toolbar-btn" id="mobileToolbarReset" title="Reset" aria-label="Reset challenge">
+              <i class="ri-restart-line" aria-hidden="true"></i>
+            </button>
+          </div>
+
+          <!-- Mobile Mode Toggle -->
+          <div class="mobile-stats-strip mobile-mode-badge-strip">
+            <div class="mode-toggle-inline" id="mobileModeBadge">
+              <button class="mode-toggle-btn active" id="mobileModeClassic" title="Answer one element at a time with immediate feedback">Classic</button>
+              <button class="mode-toggle-btn" id="mobileModeRecall" title="Enter all elements from memory, then check your answers at once">Recall</button>
+            </div>
+          </div>
+
+          <!-- Compact Stats Strip -->
+          <div class="mobile-stats-strip">
+            <span class="mobile-strip-stat"><span class="strip-label">Score</span> <span id="mobileScoreDisplay" class="strip-value">0</span></span>
+            <span class="strip-divider">|</span>
+            <span class="mobile-strip-stat"><span class="strip-label">Time</span> <span id="mobileTimerDisplay" class="strip-value">00:00</span></span>
+            <span class="strip-divider">|</span>
+            <span class="mobile-strip-stat"><span id="mobileProgressDisplay" class="strip-value">0/118</span></span>
+            <span class="strip-divider">|</span>
+            <span class="mobile-strip-stat"><i class="ri-fire-line"></i> <span id="mobileStreakDisplay" class="strip-value">0</span></span>
+            <span class="strip-divider">|</span>
+            <span class="mobile-strip-stat"><span id="mobileAccuracyDisplay" class="strip-value">—</span></span>
+          </div>
+
+          <!-- Mini Table Preview (top area) -->
+          <div id="miniTableContainer" class="mini-table-container">
+            <div id="miniPeriodicTable" class="mini-periodic-table"></div>
+          </div>
+
+          <!-- SVG connector line from mini-table cell to input card -->
+          <svg class="gc-connector-svg" id="gcConnectorSvg" aria-hidden="true">
+            <path class="gc-connector-path" id="gcConnectorPath" fill="none"/>
+          </svg>
+
+          <!-- Flexible spacer above control zone -->
+          <div class="mobile-flex-spacer"></div>
+
+          <!-- Combined Element Info + Answer Input Card (cell-like design) -->
+          <div class="gc-info-card">
+            <div class="gc-cell-box" id="gcInputBox">
+              <div class="gc-cell-atomic" id="cellAtomicNumber"></div>
+              <span class="cell-symbol-display" id="cellSymbolDisplay">—</span>
+              <div class="gc-cell-name" id="cellNameDisplay"></div>
+            </div>
+            <div class="gc-cell-position" id="cellPositionDisplay"></div>
+            <div class="mobile-input-hint hidden"></div>
+          </div>
+
+          <!-- Flexible spacer below info card -->
+          <div class="mobile-flex-spacer"></div>
+
+          <!-- Hidden real input for state tracking -->
+          <input type="text" id="mobileInput" class="mobile-input-field-hidden" maxlength="3" autocomplete="off" inputmode="none" tabindex="-1" aria-hidden="true">
+
+          <!-- Two-column Controls Row -->
+          <div class="gc-controls-row">
+            <!-- Left: D-pad card -->
+            <div class="gc-dpad-card">
+              <span class="gc-micro-label">NAVIGATE</span>
+              <div class="gc-dpad">
+                <div class="gc-dpad-top">
+                  <button id="mobileArrowUp" class="gc-dpad-btn" title="Move up" aria-label="Move up">
+                    <i class="ri-arrow-up-line"></i>
+                  </button>
+                </div>
+                <div class="gc-dpad-bottom">
+                  <button id="mobileArrowLeft" class="gc-dpad-btn" title="Move left" aria-label="Move left">
+                    <i class="ri-arrow-left-line"></i>
+                  </button>
+                  <button id="mobileArrowDown" class="gc-dpad-btn" title="Move down" aria-label="Move down">
+                    <i class="ri-arrow-down-line"></i>
+                  </button>
+                  <button id="mobileArrowRight" class="gc-dpad-btn" title="Move right" aria-label="Move right">
+                    <i class="ri-arrow-right-line"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!-- Right: Enter toggle + Finish -->
+            <div class="gc-right-col">
+              <div class="gc-enter-card">
+                <span class="gc-micro-label">AFTER ENTER, JUMP TO…</span>
+                <div class="gc-pill-toggle">
+                  <button class="gc-pill active" data-nav="horizontal">→ Next in Period</button>
+                  <button class="gc-pill" data-nav="vertical">↓ Next in Group</button>
+                </div>
+              </div>
+              <button id="mobileFinishBtn" class="gc-finish-btn" title="Finish Game" aria-label="Finish Game">
+                <i class="ri-flag-line"></i> Finish Game
+              </button>
+            </div>
+          </div>
+
+          <!-- QWERTY Keyboard -->
+          <div class="qwerty-keyboard" id="qwertyKeyboard" role="group" aria-label="On-screen keyboard">
+            <div class="qwerty-row">
+              <button class="qwerty-key" data-key="Q">Q</button>
+              <button class="qwerty-key" data-key="W">W</button>
+              <button class="qwerty-key" data-key="E">E</button>
+              <button class="qwerty-key" data-key="R">R</button>
+              <button class="qwerty-key" data-key="T">T</button>
+              <button class="qwerty-key" data-key="Y">Y</button>
+              <button class="qwerty-key" data-key="U">U</button>
+              <button class="qwerty-key" data-key="I">I</button>
+              <button class="qwerty-key" data-key="O">O</button>
+              <button class="qwerty-key" data-key="P">P</button>
+            </div>
+            <div class="qwerty-row">
+              <button class="qwerty-key" data-key="A">A</button>
+              <button class="qwerty-key" data-key="S">S</button>
+              <button class="qwerty-key" data-key="D">D</button>
+              <button class="qwerty-key" data-key="F">F</button>
+              <button class="qwerty-key" data-key="G">G</button>
+              <button class="qwerty-key" data-key="H">H</button>
+              <button class="qwerty-key" data-key="J">J</button>
+              <button class="qwerty-key" data-key="K">K</button>
+              <button class="qwerty-key" data-key="L">L</button>
+            </div>
+            <div class="qwerty-row">
+              <button class="qwerty-key qwerty-shift" data-key="SHIFT" aria-label="Shift"><i class="ri-arrow-up-s-line"></i></button>
+              <button class="qwerty-key" data-key="Z">Z</button>
+              <button class="qwerty-key" data-key="X">X</button>
+              <button class="qwerty-key" data-key="C">C</button>
+              <button class="qwerty-key" data-key="V">V</button>
+              <button class="qwerty-key" data-key="B">B</button>
+              <button class="qwerty-key" data-key="N">N</button>
+              <button class="qwerty-key" data-key="M">M</button>
+              <button class="qwerty-key qwerty-backspace" data-key="BACKSPACE" aria-label="Backspace">⌫</button>
+            </div>
+            <div class="qwerty-row qwerty-action-row">
+              <button class="qwerty-key qwerty-submit" data-key="SUBMIT" aria-label="Submit answer"><i class="ri-check-line"></i> Enter</button>
+            </div>
+          </div>
+
+          <span class="mobile-modal-rank" id="mobileRankDisplay">Novice</span>
+          <button class="mobile-input-close" aria-label="Close input">
+            <i class="ri-close-line" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Achievement Toast -->
+    <div id="achievementToast" class="achievement-toast hidden">
+      <div class="achievement-icon">
+        <i class="ri-trophy-line" aria-hidden="true"></i>
+      </div>
+      <div class="achievement-info">
+        <div class="achievement-title"></div>
+        <div class="achievement-description"></div>
+      </div>
+    </div>
+
+    <!-- Hint Toast -->
+    <div id="hintToast" class="hint-toast hidden" role="status" aria-live="polite"></div>
+
+    <!-- Score Change Floater -->
+    <div id="scoreFloater" class="score-floater hidden" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- Modals -->
+    
+    <!-- History Modal -->
+    <div id="historyModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Practice History">
+      <div class="modal-overlay"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>
+            <i class="ri-history-line" aria-hidden="true"></i>
+            Practice History
+          </h3>
+          <button id="closeHistoryBtn" class="close-modal-btn" aria-label="Close">
+            <i class="ri-close-line" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div id="historyModalBody" class="modal-body">
+          <!-- Populated by JS -->
+        </div>
+        <div class="modal-footer history-footer">
+          <div class="history-data-actions">
+            <button class="history-data-btn" id="exportDataBtn" title="Export all data">
+              <i class="ri-download-2-line"></i> Export
+            </button>
+            <button class="history-data-btn" id="importDataBtn" title="Import data">
+              <i class="ri-upload-2-line"></i> Import
+            </button>
+            <button class="history-data-btn danger" id="resetDataBtn" title="Delete all data">
+              <i class="ri-delete-bin-line"></i> Reset
+            </button>
+          </div>
+          <input type="file" id="importFileInput" accept=".json" class="hidden" aria-hidden="true">
+        </div>
+      </div>
+    </div>
+
+    <!-- Leaderboard Modal -->
+    <div id="leaderboardModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Your Top Scores">
+      <div class="modal-overlay"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>
+            <i class="ri-trophy-line" aria-hidden="true"></i>
+            Your Top Scores
+          </h3>
+          <button id="closeLeaderboardBtn" class="close-modal-btn" aria-label="Close">
+            <i class="ri-close-line" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div id="leaderboardModalBody" class="modal-body">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Achievements Modal -->
+    <div id="achievementsModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Achievements">
+      <div class="modal-overlay"></div>
+      <div class="modal-content achievements-modal-content">
+        <div class="modal-header">
+          <h3>
+            <i class="ri-medal-line" aria-hidden="true"></i>
+            Achievements
+          </h3>
+          <button id="closeAchievementsBtn" class="close-modal-btn" aria-label="Close">
+            <i class="ri-close-line" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div id="achievementsModalBody" class="modal-body">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+
+<!-- Info Modal -->
+<div id="infoModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="About AtomicMemory">
+  <div class="modal-overlay"></div>
+  <div class="modal-content info-modal-content">
+    <button id="closeInfoBtn" class="close-modal-btn info-modal-close" aria-label="Close">
+      <i class="ri-close-line" aria-hidden="true"></i>
+    </button>
+    <div class="modal-body info-modal-body">
+      <div class="info-hero">
+        <div class="info-hero-icon">
+          <i class="ri-flask-line" aria-hidden="true"></i>
+        </div>
+        <h4 class="info-story-title">The Story Behind AtomicMemory</h4>
+      </div>
+
+      <div class="info-story">
+        <p>
+          I built this as a high school student in Bangladesh.
+        </p>
+
+        <p>
+          Memorizing the periodic table was a nightmare; until my coach showed me how to
+          stop memorizing and start seeing patterns. Groups, trends, connections. Suddenly
+          118 elements felt like one coherent thing.
+        </p>
+
+        <p>
+          That shift stuck with me. So I built a game around it.
+        </p>
+      </div>
+
+      <div class="info-dedication">
+        <span class="info-dedication-label">Dedication</span>
+        <p class="info-dedication-text">
+          To <strong>Arif Haque</strong>, my Aribbai —<br>
+          he didn't just teach chemistry.<br>
+          He taught me how to <em>see</em> it.
+        </p>
+      </div>
+
+      <div class="info-links">
+        <p>Made with <span aria-label="love">❤️</span> by <a href="https://hello2himel.netlify.app" target="_blank" rel="noopener noreferrer">@hello2himel</a> from <span aria-label="Bangladesh">🇧🇩</span></p>
+        <p>Open source — <a href="https://github.com/hello2himel/atomicmemory" target="_blank" rel="noopener noreferrer">click here to view source</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <!-- Element Detail Modal -->
+    <div id="elementModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Element Details">
+      <div class="modal-overlay"></div>
+      <div class="modal-content element-modal-content">
+        <button id="closeElementBtn" class="close-modal-btn element-modal-close" aria-label="Close">
+          <i class="ri-close-line" aria-hidden="true"></i>
+        </button>
+        <div class="element-modal-scroll">
+          <div class="element-modal-hero">
+            <div class="element-modal-symbol-block">
+              <span class="element-modal-number" id="emNumber"></span>
+              <span class="element-modal-symbol" id="emSymbol"></span>
+              <span class="element-modal-mass" id="emMassBig"></span>
+            </div>
+            <div class="element-modal-titles">
+              <h3 class="element-modal-name" id="emName"></h3>
+              <div class="element-modal-badges">
+                <span class="element-modal-category" id="emCategory"></span>
+                <span class="element-modal-occurrence" id="emOccurrence"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="em-grid">
+            <div class="em-section em-full em-section-progress hidden" id="emProgressSection">
+              <div class="em-section-title"><i class="ri-bar-chart-2-line" aria-hidden="true"></i> Your Progress</div>
+              <div class="em-progress-row">
+                <div class="em-progress-bar-track">
+                  <div class="em-progress-bar-fill" id="emMasteryBar"></div>
+                </div>
+                <span class="em-progress-pct" id="emMasteryPct"></span>
+              </div>
+              <div class="em-stat-row">
+                <div class="em-stat">
+                  <span class="em-stat-value" id="emAccuracy"></span>
+                  <span class="em-stat-label">Accuracy</span>
+                </div>
+                <div class="em-stat">
+                  <span class="em-stat-value" id="emReviews"></span>
+                  <span class="em-stat-label">Reviews</span>
+                </div>
+                <div class="em-stat">
+                  <span class="em-stat-value" id="emLastSeen"></span>
+                  <span class="em-stat-label">Last seen</span>
+                </div>
+              </div>
+            </div>
+
+
+            <div class="em-section em-half">
+              <div class="em-section-title"><i class="ri-layout-grid-line" aria-hidden="true"></i> Position</div>
+              <div class="em-card-grid" id="emPositionGrid"></div>
+            </div>
+
+            <div class="em-section em-half">
+              <div class="em-section-title"><i class="ri-flashlight-line" aria-hidden="true"></i> Electronic Structure</div>
+              <div class="em-econfig-box" id="emEconfigBox"></div>
+              <div class="em-card-grid" id="emElectronicGrid"></div>
+            </div>
+
+            <div class="em-section em-full">
+              <div class="em-section-title"><i class="ri-test-tube-line" aria-hidden="true"></i> Physical Properties</div>
+              <div class="em-card-grid em-card-grid-4" id="emPhysicalGrid"></div>
+            </div>
+
+            <div class="em-section em-full">
+              <div class="em-section-title"><i class="ri-book-open-line" aria-hidden="true"></i> Discovery</div>
+              <div class="em-card-grid" id="emDiscoveryGrid">
+                <div class="em-card">
+                  <span class="em-card-label">When</span>
+                  <span class="em-card-value em-card-value-text" id="emDiscoveryText"></span>
+                </div>
+                <div class="em-card" id="emAppearanceWrap">
+                  <span class="em-card-label">Appearance</span>
+                  <span class="em-card-value em-card-value-text" id="emAppearance"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <a id="emWikiLink" class="em-wiki-link" href="#" target="_blank" rel="noopener noreferrer">
+          <i class="ri-external-link-line" aria-hidden="true"></i>
+          Read more on Wikipedia
+        </a>
+      </div>
+    </div>
+
+    <!-- Donate Modal -->
+    <div id="donateModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Support AtomicMemory">
+      <div class="modal-overlay"></div>
+      <div class="modal-content donate-modal-content">
+        <div class="donate-modal-body">
+          <div class="donate-icon-hero">
+            <i class="ri-heart-pulse-line" aria-hidden="true"></i>
+          </div>
+          <p class="donate-message">AtomicMemory is built and maintained by a student developer. Keeping it running takes both time and money. If this project has been helpful to you, please consider donating to help keep it alive and free for everyone.</p>
+          <div class="donate-actions-row">
+            <button class="donate-dismiss-btn" id="donateDismissBtn" aria-label="Maybe later">
+              <i class="ri-emotion-sad-line" aria-hidden="true"></i>
+              Maybe later
+            </button>
+            <a href="https://hello2himel.netlify.app/donate?source=AtomicMemory" target="_blank" rel="noopener noreferrer" class="donate-cta-btn">
+              <i class="ri-hand-heart-line" aria-hidden="true"></i>
+              Donate
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Challenge Complete Modal -->
+    <div id="completeModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Challenge Complete">
+      <div class="modal-overlay"></div>
+      <div class="modal-content complete-modal-content">
+        <!-- Header: icon + title + close -->
+        <div class="complete-header">
+          <div class="complete-icon">
+            <i class="ri-trophy-line"></i>
+          </div>
+          <h2 class="complete-title">Challenge Complete!</h2>
+          <button id="closeCompleteBtn" class="close-modal-btn complete-close-btn" aria-label="Close">
+            <i class="ri-close-line" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        <!-- Score block -->
+        <div class="complete-score">
+          <div class="complete-score-label">Final Score</div>
+          <div class="complete-score-value" id="finalScoreDisplay">0</div>
+          <div class="complete-rank" id="finalRankDisplay">Novice</div>
+        </div>
+
+        <!-- Stats row (3-column inline) -->
+        <div class="complete-stats-grid">
+          <div class="complete-stat">
+            <i class="ri-timer-line"></i>
+            <span class="complete-stat-value" id="completeTime">00:00</span>
+            <span class="complete-stat-label">Time</span>
+          </div>
+          <div class="complete-stat">
+            <i class="ri-percent-line"></i>
+            <span class="complete-stat-value" id="completeAccuracy">100%</span>
+            <span class="complete-stat-label">Accuracy</span>
+          </div>
+          <div class="complete-stat">
+            <i class="ri-fire-line"></i>
+            <span class="complete-stat-value" id="completeStreak">0</span>
+            <span class="complete-stat-label">Best Streak</span>
+          </div>
+        </div>
+
+        <!-- Collapsible breakdown -->
+        <div class="complete-breakdown">
+          <button class="breakdown-toggle" id="breakdownToggle" aria-expanded="false">
+            <span>Score Breakdown</span>
+            <i class="ri-arrow-down-s-line"></i>
+          </button>
+          <div class="breakdown-content hidden" id="breakdownContent">
+            <div class="breakdown-item">
+              <span>Base Score</span>
+              <span id="breakdownBase">0</span>
+            </div>
+            <div class="breakdown-item bonus">
+              <span>Bonuses</span>
+              <span id="breakdownBonus">+0</span>
+            </div>
+            <div class="breakdown-item penalty">
+              <span>Penalties</span>
+              <span id="breakdownPenalty">-0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recall Mode Suggestion -->
+        <div class="recall-suggestion hidden" id="recallSuggestion">
+          <div class="recall-suggestion-text">
+            🎯 Ready for a challenge? Try <strong>Recall Mode</strong>! Enter all elements from memory, then check your answers.
+          </div>
+          <button class="recall-suggestion-btn" id="tryRecallBtn">
+            <i class="ri-gamepad-line"></i>
+            Try Recall Mode
+          </button>
+        </div>
+
+        <!-- Actions -->
+        <div class="complete-actions">
+          <button id="playAgainBtn" class="complete-btn primary-btn">
+            <i class="ri-restart-line"></i>
+            Play Again
+          </button>
+          <button id="shareScoreBtn" class="complete-btn secondary-btn">
+            <i class="ri-share-line"></i>
+            Share
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Guide Overlay (SVG connector line + message) -->
+    <div id="guideOverlay" class="guide-overlay hidden">
+      <svg class="guide-svg" id="guideSvg" aria-hidden="true">
+        <path class="guide-path" id="guidePath" fill="none"/>
+      </svg>
+      <div class="guide-message" id="guideMessage">
+        <span class="guide-text" id="guideText"></span>
+        <button class="guide-dismiss-btn" id="guideDismissBtn">Got it</button>
+      </div>
+    </div>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confettiCanvas" class="confetti-canvas" aria-hidden="true"></canvas>
+
+
+  </div>
+
+  <!-- Custom Confirm Dialog -->
+  <div id="confirmDialog" class="confirm-dialog-overlay hidden" role="dialog" aria-modal="true">
+    <div class="confirm-dialog">
+      <div class="confirm-dialog-icon">
+        <i class="ri-question-line"></i>
+      </div>
+      <p class="confirm-dialog-message" id="confirmMessage"></p>
+      <div class="confirm-dialog-actions">
+        <button class="confirm-dialog-btn confirm-cancel" id="confirmCancel">Cancel</button>
+        <button class="confirm-dialog-btn confirm-ok" id="confirmOk">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/elements.js"></script>
+  <script src="js/achievements.js"></script>
+  <script src="js/scoring.js"></script>
+  <script src="js/cubes.js"></script>
+  <script src="js/script.js"></script>
+</body>
+</html>
